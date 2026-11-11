@@ -2,4 +2,6 @@ build/
 *.o
 *.pyc
 __pycache__/
-Sources/Apps/EditApp/s/AppName
+Sources/Apps/*/s/AppName
+Sources/Apps/Draw/s/
+Sources/Apps/Paint/s/

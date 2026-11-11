@@ -8,12 +8,12 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 
 | Works | Not yet |
 |---|---|
-| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | The other C programs: Draw, Paint, Filer_Action, Squash, DOSFS |
-| 64 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program), Calc, Configure |
+| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | The other C programs: Filer_Action, Squash, DOSFS |
+| 66 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program), Calc, Configure |
 | Supervisor prompt, keyboard, mouse, `*` commands | Palette utility on the icon bar |
 | BBC BASIC V 1.14 with graphics, FPEmulator 4.39 | Printing modules, Econet and NetFS |
 | Desktop with the RISC OS 3 look: icon bar, Filer windows, error boxes, Task Manager | Power-on self test |
-| Chars, Help and Edit run from the Apps folder | Hard disc access is untested |
+| Chars, Help, Edit, Draw and Paint run from the Apps folder | Hard disc access is untested |
 | Outline fonts (Font Manager and ROM fonts), scaled sprites (SpriteExtend) | Sound has not been listened to |
 | ADFS floppy access on the 82C711, including `ADFS_DiscOp` writes | Copy-protected floppy images (they need a track-level image format) |
 | HostFS from Arculator's support ROM (extension ROM loading) | Most games are untried |
@@ -22,7 +22,7 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 | SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC: a test program passes every check | |
 | Battle Chess (1992), a C game built with the Norcroft compiler, runs on that library | |
 
-The image uses 1.61MB of the 2MB.
+The image uses 1.86MB of the 2MB.
 
 ## Where everything comes from
 
@@ -31,6 +31,7 @@ Every file in the ROM comes from the RISC OS Open repositories or was written fo
 - The kernel and most modules are the RISC OS 3.60 sources, the oldest RISC OS Open publishes and the last to carry the MEMC1 code paths.
 - Components listed in `Sources/NEWER` come from the current RISC OS Open sources and build against current headers (`Sources/Headers5`). FPEmulator is the first.
 - SpriteExtend is built with its all-assembler code generator and no JPEG, as RISC OS 3.11's was.
+- ColourTrans's ready-made tables for plotting 16 and 32 bit per pixel sprites are left out of the ROM (83K). It builds a table when one is first wanted.
 - Changes to imported sources carry a comment starting `ROO26:` that says what changed. Where a commercial ROM was consulted to settle how something behaved, the comment names the ROM and the address.
 
 ## Building

@@ -136,8 +136,12 @@ def basic_app(runlink, version_tag=None):
 
 def c_app(name, version_tag):
     """A desktop application written in C and held in the ROM as a module, with RISC_OSLib's module wrapper
-    as its header. The wrapper takes the name and version from s.AppName (awk.AppName)."""
+    as its header. The wrapper takes the name and version from s.AppName (awk.AppName) and the files it
+    registers with ResourceFS from s.ResFiles, which Draw and Paint keep as asm.ResFiles."""
     def make(comp):
+        (comp / "s").mkdir(exist_ok=True)
+        if (comp / "asm" / "ResFiles").exists():
+            (comp / "s" / "ResFiles").write_bytes((comp / "asm" / "ResFiles").read_bytes())
         version, d, m, y = message_version(comp, version_tag)
         lines = ["; AppName - generated from Messages, used by ModuleWrap", "",
                  "                   GBLS    ApplicationName", "                   GBLS    ApplicationVersion", "",
@@ -151,7 +155,8 @@ GENERATORS = {"Internat/Territory/TerritoryManager": territory, "Video/Render/Su
               "Internat/Inter": international, "Video/Render/Fonts/ROMFonts": romfonts,
               "Apps/Chars": basic_app("Resources/UK/!RunLink,ffb"),
               "Apps/Help": basic_app("Resources/UK/ROM/!RunLink,ffb", "HelpID"),
-              "Apps/EditApp": c_app("Edit", "EditId")}
+              "Apps/EditApp": c_app("Edit", "EditId"), "Apps/Draw": c_app("Draw", "DrawID"),
+              "Apps/Paint": c_app("Paint", "PntID")}
 
 
 def main():

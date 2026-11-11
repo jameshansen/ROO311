@@ -157,14 +157,27 @@ clib() {
 
 # romapp <name>: a C application held in the ROM as a module, the way RISC OS 3 held Edit, Draw and Paint.
 # RISC_OSLib's module wrapper is its header, its C files are compiled as module code, and it calls the
-# library in the ROM directly. It comes after the SharedCLibrary in Sources/MODULES.
+# library in the ROM directly. It comes after the SharedCLibrary in Sources/MODULES, under the module's
+# title (!Edit).
 romapp() {
+	asms=
 	case $1 in
-	Edit) srcs="edit editv message slist" ;;
+	!Edit) srcs="edit editv message slist" ;;
+	!Draw) srcs="Draw DrawAction DrawCheck DrawDispl DrawDXF DrawEdit DrawEnter DrawFileIO DrawGrid DrawHelp
+		DrawMenu DrawObject DrawPrint DrawScan DrawSelect DrawTextC DrawTrans DrawUndo bezierarc"
+		asms="asm/jpeg" ;;
+	!Paint) srcs="Colours Main Menus PSprite SprWindow Tools ToolWindow"; asms="asm/jpeg asm/writepixel" ;;
 	esac
 	O="$B/$1.d"; rm -rf "$O"; mkdir -p "$O/inc"
-	for h in h/*; do ln -s "$PWD/$h" "$O/inc/${h##*/}.h"; ln -s "$PWD/$h" "$O/inc/h.${h##*/}"; done
+	# the program's own headers: "name.h" and "h.name", as spelt and in lower case (RISC OS does not mind which)
+	for h in h/*; do
+		n=${h##*/}
+		for v in "$n" "$(echo "$n" | tr A-Z a-z)"; do ln -sf "$PWD/$h" "$O/inc/$v.h"; ln -sf "$PWD/$h" "$O/inc/h.$v"; done
+	done
 	"$ASASM" -Uppercase -NOWarn -G -apcs 3/26bit -o "$O/ModuleWrap.o" "$ROOT/Sources/Lib/RISC_OSLib/s/modulewrap" || return 1
+	for s in $asms; do
+		"$ASASM" -Uppercase -NOWarn -G -apcs 3/26bit -o "$O/${s##*/}.o" "$s" || return 1
+	done
 	for c in $srcs; do
 		modcc 536 "$O/$c.o" c/$c -mapcs-stack-check -I"$O/inc" -I"$B/clib/inc" || return 1
 	done
