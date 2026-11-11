@@ -7624,7 +7624,7 @@ copyfield Entry "R0,R5"
         CMP     R14,R5                  ; terminate on \ or <=R4
         CMPNE   R14,R4
         ADDGT   R3,R3,#1
-        MOVGT   R5,#"\"                 ; now we can terminate on \
+        MOVGT   R5,#"\"                 ; now we can terminate on \ 
         BGT     %BT01
 
         EXITS
@@ -7637,7 +7637,7 @@ copyfield Entry "R0,R5"
         EXITS   LE
         SUBS    R3,R3,#1
         STRGTB  R14,[R2],#1             ; note GT => must be room for one more (the terminator)
-        MOVGT   R5,#"\"                 ; now we can terminate on \
+        MOVGT   R5,#"\"                 ; now we can terminate on \ 
         BGT     %BT02
 
         BL      xerr_buffoverflow
@@ -7661,7 +7661,7 @@ skipfield Entry "R4,R5"
 01      LDRB    R14,[R0],#1
         CMP     R14,R5                  ; terminate on \ or <=R4
         CMPNE   R14,R4
-        MOVGT   R5,#"\"                 ; now we can terminate on \
+        MOVGT   R5,#"\"                 ; now we can terminate on \ 
         BGT     %BT01
 
         SUB     R0,R0,#1                ; R0 -> terminating character

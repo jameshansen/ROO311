@@ -22,7 +22,7 @@ export HDR_PATH="$ROOT/build/Hdr" MACHINE IMAGESIZE
 
 kernel() {
 	cd "$ROOT/Sources/Kernel"
-	"$ASASM" -ABSolute -Uppercase -NOWarn -o "$B/Kernel.o" s/GetAll
+	"$ASASM" -ABSolute -Uppercase -NOWarn -G -o "$B/Kernel.o" s/GetAll
 	arm-none-eabi-ld -Ttext=0x03800000 -e 0x03800000 -o "$B/Kernel.elf" "$B/Kernel.o"
 	arm-none-eabi-objcopy -O binary "$B/Kernel.elf" "$B/Kernel"
 	echo "Kernel: $(wc -c < "$B/Kernel") bytes"

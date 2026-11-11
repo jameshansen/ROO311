@@ -164,14 +164,14 @@
           ^     0
 fscb_link       #       4
 fscb_startuptext #      4       ; Ptr to text to be printed on Filing System startup
-fscb_open       #       4       ; --\
+fscb_open       #       4       ; --\ 
 fscb_get        #       4       ;   |
 fscb_put        #       4       ;   } Addresses in same order and offset as FS_xxx
 fscb_args       #       4       ;   |
 fscb_close      #       4       ;   |
 fscb_file       #       4       ; --/
 fscb_info       #       4
-fscb_func       #       4       ; --\
+fscb_func       #       4       ; --\ 
 fscb_gbpb       #       4       ; --/
 
 fscb_modulebase  #      4       ; Ptr to module base (for * decoding primarily)
@@ -1538,7 +1538,7 @@ SetFromNameEntry NewSwiEntry "r0,r1,r4,r5,r6,fscb"
 
 ; <allowed/wild char>   ::=     <allowed char> | <wild char>
 
-; <absolute char>       ::=     $ | & | % | @ | \
+; <absolute char>       ::=     $ | & | % | @ | \ 
 
 ; <passed name>         ::=     <filename> <name term>
 ;                             | " <filename> "

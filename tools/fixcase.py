@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-"""Make GET/LNK/BIN file names in the assembler sources match the case of the files on disc.
+"""Make the assembler sources safe to build on Linux with AsAsm. Two fixes, both idempotent:
 
     python tools/fixcase.py [--check]
 
-RISC OS filing systems ignore case, so the sources name files however the author typed them
-(GET s.vdu.VduDriver for s/vdu/vdudriver). A Linux build needs the names to match. Only the
-parts of a name that resolve are touched: anything holding $variables or <variables> is left.
+1. GET/LNK/BIN file names match the case of the files on disc. RISC OS filing systems ignore case,
+   so the sources name files however the author typed them (GET s.vdu.VduDriver for
+   s/vdu/vdudriver). Only the parts of a name that resolve are touched: anything holding
+   $variables or <variables> is left.
+2. A line ending in a backslash gets a space after it. AsAsm reads a final backslash as a line
+   continuation, as ObjAsm does, and swallows the next line; AAsm did not. The sources have
+   comments that end that way ("; \\" beside the backslash's own font row).
 """
 import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "Sources"
+ASM_DIRS = {"s", "hdr", "testsrc", "oldtestsrc"}
 DIRECTIVE = re.compile(r'(^[ \t]+|")(GET|LNK|BIN|INCLUDE|INCBIN)([ \t]+)([A-Za-z0-9_:.\-!+]+)', re.M)
 
 
@@ -36,13 +41,24 @@ def resolve(base, parts):
 def main():
     check = "--check" in sys.argv
     hdrs = [d for d in ROOT.rglob("*") if d.is_dir() and d.name.lower() == "hdr"]
-    changed = unresolved = 0
+    changed = unresolved = slashes = 0
     for f in sorted(p for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts):
         try:
             text = f.read_bytes().decode("latin-1")
         except OSError:
             continue
-        if "\0" in text[:4096] or not DIRECTIVE.search(text):
+        if "\0" in text[:4096]:
+            continue
+        if ASM_DIRS & {part.lower() for part in f.parts[:-1]}:
+            new = re.sub(r"\\(\r?)$", r"\\ \1", text, flags=re.M)
+            if new != text:
+                slashes += 1
+                if check:
+                    print(f"would fix trailing backslash: {f.relative_to(ROOT)}")
+                else:
+                    f.write_bytes(new.encode("latin-1"))
+                    text = new
+        if not DIRECTIVE.search(text):
             continue
 
         def fix(m):
@@ -70,7 +86,8 @@ def main():
                 print(f"would fix: {f.relative_to(ROOT)}")
             else:
                 f.write_bytes(new.encode("latin-1"))
-    print(f"{changed} files {'need fixing' if check else 'fixed'}, {unresolved} names left alone")
+    print(f"{changed} files {'need' if check else 'had'} file names fixed, {unresolved} names left alone, "
+          f"{slashes} files {'need' if check else 'had'} trailing backslashes fixed")
 
 
 if __name__ == "__main__":

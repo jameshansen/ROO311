@@ -640,7 +640,7 @@ KeyTran ROUT
 
 50
         =       &80, &90, &A0, &B0      ; MENU now acts like f0
-        =       "\|", &1C, &1C          ; \
+        =       "\|", &1C, &1C          ; \ 
         =       "cC", &03, &03          ; C
         =       "nN", &0E, &0E          ; N
         =       &8E, &9E, &AE, &BE      ; down arrow
@@ -802,7 +802,7 @@ KeyTran2 ROUT
         =       "pP", &10, &10          ; P
         =       "[{", &1B, &1B          ; [
         =       "]}", &1D, &1D          ; ]
-        =       "\|", &1C, &1C          ; \
+        =       "\|", &1C, &1C          ; \ 
         =       &7F, &7F, &7F, &7F      ; Delete
         =       &8B, &9B, &AB, &BB      ; Copy
         =       &9E, &8E, &BE, &AE      ; Page Down

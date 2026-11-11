@@ -152,7 +152,7 @@ magic_heap_descriptor * (((((("p":SHL:8)+"a"):SHL:8)+"e"):SHL:8)+"H")
 ;      +---+--------------------+--------+
 ;  low |hpd|     heap blocks    | unused | high
 ;      +---+--------------------+---------+
-;              /|\                       /|\
+;              /|\                       /|\ 
 ;               | hpdfree                 | hpdend
 ;               | in here somewhere.
 

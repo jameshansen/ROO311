@@ -261,7 +261,7 @@ image_scaling
 ;        bit 0 set: R2 is pointer to dest co-ords, else pointer to matrix
 ;        bit 1 set: dither output when plotting 24 bit JPEG at 8bpp or below
 ;   R2 = pointer to matrix (as for Draw module), or
-;        pointer to destination co-ordinate block, depending on R1:b0\
+;        pointer to destination co-ordinate block, depending on R1:b0\ 
 ;   R3 = length of data in memory (bytes)
 ;
 ; Note: it is assumed that caller has protected register contents as required
