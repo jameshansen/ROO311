@@ -16,6 +16,7 @@ SECTIONS
     *("Stub$$Entries")
     "C$$code$$Base" = .;
     *("C$$code")
+    *("C$$Code")
     *(.text .text.*)
     "C$$code$$Limit" = .;
     *(.rodata .rodata.*)
@@ -24,8 +25,10 @@ SECTIONS
     *("RTSK$$Data")
     "RTSK$$Data$$Limit" = .;
   }
+  "Image$$RO$$Limit" = .;
   "Image$$RW$$Base" = .;
   .data : {
+    *("!!!asm$$Data")        /* Squash: the statics its header addresses, which have to come first */
     *(.data .data.*)
     . = ALIGN(4);
   }
@@ -36,6 +39,7 @@ SECTIONS
     . = ALIGN(4);
   }
   "Image$$RW$$Limit" = .;
+  "Image$$ZI$$Limit" = .;
 
   /DISCARD/ : { *(.comment) *(.note*) *(.ARM.attributes) }
 }

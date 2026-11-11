@@ -67,6 +67,7 @@ HWSupport/Sound/Voices/StringLib      s/StringLib         StringLib
 HWSupport/Sound/Voices/Percussion     s/Percussion        Percussion
 Lib/RISC_OSLib                        @clib               SharedCLibrary
 Desktop/FilerAct                      @romapp             Filer_Action
+Programmer/Squash                     @squash             Squash
 Apps/Draw                             @romapp             !Draw
 Apps/Paint                            @romapp             !Paint
 Apps/EditApp                          @romapp             !Edit

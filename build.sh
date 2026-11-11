@@ -187,6 +187,23 @@ romapp() {
 	arm-none-eabi-objcopy -O binary "$B/$1.elf" "$B/$1"
 }
 
+# The Squash module: C inside a module header of its own (s.mr_module), with no library. Its statics are
+# found through the word sl points at, where the header keeps the relocation offset (hdr.magicoff), so that
+# is the offset its C is compiled for.
+squash() {
+	O="$B/$1.d"; rm -rf "$O"; mkdir -p "$O/inc"
+	for h in h/*; do ln -s "$PWD/$h" "$O/inc/${h##*/}.h"; ln -s "$PWD/$h" "$O/inc/h.${h##*/}"; done
+	for s in s/mr_module s/statics s/comp_ass s/debug s/zcat_ass12; do
+		"$ASASM" -Uppercase -NOWarn -G -apcs 3/26bit -o "$O/${s##*/}.o" "$s" || return 1
+	done
+	for c in compress cssr trial zssr; do
+		modcc 0 "$O/$c.o" c/$c -I"$O/inc" -I"$B/clib/inc" || return 1
+	done
+	"$("$GCC" -print-prog-name=ld)" -T "$ROOT/tools/romapp.ld" -T "$B/clib/abssym.ld" --defsym ROMADDR="$(romaddr "$1")" \
+		-Map "$B/$1.map" -o "$B/$1.elf" "$O"/*.o "$("$GCC" -mmodule -print-libgcc-file-name)" &&
+	arm-none-eabi-objcopy -O binary "$B/$1.elf" "$B/$1"
+}
+
 # tests/clibtest.c as an application, linked with the library's stubs. Wants the headers clib() sets up.
 clibtest() {
 	cd "$ROOT/Sources/Lib/RISC_OSLib"
