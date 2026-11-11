@@ -343,6 +343,12 @@ gotsizeandshrink
         MOVNE   r11, #ChangeDyn_FreeAndApl              ; else make src indicator reflect that we need both
         MOVNE   r5, r2                                  ; but save amount we are taking from freepool
         B       %FT10
+ |
+; ROO26: without a free pool there is nothing more to try, and a source other than application space may
+; move less than was asked for. The branch had ended up inside the UseFreePool case above, so a MEMC1 build
+; fell through into testrestoreheapend and returned to a stale lr. RISC OS 3.11 branches here too
+; (ROM311 &0380AAC0, BNE to the same place when the source is not application space).
+        B       %FT10
  ]
 
  [ (:LNOT: NewStyle_SysHeap) :LOR: (:LNOT: NewStyle_RMA)

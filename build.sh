@@ -25,6 +25,8 @@ kernel() {
 	"$ASASM" -ABSolute -Uppercase -NOWarn -G -o "$B/Kernel.o" s/GetAll
 	arm-none-eabi-ld -Ttext=0x03800000 -e 0x03800000 -o "$B/Kernel.elf" "$B/Kernel.o"
 	arm-none-eabi-objcopy -O binary "$B/Kernel.elf" "$B/Kernel"
+	# Disassembly with the source line of each instruction, for finding an address from a line and back
+	arm-none-eabi-objdump -dl -Mreg-names-raw "$B/Kernel.elf" | sed "s|$ROOT/||" > "$B/Kernel.lst"
 	echo "Kernel: $(wc -c < "$B/Kernel") bytes"
 }
 
