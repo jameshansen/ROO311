@@ -29,7 +29,7 @@ Every file in the ROM comes from the RISC OS Open repositories or was written fo
 
 ## Building
 
-The build runs on Linux and needs AsAsm from GCCSDK (`svn://svn.riscos.info/gccsdk/trunk/tools/asasm`), `binutils-arm-none-eabi` and Python 3.
+The build runs on Linux and needs AsAsm from GCCSDK (`svn://svn.riscos.info/gccsdk/trunk/tools/asasm`), `binutils-arm-none-eabi` and Python 3. The C parts need GCC 4.7.4 for RISC OS. [toolchain/README.md](toolchain/README.md) says how to build both and what each one needs.
 
 ```bash
 ASASM=/path/to/asasm sh build.sh
