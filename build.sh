@@ -167,6 +167,7 @@ romapp() {
 		DrawMenu DrawObject DrawPrint DrawScan DrawSelect DrawTextC DrawTrans DrawUndo bezierarc"
 		asms="asm/jpeg" ;;
 	!Paint) srcs="Colours Main Menus PSprite SprWindow Tools ToolWindow"; asms="asm/jpeg asm/writepixel" ;;
+	Filer_Action) srcs="actionwind Initialise Buttons memmanage listfiles Chains debug"; asms="s/allerrs" ;;
 	esac
 	O="$B/$1.d"; rm -rf "$O"; mkdir -p "$O/inc"
 	# the program's own headers: "name.h" and "h.name", as spelt and in lower case (RISC OS does not mind which)

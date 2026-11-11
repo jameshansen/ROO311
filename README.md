@@ -8,11 +8,12 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 
 | Works | Not yet |
 |---|---|
-| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | The other C programs: Filer_Action, Squash, DOSFS |
-| 66 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program), Calc, Configure |
+| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | The C modules with a generated header: Squash, DOSFS |
+| 67 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program), Calc, Configure |
 | Supervisor prompt, keyboard, mouse, `*` commands | Palette utility on the icon bar |
 | BBC BASIC V 1.14 with graphics, FPEmulator 4.39 | Printing modules, Econet and NetFS |
-| Desktop with the RISC OS 3 look: icon bar, Filer windows, error boxes, Task Manager | Power-on self test |
+| Desktop with the RISC OS 3 look: icon bar, Filer windows, error boxes, Task Manager |
+| Filer operations through Filer_Action (delete and count tried) | Power-on self test |
 | Chars, Help, Edit, Draw and Paint run from the Apps folder | Hard disc access is untested |
 | Outline fonts (Font Manager and ROM fonts), scaled sprites (SpriteExtend) | Sound has not been listened to |
 | ADFS floppy access on the 82C711, including `ADFS_DiscOp` writes | Copy-protected floppy images (they need a track-level image format) |
@@ -22,7 +23,7 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 | SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC: a test program passes every check | |
 | Battle Chess (1992), a C game built with the Norcroft compiler, runs on that library | |
 
-The image uses 1.86MB of the 2MB.
+The image uses 1.89MB of the 2MB.
 
 ## Where everything comes from
 
