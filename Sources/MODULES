@@ -12,6 +12,8 @@ Internat/Territory/UK                 s/UK                UK
 Desktop/Wimp                          s/Wimp              WindowManager
 Desktop/Desktop                       s/Desktop           Desktop
 Desktop/Switcher                      s/Switcher          TaskManager
+Apps/Chars                            s/Main              !Chars
+Apps/Help                             s/Main              !Help
 FileSys/ADFS/ADFSFiler                s/ADFSFiler         ADFSFiler
 HWSupport/ARM                         s/GetAll            ARM3Support
 Programmer/BASIC                      ModuleAB            BASIC

@@ -78,6 +78,10 @@ resdata() {
 
 # every module in Sources/MODULES; reports the ones that fail and carries on
 modules() {
+	# generated files first: gathering the resources wants some of them
+	grep -v '^[#-]' "$ROOT/Sources/MODULES" | while read dir src name; do
+		[ -n "$name" ] && python3 "$ROOT/tools/prepare.py" "$ROOT/Sources/$dir"
+	done
 	resdata
 	export RESDATA="$B/resdata"
 	grep -v '^[#-]' "$ROOT/Sources/MODULES" | while read dir src name; do

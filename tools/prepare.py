@@ -106,8 +106,33 @@ def romfonts(comp):
     (enc / "Base0").write_bytes((enc / ".Base0").read_bytes())
 
 
+def basic_app(runlink, version_tag=None):
+    """A desktop application written in BASIC and held in the ROM as a module: the program goes into the
+    module as a ResourceFS file and a short !RunLink program runs it in place. The original build crunched
+    and squashed both (the "squish" tool) to save space; here they go in as they are. Some take their
+    module version from a tag in their Messages file (awk.Version)."""
+    def make(comp):
+        (comp / "Resources" / "!RunImage,ffb").write_bytes((comp / "bas" / "!RunImage,ffb").read_bytes())
+        (comp / runlink).write_bytes((comp / "bas" / "!RunLink,ffb").read_bytes())
+        if version_tag:
+            for line in (comp / "Resources" / "UK" / "Messages").read_text(encoding="latin-1").splitlines():
+                tag, _, rest = line.partition(":")
+                if tag == version_tag:
+                    version, date = rest.split()[:2]            # "2.28 (18-Jan-95)"
+                    d, m, y = date.strip("()").split("-")
+                    lines = ["; > Version - generated from Messages, used by s.Main", "",
+                             "        GBLS    VString", "        GBLS    Date", "",
+                             f'VString SETS    "{version}"', f'Date    SETS    "{d} {m} 19{y}"', "",
+                             "        END", ""]
+                    (comp / "s" / "Version").write_text("\n".join(lines))
+                    break
+    return make
+
+
 GENERATORS = {"Internat/Territory/TerritoryManager": territory, "Video/Render/Super": supersample,
-              "Internat/Inter": international, "Video/Render/Fonts/ROMFonts": romfonts}
+              "Internat/Inter": international, "Video/Render/Fonts/ROMFonts": romfonts,
+              "Apps/Chars": basic_app("Resources/UK/!RunLink,ffb"),
+              "Apps/Help": basic_app("Resources/UK/ROM/!RunLink,ffb", "HelpID")}
 
 
 def main():
