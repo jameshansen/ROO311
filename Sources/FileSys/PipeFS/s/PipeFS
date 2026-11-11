@@ -1788,7 +1788,7 @@ skipdollar ENTRY
         CMP     R14, #"$"
         CMPNE   R14, #"@"
         CMPNE   R14, #"%"
-        CMPNE   R14, #"\"
+        CMPNE   R14, #&5C
         EXIT    NE
 
         LDRB    R14, [R1, #1]

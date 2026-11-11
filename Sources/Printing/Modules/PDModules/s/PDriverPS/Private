@@ -61,7 +61,7 @@ output_PSstring_charloop
 
         CMP     R2,#68                          ;Insert a "\<newline>" escape
         BLO     output_PSstring_nonewline       ;  sequence if required to
-        MOV     R0,#"\"                         ;  limit the length of an
+        MOV     R0,#&5C                         ;  limit the length of an
         [       PSDebugBPuts
         BL      bput
         |
@@ -92,7 +92,7 @@ output_PSstring_nonewline
 
 output_PSstring_escapedchar
         ADD     R2,R2,#3
-        MOV     R0,#"\"
+        MOV     R0,#&5C
         [       PSDebugBPuts
         BL      bput
         |
@@ -116,10 +116,10 @@ output_PSstring_escapedchar
         B       output_PSstring_dolastchar
 
 output_PSstring_normalchar                      ;Note V clear on arrival here
-        TEQ     R3,#"\"                         ;Escape it in if it is "\",
+        TEQ     R3,#&5C                         ;Escape it in if it is "\",
         TEQNE   R3,#"("                         ;  "(" or ")"
         TEQNE   R3,#")"
-        MOVEQ   R0,#"\"
+        MOVEQ   R0,#&5C
         ADDEQ   R2,R2,#1
         [       PSDebugBPuts
         BLEQ    bput

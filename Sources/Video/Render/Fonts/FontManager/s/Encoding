@@ -781,7 +781,7 @@ get_name_from_id Entry "R0-R4"
         ADD     R0,R1,#1                ; skip number terminator
         LDR     R1,[sp,#3*4]            ; R1 -> output buffer
 11      LDRB    R14,[R0],#1
-        CMP     R14,#"\"
+        CMP     R14,#&5C
         CMPNE   R14,#" "-1              ; space does not terminate names
         MOVLE   R14,#0
         STRB    R14,[R1],#1
@@ -803,7 +803,7 @@ get_name_from_id Entry "R0-R4"
 
 03      LDR     R1,[sp,#3*4]            ; R1 -> output buffer
 31      LDRB    R14,[R0],#1
-        CMP     R14,#"\"
+        CMP     R14,#&5C
         CMPNE   R14,#" "                ; space terminates identifiers
         MOVLE   R14,#0
         STRB    R14,[R1],#1
@@ -817,7 +817,7 @@ get_name_from_id Entry "R0-R4"
         MOV     R14,#0
 41      STRB    R14,[R1,#-1]!           ; store identifier reversed (to correct for output)
         LDRB    R14,[R0],#1
-        CMP     R14,#"\"
+        CMP     R14,#&5C
         CMPNE   R14,#" "
         BGT     %BT41
 

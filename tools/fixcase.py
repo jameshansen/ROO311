@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Make the assembler sources safe to build on Linux with AsAsm. Two fixes, both idempotent:
+"""Make the assembler sources safe to build on Linux with AsAsm. Three fixes, all idempotent:
 
     python tools/fixcase.py [--check]
 
@@ -10,6 +10,9 @@
 2. A line ending in a backslash gets a space after it. AsAsm reads a final backslash as a line
    continuation, as ObjAsm does, and swallows the next line; AAsm did not. The sources have
    comments that end that way ("; \\" beside the backslash's own font row).
+3. A backslash character constant, "\\" or '\\', becomes &5C. AsAsm reads a backslash in a string as
+   the start of a C escape sequence, so "\\" is a string with no end. Longer strings that hold a
+   backslash are left for a hand edit ("abc", &5C, "def").
 """
 import re
 import sys
@@ -38,6 +41,20 @@ def resolve(base, parts):
     return out
 
 
+def backslash_constant(line):
+    """&5C for "\\" and '\\' in the code part of a line (not in its comment)."""
+    if "\\" not in line:
+        return line
+    code, quote = len(line), False
+    for i, ch in enumerate(line):
+        if ch == '"':
+            quote = not quote
+        elif ch == ";" and not quote:
+            code = i
+            break
+    return line[:code].replace('"\\"', "&5C").replace("'\\'", "&5C") + line[code:]
+
+
 def main():
     check = "--check" in sys.argv
     hdrs = [d for d in ROOT.rglob("*") if d.is_dir() and d.name.lower() == "hdr"]
@@ -51,10 +68,11 @@ def main():
             continue
         if ASM_DIRS & {part.lower() for part in f.parts[:-1]}:
             new = re.sub(r"\\(\r?)$", r"\\ \1", text, flags=re.M)
+            new = "\n".join(backslash_constant(line) for line in new.split("\n"))
             if new != text:
                 slashes += 1
                 if check:
-                    print(f"would fix trailing backslash: {f.relative_to(ROOT)}")
+                    print(f"would fix backslashes: {f.relative_to(ROOT)}")
                 else:
                     f.write_bytes(new.encode("latin-1"))
                     text = new
@@ -87,7 +105,7 @@ def main():
             else:
                 f.write_bytes(new.encode("latin-1"))
     print(f"{changed} files {'need' if check else 'had'} file names fixed, {unresolved} names left alone, "
-          f"{slashes} files {'need' if check else 'had'} trailing backslashes fixed")
+          f"{slashes} files {'need' if check else 'had'} backslashes fixed")
 
 
 if __name__ == "__main__":

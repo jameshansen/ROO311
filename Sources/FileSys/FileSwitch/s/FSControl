@@ -1233,7 +1233,7 @@ AccessEntry NewSwiEntry "r0-r9,fscb"
 ; ========
 
 ; In    r1 -> command tail
-PSDPath DCB "\", 0
+PSDPath DCB &5C, 0
         ALIGN
 
 BackEntry

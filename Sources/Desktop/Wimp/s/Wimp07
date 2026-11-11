@@ -1840,7 +1840,7 @@ starterrorbox_draw
         CMP     R4,#0
         BLE     %FT01
         LDRB    R14,[R4]
-        TEQ     R14,#"\"
+        TEQ     R14,#&5C
         ADDEQ   R4,R4,#1
 01
 ;

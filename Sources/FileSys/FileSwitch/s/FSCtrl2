@@ -1722,7 +1722,7 @@ IsAbsolute
         TEQNE   r0, #"&"                ; URD
         TEQNE   r0, #"@"                ; CSD
         TEQNE   r0, #"%"                ; LIB. New symbol
-        TEQNE   r0, #"\"                ; PSD. New symbol
+        TEQNE   r0, #&5C                ; PSD. New symbol
         MOV     pc, lr
 
 ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

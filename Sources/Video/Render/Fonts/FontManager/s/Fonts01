@@ -4291,7 +4291,7 @@ appendqualifieretc Entry "R0-R2"
         SUB     sp,sp,#16
         MOV     R1,sp
 
-        MOV     R14,#"\"
+        MOV     R14,#&5C
         STRB    R14,[R1],#1
         STRB    R0,[R1],#1              ; "\<qualifier>"
 
@@ -7579,7 +7579,7 @@ findmatchingfield Entry "R2,R3"
         MOV     R3,R1                           ; remember start of test string
 
         LDRB    R14,[R0]
-        TEQ     R14,#"\"
+        TEQ     R14,#&5C
         LDREQB  R2,[R0,#1]
         MOVEQ   R4,#31                          ; terminate on ctrl-char if qualifier present
         MOVNE   R4,#32                          ; terminate on space otherwise
@@ -7595,7 +7595,7 @@ findmatchingfield Entry "R2,R3"
         LDRB    R14,[R1]                        ; R14 = first character in this field
         SUBHI   R1,R1,#2                        ; move back to identifier start
 
-        CMP     R14,#"\"
+        CMP     R14,#&5C
         CMPNE   R14,R4                          ; if field was null,
         ADDLE   R4,R4,#&10000                   ; make ALL characters terminators (ie. generate a null string)
 
@@ -7624,7 +7624,7 @@ copyfield Entry "R0,R5"
         CMP     R14,R5                  ; terminate on \ or <=R4
         CMPNE   R14,R4
         ADDGT   R3,R3,#1
-        MOVGT   R5,#"\"                 ; now we can terminate on \ 
+        MOVGT   R5,#&5C                 ; now we can terminate on \ 
         BGT     %BT01
 
         EXITS
@@ -7637,7 +7637,7 @@ copyfield Entry "R0,R5"
         EXITS   LE
         SUBS    R3,R3,#1
         STRGTB  R14,[R2],#1             ; note GT => must be room for one more (the terminator)
-        MOVGT   R5,#"\"                 ; now we can terminate on \ 
+        MOVGT   R5,#&5C                 ; now we can terminate on \ 
         BGT     %BT02
 
         BL      xerr_buffoverflow
@@ -7652,7 +7652,7 @@ copyfield Entry "R0,R5"
 skipfield Entry "R4,R5"
 
         LDRB    R14,[R0]
-        TEQ     R14,#"\"
+        TEQ     R14,#&5C
         MOVEQ   R4,#31                  ; terminate on ctrl-char if qualifier present
         MOVNE   R4,#32                  ; terminate on space otherwise
 
@@ -7661,7 +7661,7 @@ skipfield Entry "R4,R5"
 01      LDRB    R14,[R0],#1
         CMP     R14,R5                  ; terminate on \ or <=R4
         CMPNE   R14,R4
-        MOVGT   R5,#"\"                 ; now we can terminate on \ 
+        MOVGT   R5,#&5C                 ; now we can terminate on \ 
         BGT     %BT01
 
         SUB     R0,R0,#1                ; R0 -> terminating character

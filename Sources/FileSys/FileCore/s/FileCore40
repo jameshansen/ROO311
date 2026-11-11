@@ -40,7 +40,7 @@ RootChar        * "$"
 UserRootChar    * "&"
 LibChar         * "%"
 CsdChar         * "@"
-BackChar        * "\"
+BackChar        * &5C
 
 UpChar          * "^"
 

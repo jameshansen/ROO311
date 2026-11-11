@@ -2256,7 +2256,7 @@ checkvalid
         TEQ     R4,#"~"
         EOREQ   R8,R8,#1                ; toggle in/excluding state
         BEQ     %BT01
-        TEQ     R4,#"\"
+        TEQ     R4,#&5C
         LDREQB  R4,[R3],#1              ; 'escaped' char
 
         LDRB    R5,[R3],#1
@@ -2270,7 +2270,7 @@ checkvalid
         TEQNE   R5,#"-"
         TEQNE   R5,#"~"
         BEQ     errcheck                ; can't allow non-escaped separator
-        TEQ     R5,#"\"
+        TEQ     R5,#&5C
         LDREQB  R5,[R3],#1              ; 'escaped' char
 
         CMP     R6,R4
@@ -2316,7 +2316,7 @@ findcommand
         Pull    "PC",CC                 ; not found (Z unset)
         TEQ     R14,#";"
         BEQ     %BT01
-        TEQ     R14,#"\"
+        TEQ     R14,#&5C
         BNE     %BT02
         LDRB    R14,[R3],#1             ; skip 'escape'd char
         CMP     R14,#32
@@ -2734,7 +2734,7 @@ crmenuiconlp
         MOV     x0,#0
         MOV     x1,#24
         LDR     R1,reversedmenu         ; Is it a reversed menu?
-        CMP     R1,#"\"
+        CMP     R1,#&5C
         LDREQ   x0,menuiconwidth        ; Put it where the arrow is
         ADDEQ   x0,x0,#24               ; supposed to be.
         ADDEQ   x1,x0,#24
@@ -2782,7 +2782,7 @@ crmenuiconlp
 
         BNE     %FT01
         LDR     x0,reversedmenu         ; Is it a reversed menu ?
-        CMP     x0,#"\"
+        CMP     x0,#&5C
         ORRNE   R1,R1,#if_numeric       ; If not all icons are numeric.
         BNE     %FT01
         TST     R1,#if_numeric
@@ -2812,7 +2812,7 @@ crmenuiconlp
         MOV     x0,x1
         ADD     x1,x0,#24               ; width of arrow icon
         LDR     R1,reversedmenu         ; Is it a reversed menu?
-        CMP     R1,#"\"
+        CMP     R1,#&5C
         MOVEQ   x0,#0                   ; Put it where tick is supposed to be
         MOVEQ   x1,#24
         LDR     R1,menuarrowflags
@@ -2823,7 +2823,7 @@ crmenuiconlp
         ORRGT   R2,R2,#&89              ; right-arrow
         BICLE   R1,R1,#if_sprite        ; Isn't a sprite if no arrow.
         LDR     R14,reversedmenu        ; Is it a reversed menu?
-        CMP     R14,#"\"
+        CMP     R14,#&5C
         EOREQ   R2,R2,#1                ; Make it a left arrow.
 
         Debuga  menuparam,"Create arrow @",x0,y0,x1,y1
@@ -2874,7 +2874,7 @@ goopenwindow TraceL sc
         TST     R14,#1
         BNE     %FT05
         LDR     R14,reversedmenu       ; is it in a reversed menu?
-        CMP     R14,#"\"
+        CMP     R14,#&5C
         LDR     R14,dx
         ADDNE   cx0,cx0,R14
         ADDNE   cx1,cx1,R14
@@ -3317,7 +3317,7 @@ createmenutitle ENTRY ""
 
         STRGE   R14,[handle,#w_flags]   ; flag as being present if required
 
-        TEQ     R0,#"\"                 ; is it a reversed menu?
+        TEQ     R0,#&5C                 ; is it a reversed menu?
         ADDEQ   R1,R1,#1
         B       %FT10                   ; and then we are finished.
 
@@ -3338,7 +3338,7 @@ createmenutitle ENTRY ""
 
         STRGE   R14,[handle,#w_flags]   ; no, so remove it!
 
-        TEQ     R0,#"\"
+        TEQ     R0,#&5C
         BICEQ   R1,R1,#&FF
         ORREQ   R1,R1,#" "              ; if reversed then remove first character
 
@@ -3352,7 +3352,7 @@ createmenutitle ENTRY ""
 
         LDR     R0,[handle,#w_titleflags]
         LDR     R14,reversedmenu
-        TEQ     R14,#"\"
+        TEQ     R14,#&5C
         ORRNE   R0,R0,#if_numeric
         TST     R4, #mif_longtitle
         ORRNE   R0,R0,#if_indirected     ; modify the title flags
@@ -3847,12 +3847,12 @@ intopmenu
  [ Version < 311
         LDR     R2,[handle,#w_wax1]             ; start at right of this menu
         LDR     R3,reversedmenu
-        CMP     R3,#"\"
+        CMP     R3,#&5C
         LDREQ   R2,[handle,#w_wax0]
  |
         LDR     R2,[handle,#w_wax0]             ; LH edge of window
         LDR     R3,reversedmenu
-        CMP     R3,#"\"
+        CMP     R3,#&5C
         LDREQ   R2,[handle,#w_wax0]
         LDRNE   R14,[handle,#w_icons]           ; If not reversed menu find RH edge of arrow
         BEQ     %FT05

@@ -692,7 +692,7 @@ ObtainAbsoluteParts ENTRY "r0-r5,r7", 4
         addr    r3, Default_CSD_Path, EQ
         TEQ     r7, #"%"
         addr    r3, Default_LibD_Path, EQ
-        TEQ     r7, #"\"
+        TEQ     r7, #&5C
         addr    r3, Default_PSD_Path, EQ
         TEQ     r7, #"&"
         addr    r3, Default_URD_Path, EQ
@@ -703,7 +703,7 @@ ObtainAbsoluteParts ENTRY "r0-r5,r7", 4
         addr    r3, Default_CSD_Whan_Path, EQ
         TEQ     r7, #"%"
         addr    r3, Default_LibD_Whan_Path, EQ
-        TEQ     r7, #"\"
+        TEQ     r7, #&5C
         addr    r3, Default_PSD_Whan_Path, EQ
         TEQ     r7, #"&"
         addr    r3, Default_URD_Whan_Path, EQ
@@ -831,7 +831,7 @@ ObtainAbsoluteParts ENTRY "r0-r5,r7", 4
 95
         TEQ     r0, #"@"
         MOVEQ   r4, #Dir_Current
-        TEQ     r0, #"\"
+        TEQ     r0, #&5C
         MOVEQ   r4, #Dir_Previous
         TEQ     r0, #"&"
         MOVEQ   r4, #Dir_UserRoot

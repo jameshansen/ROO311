@@ -33,4 +33,10 @@ OptNoControl * 1:SHL:13
 OptMends * 1:SHL:14
 OptNoMends * 1:SHL:15
         OPT     OldOpt
+
+; ROO26: AAsm's LEADR set the load address of the module file it wrote. AsAsm writes an object file and
+; has no such directive, so it is accepted here and does nothing. Every source GETs this header first.
+        MACRO
+        LEADR   $address
+        MEND
         END

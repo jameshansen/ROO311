@@ -4,7 +4,7 @@
 Arthur120       SETL    {FALSE}
 
                 GBLL    UkPCKeyboard
-UkPCKeyboard    SETL    {TRUE}
+UkPCKeyboard    SETL    {FALSE}         ; ROO26: was {TRUE}. An Archimedes has the A1 keyboard (UkA1Kbd)
 
                 GBLS    GetUKKbd
  [ UkPCKeyboard

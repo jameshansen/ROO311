@@ -842,7 +842,7 @@ returntaskhandle
         ADD     R1,sp,#ms_yourref               ; R5 set up earlier!
         STMIA   R1!,{R2-R5}
         LDRB    R14,[R0]
-        TEQ     R14,#"\"
+        TEQ     R14,#&5C
         ADDEQ   R0,R0,#1
         BL      copy0                   ; copy from [R0] to [R1]
 ;

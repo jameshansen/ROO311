@@ -57,17 +57,26 @@ FixLoaderBug    SETL    True
         ;   The following assembly-time variables control the final
         ; form of the podule manager, and should be changed with care.
 
+; ROO26: these four were fixed at the Risc PC's arrangement (8 podules, the network podule, EASI space, no
+; extension ROMs). An IOC machine has 4 podules and none of the rest, and reading the EASI address of a
+; podule there is an address exception. It does have extension ROMs, between &03400000 and the main ROM,
+; as RISC OS 3.11's Podule 1.26 supported. The source already allowed for each case.
+
                 GBLA    NumberOfPodules                 ; Excluding the network podule
-NumberOfPodules SETA    8
-
                 GBLL    NetworkPodule
-NetworkPodule   SETL    True
-
                 GBLL    EASISpace
-EASISpace       SETL    True
-
                 GBLL    ExtensionROMs
+ [ IO_Type = "IOMD"
+NumberOfPodules SETA    8
+NetworkPodule   SETL    True
+EASISpace       SETL    True
 ExtensionROMs   SETL    False
+ |
+NumberOfPodules SETA    4
+NetworkPodule   SETL    False
+EASISpace       SETL    False
+ExtensionROMs   SETL    True
+ ]
 
         [       :LNOT: ReleaseVersion
         !       0, "This version supports " :CC: ((:STR:NumberOfPodules) :RIGHT: 1) :CC: " podules"
@@ -726,7 +735,7 @@ TryNextPodule
         DLINE   " extension ROMs"
   ]
         TEQ     r10, #0
-        BEQ     %99
+        BEQ     ExitLoadLoaders                         ; ROO26: was %99, a label that no longer exists
         MOV     r8, #-2
 LoadExtensionROMLoop
   [  DebugModule

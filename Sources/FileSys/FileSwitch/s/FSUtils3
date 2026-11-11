@@ -1160,7 +1160,7 @@ Util_SpecialDir ENTRY "r1"
         CMPNE   r14, #"&"               ; URD ?
         CMPNE   r14, #"@"               ; CSD ?
         CMPNE   r14, #"%"               ; LIB ?
-        CMPNE   r14, #"\"               ; PSD ?
+        CMPNE   r14, #&5C               ; PSD ?
         LDREQB  r14, [r1, #1]
         CMPEQ   r14, #0                 ; followed by terminator
         EXIT    EQ

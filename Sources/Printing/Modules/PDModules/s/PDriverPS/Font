@@ -379,7 +379,7 @@ font_locateescape    ENTRY   "r2"
 01      CMP     r2, #32         ; control?
         BLT     %FT99           ; yes, so fail
 
-        TEQ     r2, #'\'        ; backslash?
+        TEQ     r2, #&5C        ; backslash?
         BNE     %BT00           ; no, so continue
 
         LDRB    r2, [r0], #1    ; get char after backslash
@@ -406,7 +406,7 @@ font_locatename         ENTRY   "r1,r3"
 
         MOV     r0, r1          ; not found.  get the string ptr back
         LDRB    r1, [r0]        ; check first char
-        TEQ     r0, #'\'        ; if it is not a backslash
+        TEQ     r0, #&5C        ; if it is not a backslash
         BEQ     %FT99
 
         CLRV                    ; then assume the font NAME portion starts there
@@ -435,12 +435,12 @@ font_compareR4andR5     ENTRY   "r0,r1,r4,r5"
 
 00      LDRB    r0, [r4], #1    ; get a byte of the first string
         LowerCase r0, lr        ; ASCII lowercase
-        TEQ     r0, #'\'        ; make \ equivalent to 0
+        TEQ     r0, #&5C        ; make \ equivalent to 0
         MOVEQ   r0, #0          ; character ends up in R0
 
         LDRB    r1, [r5], #1    ; as above for second string
         LowerCase r1, lr        ; character ends up in R1
-        TEQ     r1, #'\'
+        TEQ     r1, #&5C
         MOVEQ   r1, #0
 
         CMP     r0, #32         ; is first a terminator?
@@ -644,7 +644,7 @@ font_paintchunk_text
 
 00      LDRB    r14, [r0], #1                   ; get the next byte
         TEQ     r14, #0                         ; if it's not the terminator
-        TEQNE   r14, #"\"                       ; and not a backslash
+        TEQNE   r14, #&5C                       ; and not a backslash
         BNE     %BT00                           ; then continue
         MOV     r14, #0                         ; but if it is, then put a zero over it
         STRB    r14, [r0, #-1]                  ; remembering that we're pointing beyond it!

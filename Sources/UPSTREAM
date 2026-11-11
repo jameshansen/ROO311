@@ -81,3 +81,6 @@ HWSupport/Mouse                      HWSupport/Mouse                      30b5d4
 Video/UserI/Display                  Video/UserI/Display                  99cabe4  RISC OS 3.60 source import (1996-11-05)
 Video/UserI/ScrModes                 Video/UserI/ScrModes                 1aa6d45  RISC OS 3.60 source import (1996-11-05)
 Programmer/HdrSrc                    Programmer/HdrSrc                    403c6dd  HdrSrc-1_60 (2008-03-21), registration headers only: AUN CMOS Countries DevNos Devices DrawObj FSNumbers FileTypes Freeway GraphicsV KEYV Keyboard Messages NewErrors OsWords PDriverReg PDumperReg PaletteV PoduleReg Pointer SWIs Services UpCall
+Programmer/HostFS                    Programmer/HostFS                    68871b3  RISC OS 3.60 source import (1996-11-05)
+Networking/Econet                    Networking/Econet                    413ae41  RISC OS 3.60 source import (1996-11-05)
+FileSys/SCSIFS/SCSIFS                FileSys/SCSIFS/SCSIFS                cf2be5d  RISC OS 3.60 source import (1996-11-05)

@@ -69,7 +69,7 @@ CheckDiscName ROUT
         TEQNE   lr, #"^"
         TEQNE   lr, #"&"
         TEQNE   lr, #"*"
-        TEQNE   lr, #"\"
+        TEQNE   lr, #&5C
         TEQNE   lr, #":"
         TEQNE   lr, #""""
         TEQNE   lr, #"."
