@@ -69,10 +69,12 @@ clean:
 resources:
 	${MKDIR} ${RESDIR}.${COMPONENT}
 	${CP} Resources.${LOCALE}.Messages   ${RESDIR}.${COMPONENT}.Messages   ${CPFLAGS}
-	${CP} Resources.${LOCALE}.Template3D ${RESDIR}.${COMPONENT}.Templates  ${CPFLAGS}
+# ROO26: the flat templates and window tools go into the ROM in place of the 3D ones (Template3D, Tools3d),
+# for the RISC OS 3 look, and the high resolution sprites (Sprites22, 219K) stay out, as they did from the
+# RISC OS 3.11 ROM. All four files are still in Resources.
+	${CP} Resources.${LOCALE}.Templates  ${RESDIR}.${COMPONENT}.Templates  ${CPFLAGS}
 	${CP} Resources.${LOCALE}.Sprites    ${RESDIR}.${COMPONENT}.Sprites    ${CPFLAGS}
-	${CP} Resources.${LOCALE}.Sprites22  ${RESDIR}.${COMPONENT}.Sprites22  ${CPFLAGS}
-	${CP} Resources.${LOCALE}.Tools3d    ${RESDIR}.${COMPONENT}.Tools      ${CPFLAGS}
+	${CP} Resources.${LOCALE}.Tools      ${RESDIR}.${COMPONENT}.Tools      ${CPFLAGS}
 	@echo ${COMPONENT}: resource files copied
 
 ${TARGET}: ${SOURCE}

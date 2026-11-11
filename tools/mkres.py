@@ -83,7 +83,7 @@ def gather(comp, locale, files, missing):
         if re.match(r"resources[^:]*:", line):
             inside = True
             continue
-        if inside and line[:1] not in ("\t", " ", ""):
+        if inside and line[:1] not in ("\t", " ", "", "#"):
             inside = False
         f = expand(line, v).split()
         if not inside or len(f) < 3 or f[0] != "copy":
