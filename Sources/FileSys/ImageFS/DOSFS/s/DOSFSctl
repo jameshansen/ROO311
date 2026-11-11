@@ -63,16 +63,16 @@ RMAalloc        SETL    {TRUE}          ; include RMA allocation routines
 
         ; -------------------------------------------------------------------
 
-        GET     "Hdr:listopts"
-        GET     "Hdr:macros"
-        GET     "Hdr:system"
+        GET     Hdr:ListOpts
+        GET     Hdr:Macros
+        GET     Hdr:System
 ;        GET     "Hdr:File"
-        GET     "Hdr:modhand"
-        GET     "Hdr:wimp"
-        GET     "Hdr:hostfs"
-        GET     "Hdr:NdrDebug"
-        GET     "Hdr:DDVMacros"
-        GET     "s.MFSmacros"
+        GET     Hdr:ModHand
+        GET     Hdr:Wimp
+        GET     Hdr:HostFS
+        GET     Hdr:NdrDebug
+        GET     Hdr:DDVMacros
+        GET     s.MFSmacros
 
         ; -------------------------------------------------------------------
 

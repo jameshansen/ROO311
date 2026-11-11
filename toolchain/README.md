@@ -69,6 +69,8 @@ GNU `ld` from the GCCSDK build links the module with `tools/clib.ld`, at the add
 
 A C program held in the ROM (Edit is the first) is a module too: RISC_OSLib's module wrapper is its header and its C files are module code that keeps the client's offset. It links with `tools/romapp.ld` and the ROM stubs (`rlib.s.rl_stub_rm`) at its own address in the ROM, after the library. It calls the library directly, at the addresses in a list `build.sh` makes from the linked library (`PROVIDE(name = address)` for each symbol, which gives way to a symbol of the program's own). Its zero-initialised statics and the stubs' room for the library's statics take no ROM space.
 
+Two modules have headers of their own. Squash's is hand-written and keeps the relocation offset in the word `sl` points at, so its C is compiled for that offset (`modcc 0`). DOSFS's comes from a description file (`cmhg.DOSFShdr`), which CMunge turns into assembler for 26-bit code (`cmunge -tnorcroft -26bit -s`); AsAsm assembles it. Of the C header CMunge writes, only the `#define` lines are used, since its declarations of the module's handlers do not match a 1996 source. The description file carries a `date-string`, so that the build does not stamp the day it ran into the ROM.
+
 A C application on disc links with `tools/app.ld` and the library's stubs (`clib.s.cl_stub_r`) into a plain image that loads and runs at `&8000`.
 
 ### Changes to the sources for GCC
@@ -114,7 +116,7 @@ docker build -t roo26-gcc /some/work/dir
 
 `fetch.sh` checks out GCCSDK's build recipe at revision 7800 and downloads the source archives the recipe needs, each checked against `SHA256SUMS`. The recipe itself checks GCC out from the closed `gcc-4_7-branch` of GCC's Subversion repository during the build, so the build needs the network.
 
-The compiler ends up in the image at `/gccsdk/cross/bin` (`arm-unknown-riscos-gcc` and binutils) with GCCSDK's tools in `/gccsdk/env/bin` (`cmunge`, `elf2aif`, `asasm`). To use it outside the container, copy it out; it runs from any folder:
+The compiler ends up in the image at `/gccsdk/cross/bin` (`arm-unknown-riscos-gcc` and binutils), with GCCSDK's tools beside it (`cmunge`, `elf2aif`, `asasm`). To use it outside the container, copy it out; it runs from any folder:
 
 ```bash
 docker create --name roo26-gcc-x roo26-gcc && docker cp roo26-gcc-x:/gccsdk/cross ./cross && docker cp roo26-gcc-x:/gccsdk/env ./env && docker rm roo26-gcc-x

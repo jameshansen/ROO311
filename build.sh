@@ -152,7 +152,20 @@ clib() {
 	# library defines, which they call directly. PROVIDE gives way to a program's own symbol of the same name.
 	# The area boundaries (Area$$Base, Area$$Limit) are left out: each program's link makes its own.
 	"$ASASM" -Uppercase -NOWarn -apcs 3/26bit -o "$O/romstubs.obj" rlib/s/rl_stub_rm &&
+	"$ASASM" -Uppercase -NOWarn -apcs 3/26bit -o "$O/romcstubs.obj" clib/s/cl_stub_rm &&
 	arm-none-eabi-nm -g --defined-only "$B/$1.elf" | awk '$3 !~ /[$][$]/ { printf "PROVIDE(\"%s\" = 0x%s);\n", $3, $1 }' > "$O/abssym.ld"
+}
+
+# hdrlinks <include folder> <header>...: make each header includable as "name.h" and "h.name", as spelt,
+# in lower case and in upper case. RISC OS does not mind which, and the sources use all three.
+hdrlinks() {
+	inc=$1; shift
+	for h; do
+		n=${h##*/}
+		for v in "$n" "$(echo "$n" | tr A-Z a-z)" "$(echo "$n" | tr a-z A-Z)"; do
+			ln -sf "$PWD/$h" "$inc/$v.h"; ln -sf "$PWD/$h" "$inc/h.$v"
+		done
+	done
 }
 
 # romapp <name>: a C application held in the ROM as a module, the way RISC OS 3 held Edit, Draw and Paint.
@@ -170,11 +183,7 @@ romapp() {
 	Filer_Action) srcs="actionwind Initialise Buttons memmanage listfiles Chains debug"; asms="s/allerrs" ;;
 	esac
 	O="$B/$1.d"; rm -rf "$O"; mkdir -p "$O/inc"
-	# the program's own headers: "name.h" and "h.name", as spelt and in lower case (RISC OS does not mind which)
-	for h in h/*; do
-		n=${h##*/}
-		for v in "$n" "$(echo "$n" | tr A-Z a-z)"; do ln -sf "$PWD/$h" "$O/inc/$v.h"; ln -sf "$PWD/$h" "$O/inc/h.$v"; done
-	done
+	hdrlinks "$O/inc" h/*
 	"$ASASM" -Uppercase -NOWarn -G -apcs 3/26bit -o "$O/ModuleWrap.o" "$ROOT/Sources/Lib/RISC_OSLib/s/modulewrap" || return 1
 	for s in $asms; do
 		"$ASASM" -Uppercase -NOWarn -G -apcs 3/26bit -o "$O/${s##*/}.o" "$s" || return 1
@@ -192,7 +201,7 @@ romapp() {
 # is the offset its C is compiled for.
 squash() {
 	O="$B/$1.d"; rm -rf "$O"; mkdir -p "$O/inc"
-	for h in h/*; do ln -s "$PWD/$h" "$O/inc/${h##*/}.h"; ln -s "$PWD/$h" "$O/inc/h.${h##*/}"; done
+	hdrlinks "$O/inc" h/*
 	for s in s/mr_module s/statics s/comp_ass s/debug s/zcat_ass12; do
 		"$ASASM" -Uppercase -NOWarn -G -apcs 3/26bit -o "$O/${s##*/}.o" "$s" || return 1
 	done
@@ -201,6 +210,29 @@ squash() {
 	done
 	"$("$GCC" -print-prog-name=ld)" -T "$ROOT/tools/romapp.ld" -T "$B/clib/abssym.ld" --defsym ROMADDR="$(romaddr "$1")" \
 		-Map "$B/$1.map" -o "$B/$1.elf" "$O"/*.o "$("$GCC" -mmodule -print-libgcc-file-name)" &&
+	arm-none-eabi-objcopy -O binary "$B/$1.elf" "$B/$1"
+}
+
+# DOSFS: a C module whose header is generated from a description (cmhg.DOSFShdr). CMunge, which the GCCSDK
+# build installs beside the compiler, writes the header as assembler for 26-bit code. The module uses the
+# C library only, through the ROM stubs.
+dosfs() {
+	O="$B/$1.d"; rm -rf "$O"; mkdir -p "$O/inc"
+	hdrlinks "$O/inc" h/*
+	# Of the C header CMunge writes, only the #define lines are kept, which is what the header generator of
+	# the time gave. The rest declares the module's handlers with types the 1996 source does not match.
+	"$(dirname "$(command -v "$GCC")")/cmunge" -tnorcroft -26bit -s "$O/hdr.s" -d "$O/cmunge.h" cmhg/DOSFShdr &&
+	grep '^#' "$O/cmunge.h" > "$O/inc/DOSFShdr.h" && ln -s DOSFShdr.h "$O/inc/h.DOSFShdr" &&
+	"$ASASM" -Uppercase -NOWarn -apcs 3/26bit -o "$O/DOSFShdr.o" "$O/hdr.s" || return 1
+	# -apcs none, as its Makefile has it: s.DOSFSctl gives the names v1 to v5 to registers of its own choosing
+	for s in s/DOSFSctl s/StaticDefs s/init; do
+		"$ASASM" -Uppercase -NOWarn -G -apcs none -o "$O/${s##*/}.o" "$s" || return 1
+	done
+	for c in DOSFS DOSFSops DOSnaming FSerrors TIMEconv wcompare debug MsgTrans Statics; do
+		modcc 536 "$O/$c.o" c/$c -I"$O/inc" -I"$B/clib/inc" || return 1
+	done
+	"$("$GCC" -print-prog-name=ld)" -T "$ROOT/tools/romapp.ld" -T "$B/clib/abssym.ld" --defsym ROMADDR="$(romaddr "$1")" \
+		-Map "$B/$1.map" -o "$B/$1.elf" "$O"/*.o "$B/clib/romcstubs.obj" "$("$GCC" -mmodule -print-libgcc-file-name)" &&
 	arm-none-eabi-objcopy -O binary "$B/$1.elf" "$B/$1"
 }
 

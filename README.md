@@ -8,8 +8,8 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 
 | Works | Not yet |
 |---|---|
-| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | DOSFS (C, with a generated module header) |
-| 68 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program), Calc, Configure |
+| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | DOSFS is in the ROM but has not read a DOS disc yet |
+| 69 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program), Calc, Configure |
 | Supervisor prompt, keyboard, mouse, `*` commands | Palette utility on the icon bar |
 | BBC BASIC V 1.14 with graphics, FPEmulator 4.39 | Printing modules, Econet and NetFS |
 | Desktop with the RISC OS 3 look: icon bar, Filer windows, error boxes, Task Manager |
@@ -23,7 +23,7 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 | SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC: a test program passes every check | |
 | Battle Chess (1992), a C game built with the Norcroft compiler, runs on that library | |
 
-The image uses 1.89MB of the 2MB.
+The image uses 1.95MB of the 2MB.
 
 ## Where everything comes from
 

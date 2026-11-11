@@ -20,6 +20,9 @@
 ; ---------------------------------------------------------------------------
 
 help-string: DOSFS 0.62
+; ROO26: the header generator stamps the day of the build unless it is given a date, which made every
+; build of the ROM different. This is the date DOSFS 0.62 has in the RISC OS 3.60 ROM (its help string).
+date-string: 01 Mar 1995
 title-string: DOSFS
 library-initialisation-code: _dosfs_initialisemodule
 initialisation-code: init_fs

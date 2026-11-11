@@ -71,3 +71,4 @@ Programmer/Squash                     @squash             Squash
 Apps/Draw                             @romapp             !Draw
 Apps/Paint                            @romapp             !Paint
 Apps/EditApp                          @romapp             !Edit
+FileSys/ImageFS/DOSFS                 @dosfs              DOSFS

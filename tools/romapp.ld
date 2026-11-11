@@ -12,12 +12,14 @@ SECTIONS
   "Image$$RO$$Base" = .;
   .text : {
     *("!!!Module$$Header")
+    *("!Header$$code")       /* the name CMunge gives a generated header */
     *("Stub$$Code")
     *("Stub$$Entries")
     "C$$code$$Base" = .;
     *("C$$code")
     *("C$$Code")
     *(.text .text.*)
+    INPUT_SECTION_FLAGS (SHF_EXECINSTR) *(*)     /* code areas with names of a module's own */
     "C$$code$$Limit" = .;
     *(.rodata .rodata.*)
     . = ALIGN(4);
