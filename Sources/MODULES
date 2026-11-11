@@ -13,6 +13,8 @@ Desktop/Desktop                       s/Desktop           Desktop
 Desktop/Switcher                      s/Switcher          TaskManager
 FileSys/ADFS/ADFSFiler                s/ADFSFiler         ADFSFiler
 HWSupport/ARM                         s/GetAll            ARM3Support
+Programmer/BASIC                      ModuleAB            BASIC
+Programmer/BASIC                      TransSrc            BASICTrans
 HWSupport/Buffers                     s/Buffers           BufferManager
 Video/Render/Colours                  MakeNew             ColourTrans
 Programmer/Debugger                   s/Debugger          Debugger
@@ -24,6 +26,7 @@ FileSys/ADFS/ADFS                     s/ADFS              ADFS
 FileSys/RAMFS/RAMFS                   s/RamFS             RamFS
 Desktop/Filer                         s/Filer             Filer
 Desktop/FilerSWIs                     s/FilerSWIs         FilerSWIs
+Video/Render/Fonts/FontManager        s/Fonts             FontManager
 Desktop/Free                          s/Free              Free
 Video/Render/Hourglass                NewOS               Hourglass
 HWSupport/IIC                         s/IICMod            IIC
@@ -36,8 +39,10 @@ Printing/Modules/PDumperSpt           s/PDumperSpt        PDumperSupport
 Internat/IntKey                       UK/Source/IntKeyMod InternationalKeyboard
 Desktop/Pinboard                      s/Pinboard          Pinboard
 FileSys/PipeFS                        s/PipeFS            PipeFS
+- Portable: for the A4 laptop. The RISC OS 3.60 source drives the Stork prototype's IOMD registers as well.
 FileSys/RAMFS/RAMFSFiler              s/RAMFSFiler        RAMFSFiler
 FileSys/ResourceFS/ResFiler           s/ResFiler          ResourceFiler
+Video/Render/Fonts/ROMFonts           s/ROMFonts          ROMFonts
 HWSupport/RTCAdjust                   s/RTC               RTCAdjust
 Video/Render/ScrBlank                 s/ScrBlank          ScreenBlanker
 HWSupport/Serial                      s/Serial            SerialDeviceDriver
@@ -52,3 +57,6 @@ HWSupport/SystemDevs                  s/SystemDevs        SystemDevices
 Desktop/TaskWindow                    s/Taskman           TaskWindow
 Desktop/WimpUtils                     s/WimpUtils2        WindowUtils
 Desktop/Filter                        s/FilterMgr         FilterManager
+HWSupport/Sound/Voices/WaveSynth      s/WaveSynth         WaveSynth
+HWSupport/Sound/Voices/StringLib      s/StringLib         StringLib
+HWSupport/Sound/Voices/Percussion     s/Percussion        Percussion

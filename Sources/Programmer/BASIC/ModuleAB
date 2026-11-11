@@ -322,7 +322,7 @@ Service_Reset      * &27
 Service_UKConfig   * &28
 Service_UKStatus   * &29
 
- LEADR Module_LoadAddr
+; ROO26: LEADR Module_LoadAddr stood here. BASIC includes no shared headers, so nothing defines it for AsAsm.
 
 Module_BaseAddr * .
 

@@ -20,7 +20,7 @@
         GET     Hdr:System
         GET     Hdr:CPU.ARM600
         GET     Hdr:IO.IOC-A1
-        GET     Hdr:VIDC.VIDC1A ; VIDC20
+        GET     Hdr:VIDC.VIDC1a ; VIDC20
         GET     Hdr:MEMM.MEMC1  ; ARM600
 
         GET     Hdr:Symbols

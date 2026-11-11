@@ -52,7 +52,7 @@ origin
         GET     hdr:Territory
         GET     hdr:NdrDebug
         GET     hdr:PublicWS
-        GET     hdr:hostfs
+        GET     hdr:HostFS
 
         GET     s.Errors
         GET     s.Fonts01

@@ -101,7 +101,7 @@ Debug5  switch  F       ;SCSI drivers border colours
 Debug6  switch  F       ;SCSI drivers tube debug
 Debug9  switch  F       ;useful routines
 
-        GET     hdr.MyMacros
+        GET     hdr.mymacros
         GET     hdr.CoreHdr
 
 bit0    bit 0

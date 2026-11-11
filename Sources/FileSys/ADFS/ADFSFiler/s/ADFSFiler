@@ -1564,7 +1564,7 @@ mo_fl_unprot    Item    "M32"
 
                 DCB     0                       ; terminator
 
-mv_namedisc     DCB     "A~$&%@\\^:.#*""| ", 0  ; disallow funny chars
+mv_namedisc     DCB     "A~$&%@", &5C, &5C, "^:.#*""| ", 0  ; disallow funny chars
 
         [ Version >= 40
 OtherFormatsToken       DCB     "OForms",0

@@ -46,7 +46,7 @@ TOKENS   = Hdr:Tokens
 #
 COMPONENT = BASIC
 EXPORTS   = ${EXP_HDR}.BASICTrans
-TARGETS   = rm.BASIC105 \
+TARGETS   = rm.BASIC105 \ 
             rm.BASICTrans
 
 #

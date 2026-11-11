@@ -100,8 +100,14 @@ def international(comp):
         subprocess.run(["arm-none-eabi-objcopy", "-O", "binary", str(obj), str(comp / "s" / "IntHelpTok")], check=True)
 
 
+def romfonts(comp):
+    """Fonts.Encodings.Base0: a copy of the file RISC OS calls "/Base0", under a name AsAsm can open."""
+    enc = comp / "Fonts" / "Encodings"
+    (enc / "Base0").write_bytes((enc / ".Base0").read_bytes())
+
+
 GENERATORS = {"Internat/Territory/TerritoryManager": territory, "Video/Render/Super": supersample,
-              "Internat/Inter": international}
+              "Internat/Inter": international, "Video/Render/Fonts/ROMFonts": romfonts}
 
 
 def main():

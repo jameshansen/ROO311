@@ -20,6 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "Sources"
 ASM_DIRS = {"s", "hdr", "testsrc", "oldtestsrc"}
+ASM_COMPONENTS = ("Programmer/BASIC",)          # components that keep their assembler sources in their top folder
 DIRECTIVE = re.compile(r'(^[ \t]+|")(GET|LNK|BIN|INCLUDE|INCBIN)([ \t]+)([A-Za-z0-9_:.\-!+]+)', re.M)
 
 
@@ -52,7 +53,20 @@ def backslash_constant(line):
         elif ch == ";" and not quote:
             code = i
             break
-    return line[:code].replace('"\\"', "&5C").replace("'\\'", "&5C") + line[code:]
+    head = line[:code].replace('"\\"', "&5C").replace("'\\'", "&5C")
+    if "\\" in head and re.match(r"\S*\s+(DCB|=)\s", head):
+        # a data directive: "ab\cd" becomes "ab", &5C, "cd"
+        def split(m):
+            parts = m.group(1).split("\\")
+            out = []
+            for i, part in enumerate(parts):
+                if i:
+                    out.append("&5C")
+                if part:
+                    out.append(f'"{part}"')
+            return ", ".join(out)
+        head = re.sub(r'"((?:[^"]|"")*)"', lambda m: split(m) if "\\" in m.group(1) else m.group(0), head)
+    return head + line[code:]
 
 
 def main():
@@ -66,7 +80,7 @@ def main():
             continue
         if "\0" in text[:4096]:
             continue
-        if ASM_DIRS & {part.lower() for part in f.parts[:-1]}:
+        if ASM_DIRS & {part.lower() for part in f.parts[:-1]} or f.parent.relative_to(ROOT).as_posix() in ASM_COMPONENTS:
             new = re.sub(r"\\(\r?)$", r"\\ \1", text, flags=re.M)
             new = "\n".join(backslash_constant(line) for line in new.split("\n"))
             if new != text:
