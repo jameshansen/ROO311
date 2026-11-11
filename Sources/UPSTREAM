@@ -86,3 +86,13 @@ Networking/Econet                    Networking/Econet                    413ae4
 FileSys/SCSIFS/SCSIFS                FileSys/SCSIFS/SCSIFS                cf2be5d  RISC OS 3.60 source import (1996-11-05)
 Headers5/HdrSrc                      Programmer/HdrSrc                    8cae000  Current headers (2026-11-03), hdr only: for components newer than the 3.60 import
 Headers5/Kernel                      Kernel                               b9d8f88  Current kernel headers (hdr only), for the same components
+HWSupport/SCSI/SCSIDriver            HWSupport/SCSI/SCSIDriver            b66d919  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/SCSI hdr/SCSIErr
+Printing/Modules/MakePSFont          Printing/Modules/MakePSFont          3a30327  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/MakePSFont
+FileSys/FSLock                       FileSys/FSLock                       ecb3a1a  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/FSLock
+Desktop/DragAnObj                    Desktop/DragAnObj                    18e00b5  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/DragAnObj
+HWSupport/DMA                        HWSupport/DMA                        f5471a8  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/DMA
+Programmer/DDTHdr                    Programmer/DDTHdr                    dbb725c  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/DDT
+Video/UserI/Picker                   Video/UserI/Picker                   a257093  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/ColourPick
+FileSys/CDFS/CDFS                    FileSys/CDFS/CDFS                    6ce12ee  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/CDFS
+HWSupport/CD/CDFSDriver              HWSupport/CD/CDFSDriver              4ab9044  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/CDROM hdr/CDErrors
+HWSupport/CD/ATAPI                   HWSupport/CD/ATAPI                   e5462ee  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/ATAPI

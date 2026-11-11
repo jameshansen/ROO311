@@ -1729,13 +1729,13 @@ default_unwind_handler Keep
         ; were saved in this frame.
         MOV     ip, #1
         ADD     v2, a4, #frame_prevfp
-        MOV     v3, #v6
+        MOV     v3, #9                  ; ROO26: was #v6, a register name as a number, which AsAsm rejects
         ADD     v4, a1, #uwb_r4-r4*4
 01      TST     v1, ip, ASL v3
         LDRNE   r14, [v2, #-4]!
         STRNE   r14, [v4, v3, ASL #2]
         SUB     v3, v3, #1
-        CMP     v3, #v1
+        CMP     v3, #4                  ; ROO26: was #v1
         BGE     %B01
 
         ; now look for floating point stores immediately after the savemask
