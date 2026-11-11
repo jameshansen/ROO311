@@ -27,4 +27,4 @@ Pfx                SETS  "art_"
 
         GET     "s.h_Regs"
         GET     "s.h_Brazil"
-        LNK     s.ArthurAsm
+        LNK     s.arthurasm

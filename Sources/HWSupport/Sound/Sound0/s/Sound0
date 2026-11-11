@@ -136,7 +136,7 @@
         GET     Hdr:MsgTrans
         GET     Hdr:HostFS
         GET     Hdr:DDVMacros
-        GET     Hdr:NDRDebug
+        GET     Hdr:NdrDebug
 ;        GET     Hdr:IO.IOMD
 ;        GET     Hdr:MEMC.MEMC2
 

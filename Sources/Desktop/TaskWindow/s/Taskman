@@ -231,7 +231,7 @@ Regs    SETS    "r1-r12, r14"
         GBLL    hostvdu
 hostvdu SETL    {FALSE}
 
-        GET     Hdr:NDRDebug
+        GET     Hdr:NdrDebug
         GBLL    debugndr
         GBLL    debugenv
         GBLL    debugup

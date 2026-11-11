@@ -54,4 +54,4 @@ TransformString
         BNE     %B02
         EXITS                   ; return r0
 
-        LNK     s.tail
+        LNK     s.Tail

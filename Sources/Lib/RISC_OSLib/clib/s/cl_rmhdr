@@ -67,7 +67,7 @@ Code_HelpString
     [ :LEN: "$ModuleHelpName" < 8
         DCB     TAB
     ]
-        GET     s.Version
+        GET     s.version
         DCB     0
         ALIGN
 

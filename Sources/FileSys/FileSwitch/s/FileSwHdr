@@ -33,7 +33,7 @@
         GET     Hdr:FileTypes
         GET     Hdr:VduExt
         GET     Hdr:UpCall
-        GET     Hdr:LowFSi
+        GET     Hdr:LowFSI
         GET     Hdr:Wimp              ; It happens to us all in the end ...
         GET     Hdr:MsgTrans
         GET     Hdr:Territory

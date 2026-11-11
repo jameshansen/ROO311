@@ -257,7 +257,7 @@ DoMorrisROMHeader SETS  ""
     [ MEMC_Type = "IOMD"
         B       CONT                            ; PhysROM is at zero on IOMD
     |
-        B       MOSROMVecs+CONT                 ; executed out of ROM or RAM
+        BWrap   MOSROMVecs+CONT                 ; executed out of ROM or RAM
     ]
    ]
         B       UndInstInReset
@@ -295,7 +295,7 @@ MOSROMVecs
         LDR     pc, MOSROMVecs+ProcVec_PrefAb
         LDR     pc, MOSROMVecs+ProcVec_DataAb
         LDR     pc, MOSROMVecs+ProcVec_AddrEx
-        B       MOSROMVecs+IRQ_Test_CTRL_or_R_Pressed
+        BWrap   MOSROMVecs+IRQ_Test_CTRL_or_R_Pressed
 
         MOV     r10, #IOC               ; we dunno what to do with it -
                                         ; so cut it off - right off!
@@ -357,24 +357,24 @@ MOSROMVecs
    [ MEMC_Type = "IOMD"
         B       CONT                            ; PhysROM is at zero on IOMD
    |
-        B       MOSROMVecs+CONT                 ; executed out of ROM or RAM
+        BWrap   MOSROMVecs+CONT                 ; executed out of ROM or RAM
                                                 ; or not at all if test software present
    ]
   ]
 
   [ CPU_Type = "ARM600"
-        B       MOSROMVecs+UndPreVeneer
-        B       MOSROMVecs+SVC
-        B       MOSROMVecs+PAbPreVeneer
-        B       MOSROMVecs+DAbPreVeneer
+        BWrap   MOSROMVecs+UndPreVeneer
+        BWrap   MOSROMVecs+SVC
+        BWrap   MOSROMVecs+PAbPreVeneer
+        BWrap   MOSROMVecs+DAbPreVeneer
   |
         LDR     PC, MOSROMVecs+UndHan
-        B       MOSROMVecs+SVC
+        BWrap   MOSROMVecs+SVC
         LDR     PC, MOSROMVecs+PAbHan
         LDR     PC, MOSROMVecs+DAbHan
   ]
         LDR     PC, MOSROMVecs+AdXHan
-        B       MOSROMVecs+IRQ_Test_CTRL_or_R_Pressed
+        BWrap   MOSROMVecs+IRQ_Test_CTRL_or_R_Pressed
         MOV     R10, #IOC               ; we dunno what to do with it -
                                         ; so cut it off - right off!
         STRB    R10, [R10, #IOCFIQMSK]  ; :LSB: IOC = 0

@@ -229,7 +229,7 @@ Module_BaseAddr
         GET     Hdr:UpCall
         GET     Hdr:MsgMenus
         GET     Hdr:DragASprit
-        GET     Hdr:NDRDebug
+        GET     Hdr:NdrDebug
 
         GBLL    hostvdu
 hostvdu SETL    true

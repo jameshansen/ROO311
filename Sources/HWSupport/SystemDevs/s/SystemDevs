@@ -82,7 +82,7 @@ OSByte_ReadPrinterDestination * 245
         GET     Hdr:Proc
         GET     Hdr:FSNumbers
         GET     Hdr:HighFSI
-        GET     Hdr:LowFSi
+        GET     Hdr:LowFSI
         GET     Hdr:NewErrors
 ;        GET     Hdr:Debug
 ;        GET     Hdr:HostDebug

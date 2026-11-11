@@ -29,8 +29,8 @@ Calling_Standard   SETS  "APCS_A"
 ModeMayBeNonUser   SETL  {FALSE}
 DDE                SETL  {TRUE}
 
-        GET     s.h_Regs
-        GET     s.h_Brazil
+        GET     s.h_regs
+        GET     s.h_brazil
         GET     s.h_objmacro
 
         Module  kernel

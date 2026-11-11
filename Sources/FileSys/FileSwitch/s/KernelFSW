@@ -38,7 +38,7 @@ Use_fsfile_Load SETL True
         GET     Hdr:FileTypes
         GET     Hdr:Wimp
         GET     Hdr:UpCall
-        GET     Hdr:LowFSi
+        GET     Hdr:LowFSI
 
         GET     FSW:Sources.DebugOpts
         GET     FSW:Sources.FileSwBody

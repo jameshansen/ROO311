@@ -90,7 +90,7 @@ Module_BaseAddr
         GET     Hdr:Proc
         GET     Hdr:Services
         GET     Hdr:MsgTrans
-        GET     Hdr:NDRDebug
+        GET     Hdr:NdrDebug
         GET     Hdr:PublicWS
         GET     Hdr:Squash
 

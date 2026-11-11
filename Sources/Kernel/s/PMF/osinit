@@ -373,6 +373,7 @@ UpdateLatchB
         Pull    "R2, R3, PC"
 
 
+ [ MorrisSupport                ; ROO26: only called under MorrisSupport, and it writes IOMD registers
 ; *****************************************************************************
 ;
 ;       UpdateMonitorTypeLatch - update monitor type latch and soft copy
@@ -398,6 +399,7 @@ UpdateMonitorTypeLatch
 
         TEQP    R14, #0                 ;Re-enable IRQ
         Pull    "R2, R3, PC"
+ ]
 
 
 ; *****************************************************************************

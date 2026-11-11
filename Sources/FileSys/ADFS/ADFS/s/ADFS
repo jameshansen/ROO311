@@ -42,13 +42,13 @@
         GET     Hdr:CPU.ARM600
 
         GET     s.NewBits
-        GET     s.ADFSMacros
+        GET     s.AdfsMacros
         GET     s.Consts
         GET     s.DebugOpts
         GET     s.ModHeader
-        GET     s.ADFSErrors
-        GET     s.ADFS00
-        GET     s.ADFS05
+        GET     s.AdfsErrors
+        GET     s.Adfs00
+        GET     s.Adfs05
         GBLS    GRBA
  [ MEMC1A
 GRBA    SETS    "MEMC1ABits"
@@ -56,13 +56,13 @@ GRBA    SETS    "MEMC1ABits"
 GRBA    SETS    "MEMC1Bits"
  ]
         GET     s.$GRBA
-        GET     s.ADFS15
-        GET     s.ADFS17
-        GET     s.ADFS18
-        GET     s.ADFS19
-        GET     s.ADFS20
+        GET     s.Adfs15
+        GET     s.Adfs17
+        GET     s.Adfs18
+        GET     s.Adfs19
+        GET     s.Adfs20
         GET     s.TokenHelp
-        GET     s.ADFS50
+        GET     s.Adfs50
         GET     s.MFormat
 
         END

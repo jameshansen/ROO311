@@ -179,7 +179,10 @@ Module          SETL    {FALSE}
  [ MorrisSupport
 IncludeTestSrc  SETL    {TRUE}
  |
-IncludeTestSrc  SETL    :LNOT: (MEMM_Type = "MEMC2") ; not on internal test versions
+; ROO26: the power-on self test in TestSrc was reworked for the Risc PC and no longer assembles for a
+; MEMC1 machine (32-bit mode macros, a missing Mem1MEMC1a), so it is left out for now. RISC OS 3.11 ran it:
+; the coloured borders at power on. Without it the ROM starts at the reset code in s.Kernel.
+IncludeTestSrc  SETL    {FALSE}
  ]
 
                 GBLL    NormalSpeedROMS
@@ -192,7 +195,7 @@ RISCPCBurstMode SETL    {FALSE}
 ;>>>could be replaced by NormalSpeedROMS
 
                 GBLL    Select16BitSound
-Select16BitSound SETL   {TRUE}
+Select16BitSound SETL   MEMC_Type = "IOMD"      ; ROO26: was {TRUE}; the code it selects reads IOMD registers
 
                 GBLL    Simulator               ; running on simulator?
 Simulator       SETL    {FALSE}
@@ -369,7 +372,7 @@ ProcessorVectors        SETL    {TRUE}          ; Processor vectors indirected t
 
                     GBLS  GetUnsqueeze
  [ SqueezeMods
-GetUnsqueeze        SETS  "GET s.Unsqueeze"
+GetUnsqueeze        SETS  "GET s.UnSqueeze"
  |
 GetUnsqueeze        SETS  ""
  ]
@@ -395,15 +398,15 @@ GetMemInfo          SETS  ""
  ]
 
  [ VIDC_Type = "VIDC20"
-GetPalette          SETS  "GET s.Vdu.VduPal20"
+GetPalette          SETS  "GET s.vdu.vdupal20"
  |
-GetPalette          SETS  "GET s.Vdu.VduPal10"
+GetPalette          SETS  "GET s.vdu.vdupal10"
  ]
 
 
                     GBLS    GetRS423
  [ DriversInKernel
-GetRS423            SETS  "GET s.PMF.rs423"
+GetRS423            SETS  "GET s.PMF.RS423"
  |
 GetRS423            SETS  ""
  ]
@@ -424,7 +427,7 @@ GetKbdRes           SETS  "GET s.KbdResA1"
 
                     GBLS  GetKey2
  [ AssembleA1KeyHandler
-GetKey2             SETS  "GET s.PMF.Key2"
+GetKey2             SETS  "GET s.PMF.key2"
  |
 GetKey2             SETS  ""
  ]
@@ -509,8 +512,16 @@ largest_rma_size    * (128*1024)                 ; and the ceiling for rma use
         GET     Hdr:Wimp
         GET     Hdr:ColourTran
         GET     Hdr:Debug
-        GET     s.PMF.DEF          ; Common with 6502 code in the keyboard
+        GET     s.PMF.Def          ; Common with 6502 code in the keyboard
         Protocol
+
+; ROO26: a branch to a target more than 32MB away, for code that is copied to page zero and branches back
+; into ROM. AAsm wrapped such an offset within the 26-bit address space and assembled a plain B; AsAsm
+; refuses it, so the same instruction word is written out as data.
+        MACRO
+$label  BWrap   $dest
+$label  &       &EA000000 + (((($dest) - . - 8) :SHR: 2) :AND: &00FFFFFF)
+        MEND
 
 ; now the main parts of the MOS
 
@@ -542,35 +553,35 @@ largest_rma_size    * (128*1024)                 ; and the ceiling for rma use
         $GetMemInfo
         ! 0, "Main kernel size = &" :CC: :STR: (.-ROM)
 StartOfVduDriver
-        GET     s.vdu.VduDriver
-        GET     s.vdu.VduSWIs
-        GET     s.vdu.VduPalette
+        GET     s.vdu.vdudriver
+        GET     s.vdu.vduswis
+        GET     s.vdu.vdupalette
         $GetPalette
-        GET     s.vdu.VduPlot
-        GET     s.vdu.VduGrafA
-        GET     s.vdu.VduGrafB
-        GET     s.vdu.VduGrafC
-        GET     s.vdu.VduGrafD
-        GET     s.vdu.VduGrafE
-        GET     s.vdu.VduGrafF
-        GET     s.vdu.VduGrafG
-        GET     s.vdu.VduGrafH
-        GET     s.vdu.VduGrafI
-        GET     s.vdu.VduGrafJ
-        GET     s.vdu.VduGrafK
-        GET     s.vdu.VduGrafL
-        GET     s.vdu.VduWrch
-        GET     s.vdu.Vdu23
-        GET     s.vdu.VduPointer
-        GET     s.vdu.Vdu5
-        GET     s.vdu.VduCurSoft
-        GET     s.vdu.VduTTX
+        GET     s.vdu.vduplot
+        GET     s.vdu.vdugrafa
+        GET     s.vdu.vdugrafb
+        GET     s.vdu.vdugrafc
+        GET     s.vdu.vdugrafd
+        GET     s.vdu.vdugrafe
+        GET     s.vdu.vdugraff
+        GET     s.vdu.vdugrafg
+        GET     s.vdu.vdugrafh
+        GET     s.vdu.vdugrafi
+        GET     s.vdu.vdugrafj
+        GET     s.vdu.vdugrafk
+        GET     s.vdu.vdugrafl
+        GET     s.vdu.vduwrch
+        GET     s.vdu.vdu23
+        GET     s.vdu.vdupointer
+        GET     s.vdu.vdu5
+        GET     s.vdu.vducursoft
+        GET     s.vdu.vduttx
 
         GBLS    GiveMeBfontAnyDay
         [ BleedinDaveBell
-GiveMeBfontAnyDay SETS "GET s.vdu.VduFontL1"
+GiveMeBfontAnyDay SETS "GET s.vdu.vdufontl1"
         |
-GiveMeBfontAnyDay SETS "GET s.vdu.VduFont"
+GiveMeBfontAnyDay SETS "GET s.vdu.vdufont"
         ]
 
         $GiveMeBfontAnyDay
@@ -587,7 +598,7 @@ StartOfPMF
         $GetRS423
         GET     s.PMF.i2cutils
         GET     s.PMF.oswrch
-        GET     s.PMF.buffer
+        GET     s.PMF.Buffer
         $GetKbdDrA1
         GET     s.PMF.key
         $GetKey2

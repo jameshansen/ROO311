@@ -19,10 +19,10 @@
         GET     Hdr:ModHand
         GET     Hdr:MsgTrans
 
-        GET     Hdr.MagicOff
-        GET     Hdr.StaticDecl
+        GET     hdr.magicoff
+        GET     hdr.StaticDecl
         GET     s.Version
-        GET     Hdr.debug
+        GET     hdr.debug
 
         ; Linker symbols
         IMPORT  |Image$$RO$$Base|

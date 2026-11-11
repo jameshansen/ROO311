@@ -21,7 +21,7 @@
 ; 23-Sep-94 AMcC  __rt_ symbols defined and exported (compatible with cc vsn 5 etc)
 ;
 
-        GET     s.h_Stack
+        GET     s.h_stack
         GET     rlib.s.asmdefs
 
 SIGFPE  *       2

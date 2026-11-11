@@ -422,4 +422,4 @@ Die
 
         Pull    "R0-R11,PC",,^           ; don't refuse to die
 
-        LNK     s.SWIs
+        LNK     s.SWIS

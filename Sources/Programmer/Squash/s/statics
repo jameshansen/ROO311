@@ -18,7 +18,7 @@
         GET     Hdr:Macros
         GET     Hdr:System
 
-        GET     Hdr.MagicOff
+        GET     hdr.magicoff
 
         MACRO
         AsmVar  $VarName,$VarSize
@@ -33,7 +33,7 @@ $VarName %      $VarSize
         AREA    |!!!asm$$Data|,NOINIT
 |hdr$statics|
         EXPORT  |hdr$statics|
-        GET     Hdr.statics
+        GET     hdr.statics
 
 LTORG
 

@@ -85,7 +85,7 @@
                 GET     hdr:PDumper
                 GET     hdr:MsgTrans
                 GET     hdr:HostFS
-                GET     hdr:NDRDebug
+                GET     hdr:NdrDebug
                 GET     hdr:DDVMacros
                 GET     hdr:Proc
                 GET     hdr:ColourTran

@@ -138,7 +138,7 @@
                 GET     hdr:ColourTran
                 GET     hdr:Symbols
                 GET     hdr:HostFS
-                GET     hdr:variables
+                GET     hdr:Variables
 
                 ;Debugging SelectTable with older versions of these macros which
                 ;call OS_CLI and hence corrupt scratchspace can cause 'interesting'
@@ -146,7 +146,7 @@
 
                 GBLL    debug_noscratchspace
 debug_noscratchspace SETL {FALSE}
-                GET     hdr:NDRDebug
+                GET     hdr:NdrDebug
 
                 GET     Version
 

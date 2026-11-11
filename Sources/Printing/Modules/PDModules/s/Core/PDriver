@@ -191,7 +191,7 @@ FontHandleEnsure SETL   {TRUE}                  ;Apply the bug fix
         GBLL    debugMedusa
 
         GET     hdr:HostFS
-        GET     hdr:NDRDebug
+        GET     hdr:NdrDebug
 
 ; Setting the 'debug' variable to FALSE will turn off all NDR debugging
 

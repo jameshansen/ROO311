@@ -31,8 +31,8 @@ ModeMayBeNonUser   SETL  {TRUE}
 SharedLibrary      SETL  {TRUE}
 DDE                SETL  {TRUE}
 
-        GET     s.h_Regs
-        GET     s.h_Brazil
+        GET     s.h_regs
+        GET     s.h_brazil
         GET     s.h_modmacro
 
         Module  kernel

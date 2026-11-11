@@ -938,7 +938,9 @@ HeapReturnedReg_PC  # 4                 ; also acts as interlock
 PrinterBufferAddr   #  4                ; holds address of printer buffer
 PrinterBufferSize   #  4                ; size of printer buffer - not to be confused with PrintBuffSize
                                         ; which is the (constant) default size for the MOS's smallish buffer
-UniqueMachineID     #  8                ; 64 bits for unique machine ID
+RawMachineID        #  8                ; 64 bits for unique machine ID
+                                        ; ROO26: was UniqueMachineID. Hdr:KernelWS renamed it in December 1993
+                                        ; and the kernel code followed; this header was left behind.
 KernelMessagesBlock #  20               ; 5 Words for messagetrans message block.
 ErrorSemaphore      #  1                ; Error semaphore to avoid looping on error translation.
 PortableFlag        #  1                ; Non-zero => got an error from Portable_Speed, so don't try it again

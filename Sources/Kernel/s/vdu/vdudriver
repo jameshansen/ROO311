@@ -31,8 +31,8 @@ DoVdu23_0_12   SETL  {FALSE}
         GBLL    BleedinDaveBell
 BleedinDaveBell SETL {TRUE}
 
-        GET s.vdu.VduDecl
-        GET s.vdu.VduGrafDec
+        GET s.vdu.vdudecl
+        GET s.vdu.vdugrafdec
 
         MACRO
         HostVdu
@@ -1146,7 +1146,7 @@ NColour_3       *       63
 NColour_4       *       &FFFF
 NColour_5       *       &FFFFFFFF
 
-        GET     s.vdu.VduModes
+        GET     s.vdu.vdumodes
 
 ; *****************************************************************************
 ;

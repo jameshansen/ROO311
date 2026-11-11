@@ -59,7 +59,7 @@ Module_BaseAddr
         GET     Hdr:Proc
         GET     Hdr:FSNumbers
         GET     Hdr:HighFSI
-        GET     Hdr:LowFSi
+        GET     Hdr:LowFSI
         GET     Hdr:NewErrors
         GET     Hdr:Variables
         GET     Hdr:Wimp
@@ -72,7 +72,7 @@ Module_BaseAddr
         GET     Hdr:ColourTran
         GET     Version
 
-        GET     Hdr:NDRDebug
+        GET     Hdr:NdrDebug
 
         GBLL    DesktopAllAtOnce
 DesktopAllAtOnce SETL {TRUE}

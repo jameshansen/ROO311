@@ -30,7 +30,7 @@
         GET     Hdr:Tokens
         GET     Hdr:Wimp
         GET     Hdr:UpCall
-        GET     Hdr:LowFSi
+        GET     Hdr:LowFSI
         GET     Hdr:Heap
         GET     Hdr:FileCore
         GET     Hdr:MsgTrans

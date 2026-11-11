@@ -22,7 +22,7 @@
 ; ... is it a problem being in SVC mode? No problems so far!
 
 ; Get things that compiled C needs
-        GET     sources.CSupport
+        GET     Sources.CSupport
 
 dividebyzero
         Debug   cc,"DIVIDE BY ZERO",a2,a1,lr
@@ -827,11 +827,11 @@ ErrorBlock_DynName
         GBLL    cfsi_jpeg                        ; for inclusion in ChangeFSI binary?
 cfsi_jpeg SETL  {FALSE}
 
-        GET     sources.jdhuff
-        GET     sources.jrevdct
+        GET     Sources.jdhuff
+        GET     Sources.jrevdct
 ;        GET     sources.idct
         GET     s.yuvtabs
-        GET     sources.jcconv
-        GET     sources.diffuse
-        GET     sources.swiv2
+        GET     Sources.jcconv
+        GET     Sources.diffuse
+        GET     Sources.swiv2
         END

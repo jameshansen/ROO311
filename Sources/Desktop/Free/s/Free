@@ -74,7 +74,7 @@ Module_BaseAddr
         GET     Hdr:ColourTran
         GET     Hdr:Hourglass
         GET     Hdr:ADFS
-        GET     Hdr:RamFS
+        GET     Hdr:RAMFS
         GET     Hdr:SCSIFS
         GET     Hdr:Econet
         GET     Hdr:UpCall

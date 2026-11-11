@@ -82,7 +82,7 @@ HelpText
 ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 ; Most help and syntax messages go together to save ALIGNing wastage
 
-        GET       s.MosDict
+        GET       s.MOSDict
         GET       s.TMOSHelp
 
 GO_Syntax   * Module_BaseAddr

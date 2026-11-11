@@ -50,7 +50,7 @@ origin
         GET     hdr:Hourglass
         GET     hdr:FileTypes
         GET     hdr:Territory
-        GET     hdr:NDRDebug
+        GET     hdr:NdrDebug
         GET     hdr:PublicWS
         GET     hdr:hostfs
 

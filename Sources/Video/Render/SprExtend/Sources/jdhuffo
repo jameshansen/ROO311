@@ -76,5 +76,5 @@ pc RN 15
 ;        EXPORT huff_skip_else
 ;        EXPORT huff_skip_exit
 
-        GET sources.jdhuff
+        GET Sources.jdhuff
         END

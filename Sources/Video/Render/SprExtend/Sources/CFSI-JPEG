@@ -69,7 +69,7 @@ ip RN 12
 sp RN 13
 lr RN 14
 pc RN 15
-        GET     sources.csupport
+        GET     Sources.CSupport
 
 cfsi_jpeg_scan_file
 ; Entry conditions: r0 -> space (word-aligned)
@@ -158,11 +158,11 @@ assert
         GBLL    cfsi_jpeg
 cfsi_jpeg SETL  {TRUE}
 
-        GET     sources.jdhuff
-        GET     sources.jrevdct
-        GET     sources.jcconv
+        GET     Sources.jdhuff
+        GET     Sources.jrevdct
+        GET     Sources.jcconv
 XOS_CLI                  * &5     + (1:SHL:17)
-        GET     sources.diffuse
+        GET     Sources.diffuse
         GET     s.rojpeg
 
         END

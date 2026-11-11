@@ -29,6 +29,31 @@
 ;       R1 set to bytes moved.
 ;******************************************************************************
 
+; ROO26: the flag bits below sat further down, beside DynamicAreaSWI. The AP_ values that follow are built
+; from them, and AsAsm cannot pool a literal whose value is still a forward reference, so they are defined first.
+
+; Bits in dynamic area flags (and page flags)
+
+DynAreaFlags_APBits     *       15 :SHL: 0      ; currently only uses 2 bits, but may extend to allow svc/usr read-only
+DynAreaFlags_NotBufferable *    1 :SHL: 4
+DynAreaFlags_NotCacheable *     1 :SHL: 5
+DynAreaFlags_DoublyMapped *     1 :SHL: 6
+DynAreaFlags_NotUserDraggable * 1 :SHL: 7
+ [ DAF_SpecifyBit
+DynAreaFlags_NeedsSpecificPages *  1 :SHL: 8    ; whether area will ever require particular physical pages
+ ]
+DynAreaFlags_AccessMask *       DynAreaFlags_APBits :OR: DynAreaFlags_NotBufferable :OR: DynAreaFlags_NotCacheable :OR: DynAreaFlags_DoublyMapped
+
+; The following bits are only present in page flags
+
+TempUncacheableShift    *       9
+PageFlags_TempUncacheableBits   * 15 :SHL: TempUncacheableShift    ; temporary count of uncacheability, used by DMA mgr
+PageFlags_Unavailable   *       1 :SHL: 13      ; physical page may not be requested by a PreShrink handler
+
+; Temporary flags only used by kernel
+
+PageFlags_Required      *       1 :SHL: 14      ; physical page asked for by handler
+
 ; The following flag controls the operation of ReadCMOSAndConfigure and FudgeConfigureRMA
 ;
 ; If false, then no memory is in the free pool to start off, and these routines just allocate pages
@@ -1712,28 +1737,6 @@ DAReason_Limit  *       5
 
 DynArea_NewAreas *      &100            ; Allocated area numbers start here
 DynArea_NewAreasBase *  &04000000       ; Allocated area addresses start here
-
-; Bits in dynamic area flags (and page flags)
-
-DynAreaFlags_APBits     *       15 :SHL: 0      ; currently only uses 2 bits, but may extend to allow svc/usr read-only
-DynAreaFlags_NotBufferable *    1 :SHL: 4
-DynAreaFlags_NotCacheable *     1 :SHL: 5
-DynAreaFlags_DoublyMapped *     1 :SHL: 6
-DynAreaFlags_NotUserDraggable * 1 :SHL: 7
- [ DAF_SpecifyBit
-DynAreaFlags_NeedsSpecificPages *  1 :SHL: 8    ; whether area will ever require particular physical pages
- ]
-DynAreaFlags_AccessMask *       DynAreaFlags_APBits :OR: DynAreaFlags_NotBufferable :OR: DynAreaFlags_NotCacheable :OR: DynAreaFlags_DoublyMapped
-
-; The following bits are only present in page flags
-
-TempUncacheableShift    *       9
-PageFlags_TempUncacheableBits   * 15 :SHL: TempUncacheableShift    ; temporary count of uncacheability, used by DMA mgr
-PageFlags_Unavailable   *       1 :SHL: 13      ; physical page may not be requested by a PreShrink handler
-
-; Temporary flags only used by kernel
-
-PageFlags_Required      *       1 :SHL: 14      ; physical page asked for by handler
 
 DynamicAreaSWI ENTRY
         BL      DynAreaSub

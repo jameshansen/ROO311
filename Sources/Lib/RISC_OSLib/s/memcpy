@@ -16,7 +16,7 @@
 
 Calling_Standard   SETS  "APCS_U"
 
-        GET     s.h_Regs
+        GET     s.h_regs
 
         AREA    |C$$code|, CODE, READONLY
 

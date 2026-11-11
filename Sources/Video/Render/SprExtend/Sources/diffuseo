@@ -36,5 +36,5 @@ XOS_CLI                  * &5     + (1:SHL:17)
         EXPORT  asm_diffuse_line_to_8bpp
         EXPORT  asm_diffuse_to_8bpp
         EXPORT  asm_get_table32k
-        GET sources.diffuse
+        GET Sources.diffuse
         END

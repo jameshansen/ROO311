@@ -66,7 +66,7 @@
                 GET     hdr:MsgTrans
                 GET     hdr:Proc
                 GET     hdr:HostFS
-                GET     hdr:NDRDebug
+                GET     hdr:NdrDebug
                 GET     hdr:DDVMacros
                 GET     hdr:ResourceFS
 

@@ -66,7 +66,7 @@ Module_BaseAddr
         GET     Hdr:FSNumbers
         GET     Hdr:NewErrors
 ;        GET     Hdr:Draw
-        GET     Hdr:NDRDebug
+        GET     Hdr:NdrDebug
         GET     Hdr:MsgTrans
 
         GET     Version

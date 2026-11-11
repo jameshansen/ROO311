@@ -243,7 +243,7 @@ Module_BaseAddr
         GET     Hdr:VduExt
         GET     Hdr:FSNumbers
         GET     Hdr:NewErrors
-        GET     Hdr:NDRDebug
+        GET     Hdr:NdrDebug
         GET     Hdr:Sprite
         GET     Hdr:ColourTran
         GET     Hdr:PublicWS     ; only if bodgeOS is false

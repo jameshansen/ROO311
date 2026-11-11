@@ -400,4 +400,4 @@ Basic_Services CMP R1,#Service_Memory
  MOVGE R1,#Service_Serviced ;claim service - it's in us
  MOV PC,R14
 
- LNK BASIC
+ LNK Basic

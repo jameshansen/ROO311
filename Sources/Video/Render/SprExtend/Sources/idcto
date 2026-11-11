@@ -176,6 +176,6 @@ asm_idctsq_1_d
         MOVS    pc,lr
 
         EXPORT  asm_j_rev_dct
-        GET     sources.idct
+        GET     Sources.idct
 
         END

@@ -112,4 +112,4 @@ NFS_ComparePath
 
         Pull   "r0-r9,PC"
 
-        LNK    s.SWIs
+        LNK    s.SWIS

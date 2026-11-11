@@ -904,6 +904,7 @@ FindOKMode ROUT
         CLRV
         Pull    "r2-r4,r10,r11, pc"
 
+ [ ModeSelectors                ; ROO26: only reached under ModeSelectors, which is where the error block is too
 30
         ADRL    r0, ErrorBlock_ModeNotAvailable ; then return error
  [ International
@@ -911,6 +912,7 @@ FindOKMode ROUT
  ]
         SETV                            ; error exit
         Pull    "r2-r4,r10,r11, pc"
+ ]
 
 SubstModeTable
         &       SubstType01-SubstModeTable

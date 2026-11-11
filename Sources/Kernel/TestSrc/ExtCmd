@@ -848,6 +848,22 @@ cpr13	CN	13
 cpr14	CN	14
 cpr15	CN	15
 
+ [ MEMM_Type <> "ARM600"
+; ROO26: SetCop and ReadCop come from Hdr:MEMM.ARM600, which a MEMC1 machine does not include. An ARM3 keeps
+; its cache control registers in coprocessor 15 as well, so the two commands below work there unchanged.
+ts_SysCop	CP	15
+
+        MACRO
+        SetCop  $reg, $cop, $cc
+        MCR$cc  ts_SysCop, 0, $reg, $cop, cpr0
+        MEND
+
+        MACRO
+        ReadCop $reg, $cop, $cc
+        MRC$cc  ts_SysCop, 0, $reg, $cop, cpr0
+        MEND
+ ]
+
 
 ; Called by vectoring through command table.
 ; Read transfer value

@@ -30,8 +30,8 @@ Calling_Standard   SETS  "APCS_U"
 ModeMayBeNonUser   SETL  {FALSE}
 SharedLibrary      SETL  {FALSE}
 
-        GET     s.h_Regs
-        GET     s.h_Brazil
+        GET     s.h_regs
+        GET     s.h_brazil
         GET     s.h_objmacro
 
         Module CLib

@@ -35,7 +35,7 @@ pc RN 15
         AREA |C$$code|, CODE, READONLY
         EXPORT  asm_dct_1_d
         EXPORT  asm_j_rev_dct
-        GET sources.jrevdct
+        GET Sources.jrevdct
 
 ; ------------------------------------------------------------------------
 ; Test proc - procedure to do a 1-D DCT

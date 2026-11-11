@@ -90,9 +90,7 @@ Module_LoadAddr * &FFFFFA00  ; magic number from Stu/Bruce standard :
 
 Module_SWIChunkSize * 2_1000000
 
-Module_SWISystemBase      * 1 :SHL: 18
-Module_SWIApplicationBase * 2 :SHL: 18
-Module_SWIUserBase        * 3 :SHL: 18
+; ROO26: the three Module_SWI<x>Base values are set by Hdr:SWIs, which numbers its chunks in full
 
 
 ; flags for the information word :

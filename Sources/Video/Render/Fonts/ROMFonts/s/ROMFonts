@@ -54,7 +54,7 @@ Module_BaseAddr
         GET     Hdr:ResourceFS
         GET     Version
 
-        GET     Hdr:NDRDebug
+        GET     Hdr:NdrDebug
 
         GBLL    debug
         GBLL    debugxx

@@ -246,7 +246,7 @@ string2 SETS    "&":CC:(:STR:value)
 
         GET     Hdr:ADFS
         GET     Hdr:ATAPI
-        GET     Hdr:BasicTrans
+        GET     Hdr:BASICTrans
         GET     Hdr:Buffer
         GET     Hdr:ARM3Cache
         GET     Hdr:CDROM

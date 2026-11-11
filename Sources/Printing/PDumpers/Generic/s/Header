@@ -72,7 +72,7 @@
                 GET     hdr:System
                 GET     hdr:FSNumbers
                 GET     hdr:HighFSI
-                GET     hdr:Modhand
+                GET     hdr:ModHand
                 GET     hdr:NewErrors
 ;                GET     hdr:NewSpace
                 GET     hdr:PDriver
@@ -85,7 +85,7 @@
                 GET     hdr:Proc
                 GET     hdr:MsgTrans
                 GET     hdr:HostFS
-                GET     hdr:NDRDebug
+                GET     hdr:NdrDebug
                 GET     hdr:DDVMacros
                 GET     hdr:HostDebug
 

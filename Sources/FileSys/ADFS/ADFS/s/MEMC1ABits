@@ -13,7 +13,7 @@
 ; limitations under the License.
 ;
         GET     s.Adfs11
-        GET     s.ADFS12
-        GET     s.ADFS13
-        GET     s.ADFS14
+        GET     s.Adfs12
+        GET     s.Adfs13
+        GET     s.Adfs14
         END

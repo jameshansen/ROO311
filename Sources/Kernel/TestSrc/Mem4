@@ -150,15 +150,15 @@ ts_logpagesend                              ; End of the list.
 ; exist on page zero when arbitrary pages are mapped there.
 ;
 ts_vectors
-        B       (ts_vectors-ts_start)+ts_rom_base+ts_rst
-        B       (ts_vectors-ts_start)+ts_rom_base+ts_uni
-        B       (ts_vectors-ts_start)+ts_rom_base+ts_swi
-        B       (ts_vectors-ts_start)+ts_rom_base+ts_pab
+        BWrap   (ts_vectors-ts_start)+ts_rom_base+ts_rst
+        BWrap   (ts_vectors-ts_start)+ts_rom_base+ts_uni
+        BWrap   (ts_vectors-ts_start)+ts_rom_base+ts_swi
+        BWrap   (ts_vectors-ts_start)+ts_rom_base+ts_pab
 ts_dab_vector
-        B       (ts_vectors-ts_start)+ts_rom_base+ts_dab
-        B       (ts_vectors-ts_start)+ts_rom_base+ts_aex
-        B       (ts_vectors-ts_start)+ts_rom_base+ts_irq
-        B       (ts_vectors-ts_start)+ts_rom_base+ts_fiq
+        BWrap   (ts_vectors-ts_start)+ts_rom_base+ts_dab
+        BWrap   (ts_vectors-ts_start)+ts_rom_base+ts_aex
+        BWrap   (ts_vectors-ts_start)+ts_rom_base+ts_irq
+        BWrap   (ts_vectors-ts_start)+ts_rom_base+ts_fiq
 
 
 ; ***************************************************************************
