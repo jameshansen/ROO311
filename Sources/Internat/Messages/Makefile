@@ -113,6 +113,10 @@ clean_all:
 resources:
 	${MKDIR} ${RESDIR}.Resources.Global
 	${CP} Global.${LOCALE}.Messages ${RESDIR}.Resources.Global.Messages ${CPFLAGS}
+	# ROO26: the dictionary goes in here. The original build copied it in the step that tokenised every
+	# message file (Data.Tokenised below), which this build does not run: the ROM's messages are plain
+	# text. The kernel's *Help still opens the dictionary to expand its own help text.
+	${CP} ${DICTIONARY} ${RESDIR}.Resources.Kernel.Dictionary ${CPFLAGS}
 	@echo ${COMPONENT}: resource files copied
 
 ${TARGET}: ${SOURCE} ${DATA}.Tokenised
