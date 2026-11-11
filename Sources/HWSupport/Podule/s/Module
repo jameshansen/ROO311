@@ -758,8 +758,15 @@ ExtensionChunkLoop
         TEQ     r0, #0                                  ; Is this the last chunk?
         BNE     ExtensionChunkLoop                      ; No, so get another one
 NextExtensionROM
+; ROO26: the count of ROMs left to do was kept in r10 across EnumerateChunks, whose loaders use r10 as
+; scratch, so with an extension ROM fitted the loop ran on through tens of thousands of ROM numbers and the
+; machine sat there at start-up. The count is now taken from the workspace each time: the ROMs are numbered
+; -2 downwards, so after the last one r8 + number_of_extension_roms is -2. RISC OS 3.11's Podule 1.26 has no
+; such loop, and the Risc PC builds this came from had extension ROMs switched off.
         DEC     r8
-        DECS    r10
+        LDR     r10, number_of_extension_roms
+        ADD     r10, r10, r8
+        CMN     r10, #2
         BNE     LoadExtensionROMLoop
         ]
 ExitLoadLoaders
