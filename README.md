@@ -20,7 +20,7 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 | ADFS floppy access on the 82C711, including `ADFS_DiscOp` writes | Copy-protected floppy images (they need a track-level image format) |
 | HostFS from Arculator's support ROM (extension ROM loading) | Most games are untried |
 | CMOS defaults of RISC OS 3.11 | |
-| Blaston (1991) boots from its floppy image and runs, with no ADFFS | |
+| Blaston (1991) boots from its floppy image and runs, with no ADFFS: Shift at power on starts it | |
 | SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC: a test program passes every check | |
 | Battle Chess (1992), a C game built with the Norcroft compiler, runs on that library | |
 
