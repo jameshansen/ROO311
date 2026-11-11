@@ -2,6 +2,7 @@
 # <folder under Sources/>  <source file>  <module file name>
 # A source of the form @name is built by the function of that name in build.sh.
 # A line starting with "-" is a module RISC OS 3.11 had that is not built yet, with the reason.
+# A line with a folder and the word "resources" is a component that only adds files to the ROM's resources.
 HWSupport/Podule                      s/GetAll            Podule
 FileSys/FileSwitch                    s/FileSwitch        FileSwitch
 FileSys/ResourceFS/ResourceFS         s/ResourceFS        ResourceFS
@@ -72,3 +73,4 @@ Apps/Draw                             @romapp             !Draw
 Apps/Paint                            @romapp             !Paint
 Apps/EditApp                          @romapp             !Edit
 FileSys/ImageFS/DOSFS                 @dosfs              DOSFS
+Apps/SciCalc                          resources

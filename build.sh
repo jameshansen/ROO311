@@ -250,14 +250,14 @@ clibtest() {
 # the resource files of the kernel and every module, as the data block the Messages module registers
 resdata() {
 	cd "$ROOT"
-	python3 tools/mkres.py "$B/resdata" "$LOCALE" Sources/Kernel $(grep -v '^[#-]' Sources/MODULES | awk 'NF==3{print "Sources/"$1}')
+	python3 tools/mkres.py "$B/resdata" "$LOCALE" Sources/Kernel $(grep -v '^[#-]' Sources/MODULES | awk 'NF>=2{print "Sources/"$1}')
 }
 
 # every module in Sources/MODULES; reports the ones that fail and carries on
 modules() {
 	# generated files first: gathering the resources wants some of them
 	grep -v '^[#-]' "$ROOT/Sources/MODULES" | while read dir src name; do
-		[ -n "$name" ] && python3 "$ROOT/tools/prepare.py" "$ROOT/Sources/$dir"
+		if [ -n "$name" ]; then python3 "$ROOT/tools/prepare.py" "$ROOT/Sources/$dir"; fi
 	done
 	resdata
 	export RESDATA="$B/resdata"

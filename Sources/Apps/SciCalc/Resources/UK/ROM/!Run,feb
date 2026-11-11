@@ -1,0 +1,10 @@
+| ROO26: the !Run for SciCalc in the ROM, written for this project.
+| SciCalc was a disc application that needed BASIC64, which lives on the hard disc. A machine with no
+| disc has only the BASIC in the ROM, so this uses BASIC64 where it is loaded and BASIC otherwise.
+| BASIC works to 9 figures where BASIC64 works to 17.
+Set SciCalc$Dir <Obey$Dir>
+Set Alias$SciCalcRun BASIC64 -quit %%*0
+RMEnsure BASIC64 1.05 Set Alias$SciCalcRun BASIC -quit %%*0
+WimpSlot -min 140K -max 140K
+IconSprites <SciCalc$Dir>.!Sprites
+SciCalcRun <SciCalc$Dir>.!RunImage

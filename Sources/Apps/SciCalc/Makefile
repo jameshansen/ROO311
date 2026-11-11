@@ -72,6 +72,21 @@ install: ${FILES}
 	Access ${INSTDIR}.* lr/r
 	@echo ${COMPONENT}: Application installed {Disc}
 
+# ROO26: SciCalc was a disc application only. This rule puts it in the ROM's Apps folder, with a !Run
+# that does without BASIC64 (Resources.UK.ROM.!Run).
+RESAPP = <resource$dir>.Apps.${APP}
+
+resources:
+	${MKDIR} ${RESAPP}
+	${CP} ${LDIR}.!Help      ${RESAPP}.!Help     ${CPFLAGS}
+	${CP} ${LDIR}.ROM.!Run   ${RESAPP}.!Run      ${CPFLAGS}
+	${CP} ${RDIR}.!RunImage  ${RESAPP}.!RunImage ${CPFLAGS}
+	${CP} ${LDIR}.!Sprites   ${RESAPP}.!Sprites  ${CPFLAGS}
+	${CP} ${LDIR}.Messages   ${RESAPP}.Messages  ${CPFLAGS}
+	${CP} ${LDIR}.Sprites    ${RESAPP}.Sprites   ${CPFLAGS}
+	${CP} ${LDIR}.Templates  ${RESAPP}.Templates ${CPFLAGS}
+	@echo ${COMPONENT}: resource files copied
+
 clean:
 	${RM} ${RDIR}.!RunImage
 	${WIPE} crunched.* ${WFLAGS}
