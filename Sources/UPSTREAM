@@ -1,0 +1,4 @@
+# Where each component came from. One line per component:
+# <folder>  <RISC OS Open repository under https://gitlab.riscosopen.org/RiscOS/Sources/>  <commit>  <what that commit is>
+Kernel   Kernel             3da129d  RISC OS 3.60 source import (1996-11-05)
+HdrSrc   Programmer/HdrSrc  c9113ab  RISC OS 3.60 source import (1996-11-05)
