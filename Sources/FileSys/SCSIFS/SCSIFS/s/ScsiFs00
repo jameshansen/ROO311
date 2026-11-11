@@ -226,7 +226,7 @@ MapSizeCMOS     # 4     ;map sizes of discs in units of 256 bytes
 
 ScsiFsSwiBase   * Module_SWISystemBase + Module_SWIChunkSize * ScsiFsSWI
 
-                        ^ ScsiFsSwiBase :OR 1 :SHL: 17
+                        ^ ScsiFsSwiBase :OR: 1 :SHL: 17
 XSCSIFS_DiscOp          # 1
                         # 1 ;XADFS_HDC
 XSCSIFS_Drives          # 1

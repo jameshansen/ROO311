@@ -906,7 +906,7 @@ message_errorlookup ENTRY r1-r7
         LTORG
 
 spritedata
-        BIN     "z.SystemDisc"
+        BIN     z.SystemDisc            ; ROO26: was in quotes, which AsAsm takes as part of the name
         ALIGN
 
         LNK     s.SWIs

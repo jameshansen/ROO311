@@ -546,7 +546,8 @@ space4  DCB     "    ", 0
 Inter_Service ROUT
         TEQ     R1, #Service_International      ; is it our service ?
         MOVNE   PC, R14                         ; no, then exit
-        CMP     R2, #Inter_Highest              ; is it one we know ?
+        CMP     R2, #Inter_Keyboard + 1         ; is it one we know ? (ROO26: was Inter_Highest, which the
+                                                ; registration header has since moved past this table)
         ADDCC   PC, PC, R2, LSL #2              ; yes, go thru despatch
         MOV     PC, R14                         ; no, then exit
 
@@ -565,7 +566,7 @@ Inter_Service ROUT
         ASSERT Inter_CNoToANo = 4
         ASSERT Inter_Define   = 5
         ASSERT Inter_Keyboard = 6
-        ASSERT Inter_Highest = 7
+        ASSERT Inter_Highest >= 7               ; ROO26: was = 7; later reason codes are not ours
 
 ; *****************************************************************************
 ;

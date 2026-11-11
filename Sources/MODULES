@@ -21,7 +21,7 @@ Desktop/DragASprit                    s/Gets              DragASprite
 Video/Render/DrawMod                  s/Draw              Draw
 FileSys/FileCore                      s/FileCore          FileCore
 FileSys/ADFS/ADFS                     s/ADFS              ADFS
-FileSys/RAMFS/RAMFS                   s/RAMFS             RamFS
+FileSys/RAMFS/RAMFS                   s/RamFS             RamFS
 Desktop/Filer                         s/Filer             Filer
 Desktop/FilerSWIs                     s/FilerSWIs         FilerSWIs
 Desktop/Free                          s/Free              Free

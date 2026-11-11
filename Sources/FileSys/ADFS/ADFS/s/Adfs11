@@ -1474,7 +1474,7 @@ WinnieError ROUT
         SetBorder  &F,&F,&F
  ]
 ; R0 SSB>>2
-        CMPS    R0, #&48 :SHR 2         ;&48 = SSB for corrected ECC
+        CMPS    R0, #&48 :SHR: 2         ;&48 = SSB for corrected ECC
         LDR     R2, opCode
         AND     R2, R2, #OpMask         ; get the opcode
         BNE     %FT10                   ; on the compare with &48
@@ -2206,7 +2206,7 @@ BackgroundWriteResume
         mess    CS,"WHOLE",NL
  ]
  [ MEMC1A
-        ADDCS   R10,HDC,#:INDEX HDCdataWrite
+        ADDCS   R10,HDC,#:INDEX: HDCdataWrite
  ]
         ADRCS   PC, LowCodeLocation     ;same as BCS LowCodeLocation
 

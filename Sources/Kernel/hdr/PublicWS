@@ -36,6 +36,11 @@ ESC_Status          #         1
                     ^ &00000105
 LatchBSoftCopy      #         1
 
+; ROO26: SoundDMA drives the loudspeaker through this on an IOC machine. It is &106 in both workspace
+; layouts (Hdr:KernelWS and Hdr:Old.NewSpace); RISC OS 3.11's SoundDMA took it from the private header.
+                    ^ &00000106
+IOCControlSoftCopy  #         1
+
                     ^ &00000107
 CannotReset         #         1
 
@@ -93,6 +98,11 @@ SoundDMABufferSize  *     &1000
 
                     ^ &01F06000
 SoundDMABuffers     #     SoundDMABufferSize * 2
+
+; ROO26: on a MEMC1 machine the 32K below TopOfDMAWorkSpace is mapped to the top of the first 512K of RAM,
+; and SoundDMA works out the physical address of its buffers from these two (values from Hdr:Old.NewSpace).
+TopOfDMAPhysRAM     *     &00080000
+TopOfDMAWorkSpace   *     &01F08000
 
         OPT     OldOpt
         END

@@ -100,7 +100,7 @@ RamFSId        * 23      ;magic filing system number
  [ T
 RamFSSwiBase    * Module_SWISystemBase + Module_SWIChunkSize * RamFSSWI
 
-                ^ RamFSSwiBase :OR bit17
+                ^ RamFSSwiBase :OR: bit17
 XRamFS_DiscOp   # 1
                 # 1
 XRamFS_Drives   # 1

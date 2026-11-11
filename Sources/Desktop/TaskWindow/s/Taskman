@@ -148,7 +148,7 @@ FixRedirection  SETL    {TRUE}          ; NB: SWI not known overwrites GetEnv bu
         GBLL    FixSpool
 FixSpool        SETL    {TRUE}
 
-        GET     "s.Messages"
+        GET     s.Messages
 
         TTL     Task module version $Version
         SUBT
@@ -1436,7 +1436,7 @@ nowimpstarttask ROUT
         MOV     r9, r1          ; r9-r11 = parameters
         MOV     r10,r2
 
-      [ Version >= 26 :LAND Version < 28
+      [ Version >= 26 :LAND: Version < 28
         BL      SetRedirectWrch
         SWIVS   OS_GenerateError  ;; R12 must point to task workspace
       ]
@@ -4870,7 +4870,7 @@ CheckDomain     ROUT
         Pull    "r0, pc"
         ]
 
-        GET     "s.Redirect"            ; for OS_ChangeRedirection
+        GET     s.Redirect              ; for OS_ChangeRedirection
 
 ReadTaskKeyStates ROUT
 ;

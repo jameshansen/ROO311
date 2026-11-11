@@ -18,7 +18,7 @@ mkdir -p "$ROOT/build/Hdr"
 find Sources -type d -iname hdr | while read d; do cp -r "$d"/* "$ROOT/build/Hdr/"; done
 
 # AsAsm reads RISC OS path and system variables from the environment in upper case
-export HDR_PATH="$ROOT/build/Hdr" MACHINE IMAGESIZE LOCALE=${LOCALE:-UK} SYSTEM=${SYSTEM:-Ursula}
+export ASASM HDR_PATH="$ROOT/build/Hdr" MACHINE IMAGESIZE LOCALE=${LOCALE:-UK} SYSTEM=${SYSTEM:-Ursula}
 
 kernel() {
 	cd "$ROOT/Sources/Kernel"
@@ -33,6 +33,7 @@ kernel() {
 # module <folder under Sources> <source file> <module name>: assemble one module to $B/<name>
 module() {
 	python3 "$ROOT/tools/tokhelp.py" "$ROOT/Sources/$1" > /dev/null
+	python3 "$ROOT/tools/prepare.py" "$ROOT/Sources/$1"
 	cd "$ROOT/Sources/$1"
 	"$ASASM" -ABSolute -Uppercase -NOWarn -G -o "$B/$3.o" "$2" > "$B/$3.log" 2>&1 &&
 	arm-none-eabi-ld -Ttext=0 -e 0 -o "$B/$3.elf" "$B/$3.o" >> "$B/$3.log" 2>&1 &&
