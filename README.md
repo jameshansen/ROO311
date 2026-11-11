@@ -8,16 +8,19 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 
 | Works | Not yet |
 |---|---|
-| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | Mouse pointer and scaled icons (need SpriteExtend, which has C in it) |
-| 59 ROM modules initialise | SharedCLibrary, Filer_Action, Draw, Paint, Edit, Squash, DOSFS (C) |
-| Supervisor prompt, keyboard, `*` commands | Alarm, Chars, Help, Calc (BASIC applications, not packaged yet) |
-| BBC BASIC V 1.14 with graphics | Printing modules, Econet and NetFS |
-| FPEmulator 4.39 | Power-on self test |
-| Desktop starts: icon bar, disc and Apps icons, Task Manager | Floppy and hard disc access is untested |
-| Outline fonts (Font Manager and ROM fonts) | Sound is untested |
-| CMOS defaults and flat desktop look of RISC OS 3.11 | JASPP game compatibility is untested |
+| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | SharedCLibrary, Filer_Action, Draw, Paint, Edit, Squash, DOSFS (C; the compiler is built, the sources are not ported to it yet) |
+| 62 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program), Calc, Configure |
+| Supervisor prompt, keyboard, mouse, `*` commands | Palette utility on the icon bar |
+| BBC BASIC V 1.14 with graphics, FPEmulator 4.39 | Printing modules, Econet and NetFS |
+| Desktop with the RISC OS 3 look: icon bar, Filer windows, error boxes, Task Manager | Power-on self test |
+| Chars and Help run from the Apps folder | Hard disc access is untested |
+| Outline fonts (Font Manager and ROM fonts), scaled sprites (SpriteExtend) | Sound has not been listened to |
+| ADFS floppy access on the 82C711, including `ADFS_DiscOp` writes | Copy-protected floppy images (they need a track-level image format) |
+| HostFS from Arculator's support ROM (extension ROM loading) | Games beyond the first one |
+| CMOS defaults of RISC OS 3.11 | |
+| Blaston (1991) boots from its floppy image and runs, with no ADFFS | |
 
-The image uses 1.33MB of the 2MB.
+The image uses 1.38MB of the 2MB.
 
 ## Where everything comes from
 
@@ -25,6 +28,7 @@ Every file in the ROM comes from the RISC OS Open repositories or was written fo
 
 - The kernel and most modules are the RISC OS 3.60 sources, the oldest RISC OS Open publishes and the last to carry the MEMC1 code paths.
 - Components listed in `Sources/NEWER` come from the current RISC OS Open sources and build against current headers (`Sources/Headers5`). FPEmulator is the first.
+- SpriteExtend is built with its all-assembler code generator and no JPEG, as RISC OS 3.11's was.
 - Changes to imported sources carry a comment starting `ROO26:` that says what changed. Where a commercial ROM was consulted to settle how something behaved, the comment names the ROM and the address.
 
 ## Building
