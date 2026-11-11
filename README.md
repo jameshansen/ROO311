@@ -8,8 +8,8 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 
 | Works | Not yet |
 |---|---|
-| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | SharedCLibrary, Filer_Action, Draw, Paint, Edit, Squash, DOSFS (C; the compiler is built, the sources are not ported to it yet) |
-| 62 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program), Calc, Configure |
+| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | RISC_OSLib inside the SharedCLibrary module, and the C programs that use it: Filer_Action, Draw, Paint, Edit, Squash, DOSFS |
+| 63 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program), Calc, Configure |
 | Supervisor prompt, keyboard, mouse, `*` commands | Palette utility on the icon bar |
 | BBC BASIC V 1.14 with graphics, FPEmulator 4.39 | Printing modules, Econet and NetFS |
 | Desktop with the RISC OS 3 look: icon bar, Filer windows, error boxes, Task Manager | Power-on self test |
@@ -19,8 +19,9 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 | HostFS from Arculator's support ROM (extension ROM loading) | Games beyond the first one |
 | CMOS defaults of RISC OS 3.11 | |
 | Blaston (1991) boots from its floppy image and runs, with no ADFFS | |
+| SharedCLibrary 4.79, its C parts compiled with GCC: a test program passes every check | |
 
-The image uses 1.38MB of the 2MB.
+The image uses 1.45MB of the 2MB.
 
 ## Where everything comes from
 
@@ -36,7 +37,7 @@ Every file in the ROM comes from the RISC OS Open repositories or was written fo
 The build runs on Linux and needs AsAsm from GCCSDK (`svn://svn.riscos.info/gccsdk/trunk/tools/asasm`), `binutils-arm-none-eabi` and Python 3. The C parts need GCC 4.7.4 for RISC OS. [toolchain/README.md](toolchain/README.md) says how to build both and what each one needs.
 
 ```bash
-ASASM=/path/to/asasm sh build.sh
+ASASM=/path/to/asasm GCC=/path/to/arm-unknown-riscos-gcc sh build.sh
 ```
 
 The ROM is `build/A5000/rom`. Each module's ELF file beside it holds source line numbers.
@@ -46,7 +47,9 @@ The ROM is `build/A5000/rom`. Each module's ELF file beside it holds source line
 | `build.sh` | Assembles the kernel and modules, gathers resources, joins the ROM |
 | `Sources/MODULES` | The modules after the kernel, in ROM order |
 | `tools/mkres.py` | Gathers each component's messages, templates and sprites into the Messages module |
-| `tools/mkrom.py` | Joins the kernel and modules into the image |
+| `tools/mkrom.py` | Joins the kernel and modules into the image, and says what address a module will get |
+| `tools/clib.ld`, `tools/app.ld` | Linker scripts for the SharedCLibrary module and for a C application |
+| `tests/clibtest.c` | A test of the SharedCLibrary (`sh build.sh clibtest`) |
 | `tools/prepare.py`, `tools/tokhelp.py` | Make the source files the original build generated under RISC OS |
 | `tools/fixcase.py` | Normalises imported sources for AsAsm on Linux (file name case, backslashes) |
 | `tools/romdiff.py` | Lines a built image up against a reference ROM and shows the code that differs |

@@ -2,6 +2,10 @@
 """Join the kernel and the modules into a ROM image.
 
     python3 tools/mkrom.py <output> <size in K> <kernel> [module ...]
+    python3 tools/mkrom.py --next <kernel> [module ...]
+
+The second form prints the address the next module would get, for a module that has to be linked to run
+where it sits (C code).
 
 The kernel image ends with a zero word, the end of the module chain. Each module goes in ahead of
 that as a length word (the offset to the next entry) and the module itself, padded to a word.
@@ -10,9 +14,10 @@ import struct
 import sys
 
 
-def main():
-    out, size, kernel, *modules = sys.argv[1:]
-    size = int(size) * 1024
+ROM_BASE = 0x03800000
+
+
+def chain(kernel, modules):
     rom = bytearray(open(kernel, "rb").read())
     assert rom[-4:] == b"\0\0\0\0", "kernel does not end with the chain terminator"
     del rom[-4:]
@@ -20,7 +25,16 @@ def main():
         d = open(m, "rb").read()
         d += b"\0" * (-len(d) & 3)
         rom += struct.pack("<I", len(d) + 4) + d
-    rom += b"\0\0\0\0"
+    return rom
+
+
+def main():
+    if sys.argv[1] == "--next":
+        print(hex(ROM_BASE + len(chain(sys.argv[2], sys.argv[3:])) + 4))
+        return
+    out, size, kernel, *modules = sys.argv[1:]
+    size = int(size) * 1024
+    rom = chain(kernel, modules) + b"\0\0\0\0"
     assert len(rom) <= size, f"image is {len(rom)} bytes, over the {size} byte ROM"
     print(f"{out}: {len(rom)} bytes used of {size}, {len(modules)} modules after the kernel")
     rom += b"\xff" * (size - len(rom))

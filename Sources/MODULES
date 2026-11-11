@@ -65,3 +65,4 @@ Desktop/Filter                        s/FilterMgr         FilterManager
 HWSupport/Sound/Voices/WaveSynth      s/WaveSynth         WaveSynth
 HWSupport/Sound/Voices/StringLib      s/StringLib         StringLib
 HWSupport/Sound/Voices/Percussion     s/Percussion        Percussion
+Lib/RISC_OSLib                        @clib               SharedCLibrary

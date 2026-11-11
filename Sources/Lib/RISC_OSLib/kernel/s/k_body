@@ -165,6 +165,11 @@ DDEUtils_GetCL     EQU X+&42584
         MOVNE   r10, fp
         MOV     lr, pc
         MOV     pc, $r
+        ; ROO26: the test is made again here. It used to rest on the client returning with the flags
+        ; it was called with, which C built with GCC does not do. lr is the one register that is free
+        ; under both calling standards at this point.
+        LDRB    lr, [v6, #O_APCS_A_Client]
+        CMP     lr, #0
         MOVNE   fp, r10
         MOVNE   sl, r13
         MOVNE   sp, r12
@@ -186,6 +191,8 @@ movne_sla_sl
         MOVNE   r10, fp
         MOV     lr, pc
         MOV     pc, a4
+        LDRB    lr, [v6, #O_APCS_A_Client]      ; ROO26: tested again, as in CallClient
+        CMP     lr, #0
         MOVNE   fp, r10
 movne_sl_sla
         MOVNE   sl, r13
@@ -1085,9 +1092,13 @@ FCH_NextLanguage Keep
         CMP     v5, a1
         MOV     a1, v1
         LDR     a2, [sp, #uwb_size+4]
-        MOVEQ   lr, pc
-        MOVEQ   pc, r2
-        BEQ     FCH_ClientCalled
+        ; ROO26: was MOVEQ lr, pc / MOVEQ pc, r2 / BEQ FCH_ClientCalled, which called the handler a
+        ; second time (through CallClient) if it came back with Z clear. C built with GCC can.
+        BNE     FCH_CallClient
+        MOV     lr, pc
+        MOV     pc, r2
+        B       FCH_ClientCalled
+FCH_CallClient
         CallClient r2
 FCH_ClientCalled
         CMP     v2, #lang_Event  ; event handlers are only allowed to pass escape
@@ -2516,11 +2527,18 @@ StackOverflowExit Keep
 ; stack-description registers here and permute them back at the end.
 ; We do not do the expected ..EQ operations here, in order to keep the
 ; event handler happy - APCS change expected to be unconditional or NE.
-        MOV     r14, pc
-        TST     r14, #PSRZBit
-        MOVNE   fp, r10
-        MOVNE   sl, r13
-        MOVNE   sp, r12
+; ROO26: the Z flag no longer says which. It came from the return address in the frame, where the
+; veneer set the bit, and reached the flags only when the procedure returned with LDM ..^. C built with
+; GCC returns without restoring flags, so for an extension made under APCS_A the veneer
+; (_kernel_stkovfs_v) now moves the return address in the frame back to StackOverflowExitA.
+        MOV     r14, #0
+        B       StackOverflowExitCommon
+StackOverflowExitA
+        MOV     fp, r10
+        MOV     sl, r13
+        MOV     sp, r12
+        MOV     r14, #PSRZBit
+StackOverflowExitCommon
         ; We need to move sp and sl back into the old chunk.  Since this happens
         ; in two operations, we need precautions against events while we're
         ; doing it.
@@ -2544,11 +2562,15 @@ DeallocateChunkLoop
         MOV     a1, v2
         LDR     ip, [v2,#SC_deallocate] ; deallocate proc for this chunk
         CMPS    ip, #0                  ; if there is one...
-        MOV     lr, pc
-        MOVNE   pc, ip                  ; then call it...
-        MOVNE   a2, #0
-        STRNE   a2, [v1, #SC_next-SC_SLOffset] ; and unhook next chunk
+        ; ROO26: was conditional instructions either side of the call, which rest on the deallocate
+        ; proc returning with the flags it was called with. free() built with GCC does not.
         MOVEQ   v1, v2                  ; no deallocate proc: try next chunk
+        BEQ     DeallocateChunkNext
+        MOV     lr, pc
+        MOV     pc, ip                  ; then call it...
+        MOV     a2, #0
+        STR     a2, [v1, #SC_next-SC_SLOffset] ; and unhook next chunk
+DeallocateChunkNext
         MOV     v2, v3
         B       DeallocateChunkLoop
 DoneDeallocateChunks

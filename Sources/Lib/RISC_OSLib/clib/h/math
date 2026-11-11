@@ -56,8 +56,13 @@ extern double atan2(double /*x*/, double /*y*/);
    /* a domain error occurs if both args are zero, and -HUGE_VAL returned. */
    /* Returns: the arc tangent of y/x, in the range -Pi to Pi. */
 
+/* ROO26: __d_atan, __d_sin, __d_cos and __d_abs are operations the Norcroft */
+/* compiler does inline. GCC calls the library's atan, sin and cos and does */
+/* fabs inline under its own name.                                          */
+#ifndef __GNUC__
 extern double __d_atan(double);
 #define atan(x) __d_atan(x)
+#endif
 
 extern double cos(double /*x*/);
    /* computes the cosine of x (measured in radians). A large magnitude */
@@ -68,10 +73,12 @@ extern double sin(double /*x*/);
    /* argument may yield a result with little or no significance */
    /* Returns: the sine value. */
 
+#ifndef __GNUC__
 extern double __d_sin(double);
 extern double __d_cos(double);
 #define sin(x) __d_sin(x)
 #define cos(x) __d_cos(x)
+#endif
 
 extern double tan(double /*x*/);
    /* computes the tangent of x (measured in radians). A large magnitude */
@@ -156,8 +163,12 @@ extern double fmod(double /*x*/, double /*y*/);
    /*          less than the magnitude of y. If y is zero, a domain error */
    /*          occurs and -HUGE_VAL is returned. */
 
+#ifdef __GNUC__
+#define fabs(x) __builtin_fabs(x)
+#else
 extern double __d_abs(double);
 #define fabs(x) __d_abs(x)
+#endif
 
 #ifdef __cplusplus
 }

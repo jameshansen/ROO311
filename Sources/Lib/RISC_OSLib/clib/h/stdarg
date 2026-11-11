@@ -44,6 +44,24 @@ typedef char *va_list[1];       /* see <stdio.h> */
     * is passed as an argument it gets passed by reference.
     */
 
+#ifdef __GNUC__
+/* ROO26: for GCC. va_list keeps its type, since a pointer to it is what   */
+/* every program built with the Norcroft compiler passes to vprintf and   */
+/* friends. GCC puts only the unnamed arguments in memory on entry, so    */
+/* the first one comes from GCC's own va_start, not from the address of   */
+/* the last named argument. (It has to be the real va_start: that is what */
+/* stops the optimiser making a fixed-argument copy of the function.)     */
+#define va_start(ap,parmN) \
+   __extension__ ({ __builtin_va_list __gcc_ap; \
+                    __builtin_va_start(__gcc_ap, parmN); \
+                    __builtin_memcpy(ap, &__gcc_ap, sizeof(char *)); \
+                    __builtin_va_end(__gcc_ap); })
+#define va_arg(ap,type) \
+   (*(type *)((*(ap) = (char *)(((int)*(ap) + __alignof__(type) - 1) & \
+                                ~(__alignof__(type) - 1)) + sizeof(type)) - \
+              sizeof(type)))
+#else
+
 /* Note that ___type is a syntactic item a bit like the type qualifiers   */
 /* 'static', 'register', 'const' etc except that it has no effect! Its    */
 /* purpose is to indicate when a type is being introduced and thus        */
@@ -105,6 +123,7 @@ typedef char *va_list[1];       /* see <stdio.h> */
     * are not intended for use by ordinary users.
     */
 #endif
+#endif /* __GNUC__ */
 
 #define va_end(ap) ((void)(*(ap) = (char *)-256))
    /*

@@ -35,6 +35,67 @@ Functions return with `ldmea fp, {..., sp, pc}`, which leaves the caller's flags
 
 Checked on the built compiler: the `scl/hard/fpa` and `scl-module/hard/fpa` copies of `libgcc.a` hold no `ldrh`, `strh`, `ldrsb`, `ldrsh`, `umull`, `smull`, `bx`, `mrs`, `msr` or `clz`. Long multiplies and divides are calls into libgcc (`__muldi3`, `__divsi3`).
 
+## How the C parts are compiled
+
+`build.sh` holds the commands (`libcc`, `clib`, `clibtest`). The SharedCLibrary is the first C component, and what it needed applies to the rest.
+
+### Options
+
+| Option | Why |
+|---|---|
+| `-mmodule` | Code inside a module reaches its static data through a relocation offset kept below the stack limit, so one copy of the code serves every client |
+| `-mapcs-stack-check` | Module mode turns the stack limit check off. The library runs on its clients' stacks, which grow in chunks, so it needs the check. `c.alloc` and `c.signal` are compiled without it, as their `#pragma -s1` asks: the allocator is called by the code that grows the stack, and the signal code runs when the stack has overflowed |
+| `-mno-poke-function-name` | Function names ahead of each function cost ROM space. The original build left them out too (`cc -ff`) |
+| `-O2` | Not `-Os`. See the compiler faults below |
+| `-fno-section-anchors` | See the compiler faults below |
+| `-ffreestanding` | Stops GCC replacing a library function's body with a call to the same function, or `printf` with `puts` |
+| `-fno-common` | Every static lands in `.data` or `.bss`, where the linker script lays out the library's static data |
+| `-nostdinc -I<the library's headers>` | The library is compiled against its own headers, not GCC's |
+| `-funsigned-bitfields` | A plain `int` bitfield is unsigned to the Norcroft compiler and signed to GCC. `c.math` takes a double apart with bitfields; `floor(2.5)` came out wrong without this |
+| `-fno-strict-aliasing -fwrapv -fno-delete-null-pointer-checks` | The sources date from 1988 to 1996 and cast pointers freely, expect signed arithmetic to wrap and read page zero. These switch off the optimisations that assume otherwise |
+| `-D__arm -D___type=` | `__arm` is the Norcroft name for the target. `___type` is a Norcroft keyword in the headers' `offsetof` |
+
+### Changes to the compiler's output
+
+`libcc` compiles to assembler, edits it, and assembles the result.
+
+- `[sl, #-536]` becomes `[sl, #-540]`. GCC's module code loads the client's relocation offset. Code in the library uses the library's, the word below it (`_Lib$Reloc$Off` and `_Mod$Reloc$Off` in `s.initmodule`).
+- `sym(GOTOFF)` becomes `sym`. GCC writes the address of a static as an offset from the global offset table, and only GCCSDK's linker in its module mode (`--ro-module-reloc`) resolves that to the plain address. Written plain, the constant is the address the static has in the ROM image, and adding the relocation offset gives the client's copy, which is how Norcroft's `-zm` code works.
+
+### Linking
+
+GNU `ld` from the GCCSDK build links the module with `tools/clib.ld`, at the address the module has in the ROM (`tools/mkrom.py --next` works it out from the modules ahead of it). The script defines the `Area$$Base` and `Area$$Limit` symbols Acorn's linker made, puts the kernel's and the library's static data in the order the client stubs expect, and makes the library's static data exactly the size the stubs reserve. Division comes from `libgcc.a`.
+
+A C application links with `tools/app.ld` and the library's stubs (`clib.s.cl_stub_r`) into a plain image that loads and runs at `&8000`.
+
+### Changes to the sources for GCC
+
+Each has a `ROO26:` comment.
+
+| File | Change |
+|---|---|
+| `clib/h/stdarg` | `va_list` keeps its Norcroft type, a one-element array of `char *`, since programs built with Norcroft pass a pointer to it to `vprintf` and friends. `va_start` uses GCC's built-in to find the first unnamed argument: GCC only puts the unnamed arguments in memory, so the address of the last named one is no guide. It has to be the real `__builtin_va_start`; with `__builtin_next_arg` alone the optimiser makes fixed-argument copies of variadic functions |
+| `clib/h/math` | `__d_abs`, `__d_atan`, `__d_sin` and `__d_cos` are inline operations of the Norcroft compiler. Under GCC `fabs` is `__builtin_fabs` and the others are calls to the library |
+| `kernel/s/k_body`, `kernel/s/k_mod_r` | GCC's functions return without restoring the caller's flags; Norcroft's 26-bit code restored them. Four places in the library's assembler relied on getting flags back from a C function or a client's function: the calls to client handlers (`CallClient`, `_kernel_call_client`, `FindAndCallHandlers`), the loop that frees stack chunks, and the return from a function that grew the stack, which read the Z flag to tell which calling standard the function used. Each now tests again after the call, and the stack return has a second entry point for the old calling standard |
+| `clib/s/cl_entries` | The library held a second `bsearch` compiled for the old calling standard (`cc -zkA`). GCC cannot produce that, so old clients reach the one `bsearch` through the calling standard veneer, as they already do for `qsort` |
+
+Programs that call the library still get their flags back from the assembler parts (the SWI veneers, `memcpy`, the maths entry points) and not from the C parts. Norcroft's code never keeps a flag across a call, so C programs do not notice. Hand-written assembler that does would.
+
+### Compiler faults found
+
+- **`-Os` pushes every register.** In a function with no frame pointer, the prologue code that pads the register list to make stack room (`arm_expand_prologue`, the `optimize_size` branch) can compute a negative frame size, and the mask it builds from that covers all sixteen registers, `sp` and `pc` included. `c.alloc` (`internal_coalesce`) triggers it, and the compiler then overruns a 100-byte buffer writing the instruction out and aborts. `-O2` does not take that path.
+- **Section anchors with module data.** At `-O1` and above `c.signal` stops the compiler with "insn does not satisfy its constraints" in `reload_cse_simplify_operands`, on a store through a section anchor plus the relocation offset. `-fno-section-anchors` avoids it.
+
+### Testing
+
+`tests/clibtest.c` calls into each part of the library (formatted output and input, variadic calls, the allocator, sorting, `setjmp`, strings, maths, files, time, signals, a 200K deep recursion to grow the stack, `system`, `atexit`) and prints what failed.
+
+```bash
+sh build.sh clibtest
+```
+
+The program is `build/A5000/clibtest,ff8`. Run it from a filing system it can write to.
+
 ## Building the compiler
 
 GCC 4.7 does not build with a current host compiler, so it is built in a container running Ubuntu 14.04, the system GCCSDK's own Dockerfile names. It needs Docker, Subversion and wget, about 6GB of disc, and takes about a quarter of an hour on 12 cores.
@@ -55,7 +116,7 @@ The compiler ends up in the image at `/gccsdk/cross/bin` (`arm-unknown-riscos-gc
 docker create --name roo26-gcc-x roo26-gcc && docker cp roo26-gcc-x:/gccsdk/cross ./cross && docker cp roo26-gcc-x:/gccsdk/env ./env && docker rm roo26-gcc-x
 ```
 
-`build.sh` takes the compiler from `GCCSDK` (the `cross/bin` folder) or from `PATH`.
+`build.sh` takes the compiler from `GCC` (the path of `arm-unknown-riscos-gcc`) or from `PATH`.
 
 ## What was changed from stock GCCSDK
 
