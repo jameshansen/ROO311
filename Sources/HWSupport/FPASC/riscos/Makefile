@@ -13,87 +13,58 @@
 # limitations under the License.
 #
 # Makefile for Floating Point Accelerator Support Code (FPASC)
-#
-# ***********************************
-# ***    C h a n g e   L i s t    ***
-# ***********************************
-# Date       Name     Description
-# ----       ----     -----------
-# 25-May-94  AMcC     Created.
-# 17-Aug-94  AMcC     Removed Specific machine names.
-#                     If building for old series machines, comment out A600
-#                     target and uncomment ARM2/3 target.
 
-#
-# Paths
-#
-EXP_HDR = <export$dir>
+COMPONENT ?= FPEmulator
+SA_MODULE  = FPERAM${SUFFIX_MODULE}
+ROM_SOURCE = ${MACHINE}.s
+HEADER1    = FPEmulator
 
-#
-# Generic options:
-#
-MKDIR   = cdir
-AS      = armasm
-CP      = copy
-LD      = link
-RM      = remove
-WIPE    = -wipe
-CCFLAGS = -c -depend !Depend -IC:
-ASFLAGS = -depend !Depend -apcs 3/26bit
-CPFLAGS = ~cfr~v
-WFLAGS  = ~c~v
+FPEANCHOR ?= Low
+# 32bit-compatible RAM builds store FPEAnchor locally, so that they're compatible with kernels which use high or low zero page workspace. But this means the module must write to its own image to set its workspace pointer.
+# 26bit-only builds can stick with the legacy low FPEAnchor location, avoiding the need for the module to self-modify.
+ifeq (${FPE_APCS},3/26bit)
+FPEANCHOR_RAM ?= Low
+else
+FPEANCHOR_RAM ?= Local
+endif
 
-#
-# Program specific options:
-#
-COMPONENT = FPEmulator
-TARGET    = rm.${MACHINE}.FPEmulator
-EXPORTS   = ${EXP_HDR}.FPEmulator
+ifeq (,$(filter ${MAKECMDGOALS},rom install_rom))
+ASFLAGS += -PD "FPEAnchorType SETS \"${FPEANCHOR_RAM}\""
+else
+ASFLAGS += -PD "FPEAnchorType SETS \"${FPEANCHOR}\""
+endif
+ASFLAGS += -APCS ${FPE_APCS}
 
-#
-# Generic rules:
-#
-rom: ${TARGET}
-	@echo ${COMPONENT}: rom module built
+ifeq (,${MAKE_VERSION})
+ASFLAGS += -PD "CoreDir SETS \"^.coresrc.s.\"" -PD "VeneerDir SETS \"^.vensrc.riscos.\"" -PD "FileExt SETS \"\""   -I^
+else
+ASFLAGS += -PD "CoreDir SETS \"coresrc/\""     -PD "VeneerDir SETS \"vensrc/riscos/\""   -PD "FileExt SETS \".s\""
+ifeq (,${FPE_APCS})
+# If no explicit PCS selection, pivot to the All32 target
+MACHINE  = All32
+FPE_APCS = 3/32bit
+endif
+# The layout of source files in this component is rather non-standard!
 
-export: ${EXPORTS}
-	@echo ${COMPONENT}: export complete
+SYMLINK_DEPEND = symlink_extra
+symlink_extra:
+	$(foreach linksource,$(wildcard ../coresrc/s/*), \
+		$(shell \
+			leaf=`basename ${linksource}`; \
+			[ -d ${linksource} ] || [ -L objs/coresrc/$$leaf.s ] || mkdir -p objs/coresrc; \
+			[ -d ${linksource} ] || [ -L objs/coresrc/$$leaf.s ] || ln -s ../../${linksource} objs/coresrc/$$leaf.s; \
+		) \
+	)
+	$(foreach linksource,$(wildcard ../vensrc/riscos/*), \
+		$(shell \
+			leaf=`basename ${linksource}`; \
+			[ -d ${linksource} ] || [ -L objs/vensrc/riscos/$$leaf.s ] || mkdir -p objs/vensrc/riscos; \
+			[ -d ${linksource} ] || [ -L objs/vensrc/riscos/$$leaf.s ] || ln -s ../../../${linksource} objs/vensrc/riscos/$$leaf.s; \
+		) \
+	)
+	@[ -L objs/VersionASM ] || ln -s ../../VersionASM objs/VersionASM
+endif
 
-install_rom: ${TARGET}
-	${CP} ${TARGET} ${INSTDIR}.${COMPONENT} ${CPFLAGS}
-	@echo ${COMPONENT}: rom module installed
-
-clean:
-	${RM} ${TARGET}
-	${WIPE} o.* ${WFLAGS}
-	@echo ${COMPONENT}: cleaned
-
-resources:
-	${MKDIR} ${RESDIR}.${COMPONENT}
-	${CP} Resources.${LOCALE}.Messages  ${RESDIR}.${COMPONENT}.Messages  ${CPFLAGS}
-	@echo ${COMPONENT}: resource files copied
-
-# ARM600
-#
-${TARGET}: o.fpe
-	${MKDIR} rm.${MACHINE}
-	${LD} -bin -o $@ o.fpe
-	settype $@ Module
-
-o.fpe: s.fpemedusa
-	${AS} -I Hdr:t.^ ${ASFLAGS} s.fpemedusa $@
-
-# ARM2/3
-#
-#${TARGET}: o.fpe400
-#        ${MKDIR} rm.${MACHINE}
-#        ${LD} -bin -o $@ o.fpe400
-#        settype $@ Module
-#
-#o.fpe: s.fpe400
-#        ${AS} -I Hdr:t.^ ${ASFLAGS} s.fpe400 $@
-
-${EXP_HDR}.FPEmulator: hdr.FPEmulator
-	${CP} hdr.FPEmulator $@ ${CPFLAGS}
+include AAsmModule
 
 # Dynamic dependencies:

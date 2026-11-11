@@ -7,25 +7,38 @@
 ; Global workspace declarations
 ;
 
-UIVector        #       4               ; original Undef. Instr. vector
-FPAFlags	#	4		; flag bits
+UIHandler       #       4               ; LDR PC,CoreVector (or VeneerVector)
+   [ Arm600 :LAND: {CONFIG}=26
+VeneerVector    #       4               ; UI_veneer (or = OldVector if removed)
+VeneerOutVector #       4               ; PassAlong_Veneer
+   ]
+CoreVector      #       4               ; FPASC's handler (or = OldVector if removed)
+OldVector       #       4               ; original UI handler
 
-    [ Arm600
-CoreVector      #       4               ; address of core's UI handler
+   [ :LNOT: Arm600
+LDRPassalong    #       20              ; passalong code for when our vector removed and original instr was LDR PC form
+LDRPassalongDest #      4               ; address the original LDR was loading
+OldUIInstr      #       4               ; original instruction at &00000004
+   ]
 
-UnwantedAddr    #       4               ; address of PassAlong_veneer routine
+SVCStack        #       4               ; top of SVC stack
 
+
+SysIs32bit      #       1               ; system is 32-bit
+Unused		#	3
+
+   [ Arm600 :LAND: {CONFIG}=26
 SavedLR         #       4               ; used in undef32 -> svc26 conversion
 SavedPSR        #       4               ;  ""  ""    ""   ""  ""       ""
-    |
-UIBranchDest    #       4               ; target for B <addr> type vector
+   ]
+
+MessageBlock    #       16              ; MessageTrans descriptor
+
+FPExceptionDump #       4+8*12          ; FP register dump on exceptions
+    [ MultipleContexts
+DefaultContext	#	ContextLength	; default context created on startup
     ]
 
-;
-; bits within flags word
-;
-OnVector	*	(1 :SHL: 0)	; module is installed on undefined
-					; instruction vector
 
         END
 

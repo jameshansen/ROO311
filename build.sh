@@ -12,10 +12,21 @@ IMAGESIZE=${IMAGESIZE:-2048K}
 B=$ROOT/build/$MACHINE
 mkdir -p "$B"
 
-# One folder of headers, as the export phase of a RISC OS build makes
-rm -rf "$ROOT/build/Hdr"
-mkdir -p "$ROOT/build/Hdr"
-find Sources -type d -iname hdr | while read d; do cp -r "$d"/* "$ROOT/build/Hdr/"; done
+# Two folders of headers, as the export phase of a RISC OS build makes one.
+#   Hdr   for the kernel and the components taken from the RISC OS 3.60 sources
+#   Hdr5  for components taken from the current RISC OS Open sources: current HdrSrc and kernel headers
+#         (Sources/Headers5) plus those components' own. They build for the machine "Archimedes", which the
+#         current headers define as a 26-bit only machine.
+# Sources/NEWER lists the components that use Hdr5. Their own headers go into Hdr as well, since the older
+# components include them (the Window Manager wants Hdr:FPEmulator).
+rm -rf "$ROOT/build/Hdr" "$ROOT/build/Hdr5"
+mkdir -p "$ROOT/build/Hdr" "$ROOT/build/Hdr5"
+NEWER=$(grep -v '^#' Sources/NEWER | sed 's|^|Sources/|')
+find Sources -type d -iname hdr | while read d; do
+	case "$d" in Sources/Headers5/*) cp -r "$d"/* "$ROOT/build/Hdr5/"; continue ;; esac
+	cp -r "$d"/* "$ROOT/build/Hdr/"
+	for n in $NEWER; do case "$d" in "$n"/*) cp -r "$d"/* "$ROOT/build/Hdr5/" ;; esac; done
+done
 
 # AsAsm reads RISC OS path and system variables from the environment in upper case
 export ASASM HDR_PATH="$ROOT/build/Hdr" MACHINE IMAGESIZE LOCALE=${LOCALE:-UK} SYSTEM=${SYSTEM:-Ursula}
@@ -30,14 +41,33 @@ kernel() {
 	echo "Kernel: $(wc -c < "$B/Kernel") bytes"
 }
 
-# module <folder under Sources> <source file> <module name>: assemble one module to $B/<name>
+# link <name>: $B/<name>.o to the module file $B/<name>
+link() {
+	arm-none-eabi-ld -Ttext=0 -e 0 -o "$B/$1.elf" "$B/$1.o" >> "$B/$1.log" 2>&1 &&
+	arm-none-eabi-objcopy -O binary "$B/$1.elf" "$B/$1"
+}
+
+# module <folder under Sources> <source file> <module name>: assemble one module to $B/<name>.
+# A source of the form @name runs the function of that name below instead, for a module with a build of its own.
 module() {
 	python3 "$ROOT/tools/tokhelp.py" "$ROOT/Sources/$1" > /dev/null
 	python3 "$ROOT/tools/prepare.py" "$ROOT/Sources/$1"
 	cd "$ROOT/Sources/$1"
-	"$ASASM" -ABSolute -Uppercase -NOWarn -G -o "$B/$3.o" "$2" > "$B/$3.log" 2>&1 &&
-	arm-none-eabi-ld -Ttext=0 -e 0 -o "$B/$3.elf" "$B/$3.o" >> "$B/$3.log" 2>&1 &&
-	arm-none-eabi-objcopy -O binary "$B/$3.elf" "$B/$3"
+	case "$2" in
+	@*) "${2#@}" "$3" > "$B/$3.log" 2>&1 && link "$3" ;;
+	*) "$ASASM" -ABSolute -Uppercase -NOWarn -G -o "$B/$3.o" "$2" > "$B/$3.log" 2>&1 && link "$3" ;;
+	esac
+}
+
+# newer <asasm arguments>: assemble an ObjAsm-format source from the current RISC OS Open tree, 26-bit
+newer() {
+	HDR_PATH="$ROOT/build/Hdr5" MACHINE=Archimedes "$ASASM" -NOWarn -G -apcs 3/26bit "$@"
+}
+
+# The floating point emulator, with FPA hardware support, as its Makefile builds it for RISC OS 3.1
+fpemulator() {
+	newer -PreDefine='CoreDir SETS "../coresrc/s/"' -PreDefine='VeneerDir SETS "../vensrc/riscos/"' \
+		-PreDefine='FileExt SETS ""' -PreDefine='FPEAnchorType SETS "Low"' -I.. -o "$B/$1.o" s/Archimedes
 }
 
 # the resource files of the kernel and every module, as the data block the Messages module registers

@@ -45,7 +45,7 @@ def leaf(path):
 def variables(make, overrides):
     v = {}
     for line in make.read_text(encoding="latin-1").splitlines():
-        m = re.match(r"([A-Za-z_0-9]+)\s*=\s*(.*)", line)
+        m = re.match(r"([A-Za-z_0-9]+)\s*\??=\s*(.*)", line)
         if m:
             v.setdefault(m.group(1), m.group(2).strip())
     v.update(overrides)
@@ -78,7 +78,7 @@ def gather(comp, locale, files, missing):
     # RESDIR is handed down by the ROM build as the Resources folder of the tree. A Makefile that sets it
     # to a folder of its own (the Messages module's staging area) means the root of the tree.
     v["RESDIR"] = "<resource$dir>" if "RESDIR" in v and "resource$dir" not in v["RESDIR"] else v.get("RESDIR", "<resource$dir>.Resources")
-    inside = False
+    inside, before = False, len(files)
     for line in make.read_text(encoding="latin-1").splitlines():
         if re.match(r"resources[^:]*:", line):
             inside = True
@@ -98,6 +98,11 @@ def gather(comp, locale, files, missing):
             missing.append(f"{comp.name}: {f[1]}")
         else:
             add(files, src, dst)
+    # The current sources leave the copying to shared makefiles: a component's Resources/<locale> folder
+    # goes to Resources.<COMPONENT>
+    res = find(comp, ["Resources", locale])
+    if len(files) == before and res is not None and v.get("COMPONENT"):
+        add(files, res, "Resources." + v["COMPONENT"])
 
 
 def block(files):

@@ -1,4 +1,4 @@
-; Copyright 1996 Acorn Computers Ltd
+; Copyright 2002 Pace Micro Technology plc
 ;
 ; Licensed under the Apache License, Version 2.0 (the "License");
 ; you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 ;
 ; -*-As-*-
 ;
-; > riscos.s.fpe400
+; > riscos.s.STB400
 ;
 ; Copyright (c) 1994 Acorn Computers Ltd., Cambridge, England.
 ;
@@ -23,28 +23,11 @@
 ; Header file for the riscos veneer.
 ;
 
-                GBLS    VeneerName      ;The name of the veneer to use
-VeneerName      SETS    "riscos"
-
-                GBLS    CoreDir
-CoreDir         SETS    "^.coresrc.s."  ;RISC OS uses "." as the directory
-                                        ; separator character
-
-                GBLS    VeneerDir
-VeneerDir       SETS    "^.vensrc.$VeneerName.."
-                                        ;NB first "." after "$VeneerName"
-                                        ; terminates the variable name, the
-                                        ; second is the directory separator
-
-                GBLS    FileExt
-FileExt         SETS    ""              ;RISC OS doesn't use filename
-                                        ; extensions
-
 ;
 ; Controls for veneer sources
 ;
 	GBLS	Flavour
-Flavour	SETS	"Both"
+Flavour	SETS	"HardOnly"
 
 	GBLL	Arm600
 Arm600	SETL	{TRUE}

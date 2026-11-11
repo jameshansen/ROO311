@@ -1,5 +1,6 @@
 # The modules that follow the kernel in the ROM, in ROM order (the order RISC OS 3.11 had them).
 # <folder under Sources/>  <source file>  <module file name>
+# A source of the form @name is built by the function of that name in build.sh.
 # A line starting with "-" is a module RISC OS 3.11 had that is not built yet, with the reason.
 HWSupport/Podule                      s/GetAll            Podule
 FileSys/FileSwitch                    s/FileSwitch        FileSwitch
@@ -27,6 +28,7 @@ FileSys/RAMFS/RAMFS                   s/RamFS             RamFS
 Desktop/Filer                         s/Filer             Filer
 Desktop/FilerSWIs                     s/FilerSWIs         FilerSWIs
 Video/Render/Fonts/FontManager        s/Fonts             FontManager
+HWSupport/FPASC/riscos                @fpemulator         FPEmulator
 Desktop/Free                          s/Free              Free
 Video/Render/Hourglass                NewOS               Hourglass
 HWSupport/IIC                         s/IICMod            IIC

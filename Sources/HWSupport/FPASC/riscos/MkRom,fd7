@@ -14,4 +14,4 @@
 |
 Dir <Obey$Dir>
 wimpslot -min 1000k
-amu_machine rom
+amu_machine rom FPE_APCS="3/32bit"

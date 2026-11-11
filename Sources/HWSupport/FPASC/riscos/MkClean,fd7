@@ -13,4 +13,5 @@
 | limitations under the License.
 |
 Dir <Obey$Dir>
-amu_machine clean
+amu_machine clean System="RO380"
+stripdepnd Makefile

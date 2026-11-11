@@ -31,7 +31,7 @@ FileSys/RAMFS/RAMFS                  FileSys/RAMFS/RAMFS                  ef43a7
 Desktop/Filer                        Desktop/Filer                        d2d9cf8  RISC OS 3.60 source import (1996-11-05)
 Desktop/FilerSWIs                    Desktop/FilerSWIs                    e76e9cd  RISC OS 3.60 source import (1996-11-05)
 Video/Render/Fonts/FontManager       Video/Render/Fonts/FontManager       f883f98  RISC OS 3.60 source import (1996-11-05)
-HWSupport/FPASC                      HWSupport/FPASC                      f883cfd  RISC OS 3.60 source import (1996-11-05)
+HWSupport/FPASC                      HWSupport/FPASC                      596b41c  FPEmulator 4.41 (2023-08-17). The 3.60 import had no FPA core source (coresrc), which was published in 2010
 Desktop/Free                         Desktop/Free                         ad049d9  RISC OS 3.60 source import (1996-11-05)
 Video/Render/Hourglass               Video/Render/Hourglass               05fb084  RISC OS 3.60 source import (1996-11-05)
 HWSupport/IIC                        HWSupport/IIC                        3a9726d  RISC OS 3.60 source import (1996-11-05)
@@ -84,3 +84,5 @@ Programmer/HdrSrc                    Programmer/HdrSrc                    403c6d
 Programmer/HostFS                    Programmer/HostFS                    68871b3  RISC OS 3.60 source import (1996-11-05)
 Networking/Econet                    Networking/Econet                    413ae41  RISC OS 3.60 source import (1996-11-05)
 FileSys/SCSIFS/SCSIFS                FileSys/SCSIFS/SCSIFS                cf2be5d  RISC OS 3.60 source import (1996-11-05)
+Headers5/HdrSrc                      Programmer/HdrSrc                    8cae000  Current headers (2026-11-03), hdr only: for components newer than the 3.60 import
+Headers5/Kernel                      Kernel                               b9d8f88  Current kernel headers (hdr only), for the same components

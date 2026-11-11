@@ -1,0 +1,4 @@
+# Components taken from the current RISC OS Open sources rather than the RISC OS 3.60 import, one folder
+# under Sources/ a line. Their headers go into the newer header set (build/Hdr5) and they are assembled
+# against it. Sources/UPSTREAM records the commit of each.
+HWSupport/FPASC
