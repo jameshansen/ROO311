@@ -1046,6 +1046,10 @@ RO3Defaults SETL IO_Type <> "IOMD"
         =       DesktopCMOS,    2_01000000      ; verbose ON
         =       WimpFlagsCMOS,  2_01101111      ; instant effects, drags off screen
  [ RO3Defaults
+        =       DesktopFeaturesCMOS,(0:SHL:0) :OR: (0:SHL:1) :OR: (1:SHL:7)
+                              ;      flat look
+                              ;                     system font
+                              ;                                    plain window backgrounds
         =       MouseStepCMOS,  3
         =       FileSwitchCMOS,(1:SHL:0)        ; truncate names; drags show outlines
         =       SystemSpeedCMOS,(1:SHL:2):OR:(1:SHL:4)

@@ -348,16 +348,20 @@ flg2_ditheron   SETA 4
 flg2_widetrans  SETA 2
         ]
 
+; ROO26: these four were all true. The module then plots through a code generator written in C, decodes
+; JPEG, and keeps its JPEG workspace in a dynamic area. Set false, it is the all-assembler module with the
+; original code generator that RISC OS 3.11 had: no C to compile, no dynamic areas (which a MEMC1 kernel
+; does not provide) and no JPEG, which RISC OS 3.11 did not have either.
         GBLL    ccompiler               ; new PutSpriteScaled compiler, written in C
-ccompiler SETL  true
+ccompiler SETL  false
         GBLL    remoldcompiler          ; remove old compiler - set multibuffer to FALSE as well
-remoldcompiler SETL true
+remoldcompiler SETL false
 
         GBLL    jpeg                    ; jpeg decompression
-jpeg    SETL    true
+jpeg    SETL    false
 
         GBLL    dynamicarea             ; for storing jpeg workspace
-dynamicarea    SETL    true
+dynamicarea    SETL    false
 
 debug   SETL    false
 debugmc SETL    false                   ; macro compilation
@@ -403,9 +407,17 @@ nbuffers * 8                            ;number of code buffers to use
         DCD     Title   - Module_BaseAddr
         DCD     Helpstr - Module_BaseAddr
         DCD     0                                           ; Helptable
+      [ ccompiler
         DCD     SpriteExtendJPEGSWI_Base                    ; MySWIBase
         DCD     SpriteExtend_SWIDecode   - Module_BaseAddr  ; MySWIDecode
         DCD     SpriteExtend_SWINames      - Module_BaseAddr  ; MySWINames
+      |
+; ROO26: the module's SWIs are all JPEG ones, served by the C code. Without it the module has none, as
+; RISC OS 3.11's SpriteExtend had none.
+        DCD     0
+        DCD     0
+        DCD     0
+      ]
         DCD     0
         DCD     0
 
@@ -1068,8 +1080,11 @@ SpriteOp_CheckSpr
         ADRL    LR,My_SpriteExit+SVC_mode
         AND     R10, R0, #&FF
 ;First check for new SpriteReason_CheckSpriteArea
+      [ ccompiler                       ; ROO26: the check is written in C; without it the reason code is
+                                        ; passed on unclaimed, as under RISC OS 3.11
         CMP     r10, #SpriteReason_CheckSpriteArea
         BEQ     Go_CheckSpriteArea
+      ]
 ;now carry on as before...
         SUB     r10, r10, #myminreason
 
@@ -6012,11 +6027,15 @@ FindMaskWidth ROUT
 ;        &       0, 1, 2, 3, 4, 5
 ;
 
+      [ ccompiler
         GET     Sources.SWIs
+      ]
         GET     Sources.SprAdjSize
         GET     Sources.SprTrans
         GET     Sources.MsgCode
+      [ ccompiler :LOR: jpeg            ; ROO26: was unconditional, with a note to comment it out by hand
         GET     Sources.PutScaled   ; needs comementing out if not using JPEG stuff.
+      ]
       [ jpeg
 ;        GET     Sources.JPEG
       ]
@@ -6049,6 +6068,7 @@ ag_disasm
       LDMFD R13!,{R0-R12,R15}^ ;ensure we return flags how they started....
       ]
 
+      [ ccompiler
 Go_CheckSpriteArea
 	Push	"R1-R2,SL,LR"
 	MOV	r2, r0			; save r0 in r2
@@ -6069,6 +6089,7 @@ Go_CheckSpriteArea
 CheckSprite_exit
 	MOV	r0, r2			;restore r0
 	Pull	"R1-R2,SL,PC"
+      ]
 
 
         MakeSpriteErrorBlock BadData,,BadData

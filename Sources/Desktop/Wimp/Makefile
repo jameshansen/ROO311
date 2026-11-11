@@ -69,10 +69,12 @@ clean:
 resources:
 	${MKDIR} ${RESDIR}.${COMPONENT}
 	${CP} Resources.${LOCALE}.Messages   ${RESDIR}.${COMPONENT}.Messages   ${CPFLAGS}
-# ROO26: the flat templates and window tools go into the ROM in place of the 3D ones (Template3D, Tools3d),
-# for the RISC OS 3 look, and the high resolution sprites (Sprites22, 219K) stay out, as they did from the
-# RISC OS 3.11 ROM. All four files are still in Resources.
-	${CP} Resources.${LOCALE}.Templates  ${RESDIR}.${COMPONENT}.Templates  ${CPFLAGS}
+# ROO26: the flat window tools go into the ROM in place of the 3D ones (Tools3d), for the RISC OS 3 look, and
+# the high resolution sprites (Sprites22, 219K) stay out, as they did from the RISC OS 3.11 ROM. The
+# templates stay Template3D: this Window Manager's error box code fills in that layout, and with the flat
+# Templates file the message is missing and the button text is wrong. With 3D borders configured off, as
+# ROO26's CMOS defaults have them, the box is drawn flat. All the files are still in Resources.
+	${CP} Resources.${LOCALE}.Template3D ${RESDIR}.${COMPONENT}.Templates  ${CPFLAGS}
 	${CP} Resources.${LOCALE}.Sprites    ${RESDIR}.${COMPONENT}.Sprites    ${CPFLAGS}
 	${CP} Resources.${LOCALE}.Tools      ${RESDIR}.${COMPONENT}.Tools      ${CPFLAGS}
 	@echo ${COMPONENT}: resource files copied

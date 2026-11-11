@@ -53,6 +53,7 @@ Desktop/ShellCLI                      s/ShellCLI          ShellCLI
 HWSupport/Sound/Sound0                s/Sound0            SoundDMA
 HWSupport/Sound/Sound1                s/Sound1            SoundChannels
 HWSupport/Sound/Sound2                s/Sound2            SoundScheduler
+Video/Render/SprExtend                Sources/SprExtend   SpriteExtend
 Video/Render/SpriteUtil               s/SpriteUtil        SpriteUtils
 Video/Render/Super                    s/Super             SuperSample
 HWSupport/SystemDevs                  s/SystemDevs        SystemDevices
