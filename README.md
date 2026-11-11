@@ -8,20 +8,21 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 
 | Works | Not yet |
 |---|---|
-| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | RISC_OSLib inside the SharedCLibrary module, and the C programs that use it: Filer_Action, Draw, Paint, Edit, Squash, DOSFS |
-| 63 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program), Calc, Configure |
+| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | The other C programs: Draw, Paint, Filer_Action, Squash, DOSFS |
+| 64 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program), Calc, Configure |
 | Supervisor prompt, keyboard, mouse, `*` commands | Palette utility on the icon bar |
 | BBC BASIC V 1.14 with graphics, FPEmulator 4.39 | Printing modules, Econet and NetFS |
 | Desktop with the RISC OS 3 look: icon bar, Filer windows, error boxes, Task Manager | Power-on self test |
-| Chars and Help run from the Apps folder | Hard disc access is untested |
+| Chars, Help and Edit run from the Apps folder | Hard disc access is untested |
 | Outline fonts (Font Manager and ROM fonts), scaled sprites (SpriteExtend) | Sound has not been listened to |
 | ADFS floppy access on the 82C711, including `ADFS_DiscOp` writes | Copy-protected floppy images (they need a track-level image format) |
-| HostFS from Arculator's support ROM (extension ROM loading) | Games beyond the first one |
+| HostFS from Arculator's support ROM (extension ROM loading) | Most games are untried |
 | CMOS defaults of RISC OS 3.11 | |
 | Blaston (1991) boots from its floppy image and runs, with no ADFFS | |
-| SharedCLibrary 4.79, its C parts compiled with GCC: a test program passes every check | |
+| SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC: a test program passes every check | |
+| Battle Chess (1992), a C game built with the Norcroft compiler, runs on that library | |
 
-The image uses 1.45MB of the 2MB.
+The image uses 1.61MB of the 2MB.
 
 ## Where everything comes from
 
@@ -48,7 +49,7 @@ The ROM is `build/A5000/rom`. Each module's ELF file beside it holds source line
 | `Sources/MODULES` | The modules after the kernel, in ROM order |
 | `tools/mkres.py` | Gathers each component's messages, templates and sprites into the Messages module |
 | `tools/mkrom.py` | Joins the kernel and modules into the image, and says what address a module will get |
-| `tools/clib.ld`, `tools/app.ld` | Linker scripts for the SharedCLibrary module and for a C application |
+| `tools/clib.ld`, `tools/romapp.ld`, `tools/app.ld` | Linker scripts for the SharedCLibrary module, a C program in the ROM and a C application on disc |
 | `tests/clibtest.c` | A test of the SharedCLibrary (`sh build.sh clibtest`) |
 | `tools/prepare.py`, `tools/tokhelp.py` | Make the source files the original build generated under RISC OS |
 | `tools/fixcase.py` | Normalises imported sources for AsAsm on Linux (file name case, backslashes) |

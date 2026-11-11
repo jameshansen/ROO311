@@ -80,38 +80,47 @@ romaddr() {
 	done)
 }
 
-# libcc <object> <source> <gcc arguments>: compile one C source of a shared library.
+# modcc <offset> <object> <source> <gcc arguments>: compile one C source to run inside a module.
 # GCC's module code reaches a static variable as a constant plus a relocation offset. Two things in the
 # compiler's assembler output are changed before it is assembled:
-#   - the offset is the client's, the word at sl-536. Code in the library has to use the library's, the
-#     word below that.
+#   - the offset GCC loads is the client's, the word at sl-536. <offset> is 536 to keep that, or 540 for
+#     code in the shared library, which has to use the library's offset, the word below.
 #   - the constant is written sym(GOTOFF), which only GCCSDK's linker in its module mode resolves to the
 #     address of sym. Written plain, any linker does.
 # toolchain/README.md has the rest of the options.
 # C_DIALECT makes GCC read C the way the Norcroft compiler these sources were written for did.
 C_DIALECT="-funsigned-bitfields -fno-strict-aliasing -fwrapv -fno-delete-null-pointer-checks"
-libcc() {
-	out=$1 src=$2; shift 2
-	"$GCC" -mmodule -mno-poke-function-name -fno-section-anchors -ffreestanding -fno-common -O2 -nostdinc \
-		$C_DIALECT -D__arm -D___type= "$@" -x c -S -o "${out%.o}.s" "$src" &&
-	sed -i -e 's/\[sl, #-536\]/[sl, #-540]/' -e 's/(GOTOFF)$//' "${out%.o}.s" &&
+modcc() {
+	off=$1 out=$2 src=$3; shift 3
+	"$GCC" -mmodule -ffixed-sl -mno-poke-function-name -fno-section-anchors -ffreestanding -fno-common -O2 \
+		-nostdinc $C_DIALECT -D__arm -D___type= "$@" -x c -S -o "${out%.o}.s" "$src" &&
+	sed -i -e "s/\[sl, #-536\]/[sl, #-$off]/" -e 's/(GOTOFF)$//' "${out%.o}.s" &&
 	"$GCC" -mmodule -c -o "$out" "${out%.o}.s"
 }
+libcc() { modcc 540 "$@"; }
 
-# The SharedCLibrary. C code holds absolute addresses, so the module is linked for its place in the ROM.
+# The SharedCLibrary, with RISC_OSLib inside it for the ROM's own C programs, as the RISC OS 3 ROM had it.
+# C code holds absolute addresses, so the module is linked for its place in the ROM.
 clib() {
-	O="$B/clib"; rm -rf "$O"; mkdir -p "$O/inc"
-	# the headers, under both names the sources include them by: <name.h> and "h.name"
-	for h in h/* clib/h/*; do
+	O="$B/clib"; rm -rf "$O"; mkdir -p "$O/inc" "$O/c" "$O/r"
+	# the headers, under the names the sources include them by: <name.h>, "h.name" and "h.Folder.name"
+	for h in h/* clib/h/* rlib/h/*; do
 		[ -f "$h" ] && ln -s "$PWD/$h" "$O/inc/${h##*/}.h" && ln -s "$PWD/$h" "$O/inc/h.${h##*/}"
+	done
+	for h in rlib/h/*/*; do
+		d=${h%/*}; d=${d##*/}
+		# the folder is spelt three ways: EditIntern, editintern, Editintern
+		for v in "$d" "$(echo "$d" | tr A-Z a-z)" "${d%Intern}intern"; do ln -sf "$PWD/$h" "$O/inc/h.$v.${h##*/}"; done
 	done
 	# swis.h is what an assembly of s.makehswis puts out
 	"$ASASM" -ABSolute -Uppercase -NOWarn -o "$O/swis.elf" s/makehswis &&
 	arm-none-eabi-objcopy -O binary "$O/swis.elf" "$O/swis.bin" && tr -d '\0' < "$O/swis.bin" > "$O/inc/swis.h" &&
 	ln -s swis.h "$O/inc/h.swis" || return 1
-	for s in clib/s/cl_rmhdr rlib/s/initmod_r kernel/s/k_mod_r clib/s/cl_mod_r s/memcpy kernel/s/swiv; do
+	for s in clib/s/cl_rmhdr rlib/s/initmod_r kernel/s/k_mod_r clib/s/cl_mod_r s/memcpy kernel/s/swiv \
+		rlib/s/rl_mod_r rlib/s/bastxt rlib/s/poll rlib/s/swi; do
 		"$ASASM" -Uppercase -NOWarn -G -apcs 3/26bit -o "$O/${s##*/}.o" "$s" || return 1
 	done
+	fail=
 	for c in alloc armsys ctype error fpprintf locale math printf scanf signal sort stdio stdlib string time; do
 		case $c in
 		# no stack limit checks where the sources turn them off (#pragma -s1): the storage allocator, which
@@ -119,13 +128,48 @@ clib() {
 		alloc | signal) chk= ;;
 		*) chk=-mapcs-stack-check ;;
 		esac
-		libcc "$O/$c.o" c/$c $chk -I"$O/inc" -DSHARED_C_LIBRARY -DUROM -DDDE -DSEPERATE_MEMCPY \
-			'-DLIB_SHARED="Shared "' '-DLIB_APCS="R"' || return 1
+		libcc "$O/c/$c.o" c/$c $chk -I"$O/inc" -DSHARED_C_LIBRARY -DUROM -DDDE -DSEPERATE_MEMCPY \
+			'-DLIB_SHARED="Shared "' '-DLIB_APCS="R"' || fail="$fail $c"
 	done
-	# the stubs' room for the library's statics: its exported variables and the space clib.s.clibdata names
-	clsize=$(($(arm-none-eabi-size -A "$O/cl_mod_r.o" | awk '$1 == "C$$data" { print $2 }') + $(awk '/^ClibSpace/ { print $3 * 4 }' clib/s/clibdata)))
-	"$("$GCC" -print-prog-name=ld)" -T "$ROOT/tools/clib.ld" --defsym ROMADDR="$(romaddr "$1")" --defsym CLSIZE=$clsize \
-		-Map "$B/$1.map" -o "$B/$1.elf" "$O"/*.o "$("$GCC" -mmodule -print-libgcc-file-name)" &&
+	for c in akbd alarm baricon bbc colourmenu colourtran dbox dboxfile dboxquery dboxtcol dragasprit drawmod \
+		event fileicon flex font heap help magnify menu msgs os pointer print res resspr saveas sprite template \
+		txt txt1 txt3 txtar txtedit txtfile txtfind txtmisc txtopt txtoptmenu txtregexp txtscrap txtundo txtwin \
+		visdelay werr wimp wimpt win xferrecv xfersend; do
+		libcc "$O/r/$c.o" rlib/c/$c -mapcs-stack-check -I"$O/inc" -DSHARED_C_LIBRARY -DUROM -DDDE \
+			-DFIELDNUM -DBIG_WINDOWS -DSETOPTIONS -DALLOW_OLD_PATTERNS -DSET_MISC_OPTIONS || fail="$fail $c"
+	done
+	[ -z "$fail" ] || { echo "did not compile:$fail"; return 1; }
+	# the room the stubs hold for each library's statics: its exported variables and the space that
+	# clib.s.clibdata and rlib.s.rlibdata name
+	datasize() {
+		echo $(($(arm-none-eabi-size -A "$O/$1.o" | awk '$1 == "C$$data" { print $2 }') + $(awk '/Space +Variable/ { print $3 * 4 }' "$2")))
+	}
+	"$("$GCC" -print-prog-name=ld)" -T "$ROOT/tools/clib.ld" --defsym ROMADDR="$(romaddr "$1")" \
+		--defsym CLSIZE="$(datasize cl_mod_r clib/s/clibdata)" --defsym RLSIZE="$(datasize rl_mod_r rlib/s/rlibdata)" \
+		-Map "$B/$1.map" -o "$B/$1.elf" "$O"/*.o "$O"/c/*.o "$O"/r/*.o "$("$GCC" -mmodule -print-libgcc-file-name)" &&
+	arm-none-eabi-objcopy -O binary "$B/$1.elf" "$B/$1" || return 1
+	# For the C programs that follow in the ROM: the stubs they link with, and the address of everything the
+	# library defines, which they call directly. PROVIDE gives way to a program's own symbol of the same name.
+	# The area boundaries (Area$$Base, Area$$Limit) are left out: each program's link makes its own.
+	"$ASASM" -Uppercase -NOWarn -apcs 3/26bit -o "$O/romstubs.obj" rlib/s/rl_stub_rm &&
+	arm-none-eabi-nm -g --defined-only "$B/$1.elf" | awk '$3 !~ /[$][$]/ { printf "PROVIDE(\"%s\" = 0x%s);\n", $3, $1 }' > "$O/abssym.ld"
+}
+
+# romapp <name>: a C application held in the ROM as a module, the way RISC OS 3 held Edit, Draw and Paint.
+# RISC_OSLib's module wrapper is its header, its C files are compiled as module code, and it calls the
+# library in the ROM directly. It comes after the SharedCLibrary in Sources/MODULES.
+romapp() {
+	case $1 in
+	Edit) srcs="edit editv message slist" ;;
+	esac
+	O="$B/$1.d"; rm -rf "$O"; mkdir -p "$O/inc"
+	for h in h/*; do ln -s "$PWD/$h" "$O/inc/${h##*/}.h"; ln -s "$PWD/$h" "$O/inc/h.${h##*/}"; done
+	"$ASASM" -Uppercase -NOWarn -G -apcs 3/26bit -o "$O/ModuleWrap.o" "$ROOT/Sources/Lib/RISC_OSLib/s/modulewrap" || return 1
+	for c in $srcs; do
+		modcc 536 "$O/$c.o" c/$c -mapcs-stack-check -I"$O/inc" -I"$B/clib/inc" || return 1
+	done
+	"$("$GCC" -print-prog-name=ld)" -T "$ROOT/tools/romapp.ld" -T "$B/clib/abssym.ld" --defsym ROMADDR="$(romaddr "$1")" \
+		-Map "$B/$1.map" -o "$B/$1.elf" "$O"/*.o "$B/clib/romstubs.obj" "$("$GCC" -mmodule -print-libgcc-file-name)" &&
 	arm-none-eabi-objcopy -O binary "$B/$1.elf" "$B/$1"
 }
 

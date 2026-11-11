@@ -2,3 +2,4 @@ build/
 *.o
 *.pyc
 __pycache__/
+Sources/Apps/EditApp/s/AppName

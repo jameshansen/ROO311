@@ -106,6 +106,16 @@ def romfonts(comp):
     (enc / "Base0").write_bytes((enc / ".Base0").read_bytes())
 
 
+def message_version(comp, tag):
+    """The version and date an application keeps in its Messages file, as "<tag>:2.28 (18-Jan-95)"."""
+    for line in (comp / "Resources" / "UK" / "Messages").read_text(encoding="latin-1").splitlines():
+        t, _, rest = line.partition(":")
+        if t == tag:
+            version, date = rest.split()[:2]
+            return (version, *date.strip("()").split("-"))
+    raise SystemExit(f"{comp}: no {tag} in Messages")
+
+
 def basic_app(runlink, version_tag=None):
     """A desktop application written in BASIC and held in the ROM as a module: the program goes into the
     module as a ResourceFS file and a short !RunLink program runs it in place. The original build crunched
@@ -115,24 +125,33 @@ def basic_app(runlink, version_tag=None):
         (comp / "Resources" / "!RunImage,ffb").write_bytes((comp / "bas" / "!RunImage,ffb").read_bytes())
         (comp / runlink).write_bytes((comp / "bas" / "!RunLink,ffb").read_bytes())
         if version_tag:
-            for line in (comp / "Resources" / "UK" / "Messages").read_text(encoding="latin-1").splitlines():
-                tag, _, rest = line.partition(":")
-                if tag == version_tag:
-                    version, date = rest.split()[:2]            # "2.28 (18-Jan-95)"
-                    d, m, y = date.strip("()").split("-")
-                    lines = ["; > Version - generated from Messages, used by s.Main", "",
-                             "        GBLS    VString", "        GBLS    Date", "",
-                             f'VString SETS    "{version}"', f'Date    SETS    "{d} {m} 19{y}"', "",
-                             "        END", ""]
-                    (comp / "s" / "Version").write_text("\n".join(lines))
-                    break
+            version, d, m, y = message_version(comp, version_tag)
+            lines = ["; > Version - generated from Messages, used by s.Main", "",
+                     "        GBLS    VString", "        GBLS    Date", "",
+                     f'VString SETS    "{version}"', f'Date    SETS    "{d} {m} 19{y}"', "",
+                     "        END", ""]
+            (comp / "s" / "Version").write_text("\n".join(lines))
+    return make
+
+
+def c_app(name, version_tag):
+    """A desktop application written in C and held in the ROM as a module, with RISC_OSLib's module wrapper
+    as its header. The wrapper takes the name and version from s.AppName (awk.AppName)."""
+    def make(comp):
+        version, d, m, y = message_version(comp, version_tag)
+        lines = ["; AppName - generated from Messages, used by ModuleWrap", "",
+                 "                   GBLS    ApplicationName", "                   GBLS    ApplicationVersion", "",
+                 f'ApplicationName    SETS    "{name}"', f'ApplicationVersion SETS    "{version} ({d} {m} 19{y})"', "",
+                 "                   END", ""]
+        (comp / "s" / "AppName").write_text("\n".join(lines))
     return make
 
 
 GENERATORS = {"Internat/Territory/TerritoryManager": territory, "Video/Render/Super": supersample,
               "Internat/Inter": international, "Video/Render/Fonts/ROMFonts": romfonts,
               "Apps/Chars": basic_app("Resources/UK/!RunLink,ffb"),
-              "Apps/Help": basic_app("Resources/UK/ROM/!RunLink,ffb", "HelpID")}
+              "Apps/Help": basic_app("Resources/UK/ROM/!RunLink,ffb", "HelpID"),
+              "Apps/EditApp": c_app("Edit", "EditId")}
 
 
 def main():

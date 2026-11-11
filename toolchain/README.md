@@ -44,6 +44,7 @@ Checked on the built compiler: the `scl/hard/fpa` and `scl-module/hard/fpa` copi
 | Option | Why |
 |---|---|
 | `-mmodule` | Code inside a module reaches its static data through a relocation offset kept below the stack limit, so one copy of the code serves every client |
+| `-ffixed-sl` | The compiler reserves the stack limit register only when stack checks are on. Module code finds its statics through it either way, so it is reserved by hand |
 | `-mapcs-stack-check` | Module mode turns the stack limit check off. The library runs on its clients' stacks, which grow in chunks, so it needs the check. `c.alloc` and `c.signal` are compiled without it, as their `#pragma -s1` asks: the allocator is called by the code that grows the stack, and the signal code runs when the stack has overflowed |
 | `-mno-poke-function-name` | Function names ahead of each function cost ROM space. The original build left them out too (`cc -ff`) |
 | `-O2` | Not `-Os`. See the compiler faults below |
@@ -66,7 +67,9 @@ Checked on the built compiler: the `scl/hard/fpa` and `scl-module/hard/fpa` copi
 
 GNU `ld` from the GCCSDK build links the module with `tools/clib.ld`, at the address the module has in the ROM (`tools/mkrom.py --next` works it out from the modules ahead of it). The script defines the `Area$$Base` and `Area$$Limit` symbols Acorn's linker made, puts the kernel's and the library's static data in the order the client stubs expect, and makes the library's static data exactly the size the stubs reserve. Division comes from `libgcc.a`.
 
-A C application links with `tools/app.ld` and the library's stubs (`clib.s.cl_stub_r`) into a plain image that loads and runs at `&8000`.
+A C program held in the ROM (Edit is the first) is a module too: RISC_OSLib's module wrapper is its header and its C files are module code that keeps the client's offset. It links with `tools/romapp.ld` and the ROM stubs (`rlib.s.rl_stub_rm`) at its own address in the ROM, after the library. It calls the library directly, at the addresses in a list `build.sh` makes from the linked library (`PROVIDE(name = address)` for each symbol, which gives way to a symbol of the program's own). Its zero-initialised statics and the stubs' room for the library's statics take no ROM space.
+
+A C application on disc links with `tools/app.ld` and the library's stubs (`clib.s.cl_stub_r`) into a plain image that loads and runs at `&8000`.
 
 ### Changes to the sources for GCC
 
@@ -77,6 +80,7 @@ Each has a `ROO26:` comment.
 | `clib/h/stdarg` | `va_list` keeps its Norcroft type, a one-element array of `char *`, since programs built with Norcroft pass a pointer to it to `vprintf` and friends. `va_start` uses GCC's built-in to find the first unnamed argument: GCC only puts the unnamed arguments in memory, so the address of the last named one is no guide. It has to be the real `__builtin_va_start`; with `__builtin_next_arg` alone the optimiser makes fixed-argument copies of variadic functions |
 | `clib/h/math` | `__d_abs`, `__d_atan`, `__d_sin` and `__d_cos` are inline operations of the Norcroft compiler. Under GCC `fabs` is `__builtin_fabs` and the others are calls to the library |
 | `kernel/s/k_body`, `kernel/s/k_mod_r` | GCC's functions return without restoring the caller's flags; Norcroft's 26-bit code restored them. Four places in the library's assembler relied on getting flags back from a C function or a client's function: the calls to client handlers (`CallClient`, `_kernel_call_client`, `FindAndCallHandlers`), the loop that frees stack chunks, and the return from a function that grew the stack, which read the Z flag to tell which calling standard the function used. Each now tests again after the call, and the stack return has a second entry point for the old calling standard |
+| `rlib/c/wimp` | `#include "trace .h"` loses its space. RISC_OSLib's other 48 C files compile as they are |
 | `clib/s/cl_entries` | The library held a second `bsearch` compiled for the old calling standard (`cc -zkA`). GCC cannot produce that, so old clients reach the one `bsearch` through the calling standard veneer, as they already do for `qsort` |
 
 Programs that call the library still get their flags back from the assembler parts (the SWI veneers, `memcpy`, the maths entry points) and not from the C parts. Norcroft's code never keeps a flag across a call, so C programs do not notice. Hand-written assembler that does would.
