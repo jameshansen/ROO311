@@ -43,14 +43,18 @@ EnsureFSLock ROUT
 ; here when a write operation - check lock status
 01
         MOV     r2, r2, LSR #29         ; get drive number
-        CMP	r2, #4
+; ROO26: two repairs, found when a game's ADFS_DiscOp write to its own floppy failed with "SWI &44781 not
+; known". CLRV followed the CMP and set the carry flag, so the test for a floppy drive never passed and
+; every write asked FSLock; and with no FSLock module, as on RISC OS 3.11, the "SWI not known" error was
+; handed back as the result of the DiscOp. A machine without FSLock has nothing locked.
 	CLRV
+        CMP	r2, #4
 	Pull	"r1,r2,pc",LO		; not hard disc - ignore
 
         SWI     &44781+(1:SHL:17)       ; get the lock status
         BVC     %FT02
-        ORR     R0, R0, #1<<30
-        Pull    "r1,r2,pc"              ; if error then return it
+        CLRV
+        Pull    "r1,r2,pc"              ; no FSLock module: not locked
 02
 ; now check if FS is locked
         CMP	r0, #2
