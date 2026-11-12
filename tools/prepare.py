@@ -116,14 +116,39 @@ def message_version(comp, tag):
     raise SystemExit(f"{comp}: no {tag} in Messages")
 
 
+def swi_numbers(comp):
+    """The SWI names and numbers Squish puts in place of the names in SYS statements. It reads the C library's
+    swis.h (FNn), which is what an assembly of RISC_OSLib's s.makehswis puts out."""
+    with tempfile.TemporaryDirectory() as t:
+        obj = Path(t) / "swis.o"
+        subprocess.run([os.environ.get("ASASM", "asasm"), "-ABSolute", "-Uppercase", "-NOWarn", "-o", str(obj), "s/makehswis"],
+                       cwd=comp.parents[1] / "Lib" / "RISC_OSLib", check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(["arm-none-eabi-objcopy", "-O", "binary", str(obj), str(obj) + ".h"], check=True)
+        text = Path(str(obj) + ".h").read_bytes().replace(b"\0", b"").decode("latin-1")
+    swis = {}
+    for line in text.splitlines():
+        f = line.split()
+        if len(f) >= 3 and f[0] == "#define" and not f[1].startswith("X") and f[1].find("_") >= 1:
+            try:
+                swis[f[1]] = int(f[2], 0)
+            except ValueError:
+                pass
+    assert swis.get("Wimp_PollIdle") == 0x400E1, "swis.h did not come out as expected"
+    return swis
+
+
 def basic_app(runlink, version_tag=None):
     """A desktop application written in BASIC and held in the ROM as a module: the program goes into the
-    module as a ResourceFS file and a short !RunLink program runs it in place. The original build crunched
-    and squashed both (the "squish" tool) to save space; here they go in as they are. Some take their
+    module as a ResourceFS file and a short !RunLink program runs it in place. The original build made both
+    small with BASIC's CRUNCH -1 (crunch.!RunImage) and then the Squish tool, which basic.crunch and
+    basic.squish do here; Squish names the file it writes in the program's first line. Some take their
     module version from a tag in their Messages file (awk.Version)."""
     def make(comp):
-        (comp / "Resources" / "!RunImage,ffb").write_bytes((comp / "bas" / "!RunImage,ffb").read_bytes())
-        (comp / runlink).write_bytes((comp / "bas" / "!RunLink,ffb").read_bytes())
+        import basic
+        swis = swi_numbers(comp)
+        for src, dst in (("!RunImage,ffb", "Resources/!RunImage,ffb"), ("!RunLink,ffb", runlink)):
+            name = dst.split(",")[0].replace("/", ".").encode()
+            (comp / dst).write_bytes(basic.squish(basic.crunch((comp / "bas" / src).read_bytes()), name, swis))
         if version_tag:
             version, d, m, y = message_version(comp, version_tag)
             lines = ["; > Version - generated from Messages, used by s.Main", "",
@@ -188,7 +213,8 @@ GENERATORS = {"Internat/Territory/TerritoryManager": territory, "Video/Render/Su
               "Apps/Chars": basic_app("Resources/UK/!RunLink,ffb"),
               "Apps/Help": basic_app("Resources/UK/ROM/!RunLink,ffb", "HelpID"),
               "Apps/EditApp": c_app("Edit", "EditId"), "Apps/Draw": c_app("Draw", "DrawID"),
-              "Apps/Paint": c_app("Paint", "PntID")}
+              "Apps/Paint": c_app("Paint", "PntID"),
+              "SystemRes/Configure": c_app("Configure", "VER")}
 
 
 def main():
