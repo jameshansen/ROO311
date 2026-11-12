@@ -16,7 +16,7 @@ ROO311 is a port of RISC OS Open to the 26-bit Acorn Archimedes. It looks and wo
 
 An Archimedes emulator needs a RISC OS ROM image before it can start, and the RISC OS 3.11 one is commercial. ROO311 is a free and open ROM image that an emulator can load where it would load that one, so an emulated A5000 starts in the desktop with no commercial ROM and no hard disc. It boots a game from its floppy image, and it has Chars, Help, Edit, Draw, Paint, SciCalc and Configure in the ROM.
 
-The whole thing is one 2MB file. It's unfinished, and [What works](#what-works) says how far it's got.
+The whole ROM is one 2MB file. It's unfinished, and [What works](#what-works) says how far along it is.
 
 ## The original ROM
 
@@ -28,34 +28,34 @@ ROO311 is an unofficial project and isn't affiliated with RISC OS Open Ltd.
 
 ## How the commercial ROMs were used
 
-The commercial ROMs were to hand the whole way through, so it's worth being exact about what they were used for. No code or data in ROO311 is copied from them. Some facts about RISC OS 3.11 did come from one, and they were what ROO311 was tested against. This lists everything ROO311 has from them and every fault they helped find, starting with the lightest kind of look.
+The commercial ROMs were available throughout development, and this section sets out exactly how they were used. No code or data in ROO311 is copied from them. Some facts about RISC OS 3.11 were taken from its ROM, and ROO311 was tested against that ROM. The lists below cover everything ROO311 takes from the commercial ROMs and every fault they helped find, ordered from observing the ROM as it runs to disassembling its code.
 
-They helped find 6 faults. 4 were real faults in the published source, all in code for these older machines that nothing had built since RISC OS 3.5, and 2 were down to this project's own build tools and setup.
+The ROMs helped find 6 faults. Of those, 4 were real faults in the published source, all in code for these older machines that nothing had built since RISC OS 3.5. The other 2 were caused by this project's own build tools and setup.
 
 ### Watching RISC OS 3.11 run in the emulator
 
-Nothing here looks inside the ROM. It's what anyone with a RISC OS 3.11 machine can see by using it.
+Nothing in this group looks inside the ROM. It's what anyone can see by using a RISC OS 3.11 machine.
 
-- **The settings a CMOS reset gives.** The CMOS was reset under 3.11 (Delete held at power on) and the settings read back. ROO311's reset table for these machines has drive 0, NoBoot and mouse step 3 from that, and leaves out the Risc PC's later settings. The source's own comments record that Boot and drive 4 replaced NoBoot and drive 0 in September 1993, so only mouse step 3 rests on the readback alone.
-- **Testing.** The same games, commands and CMOS resets were run on both ROMs and the screens compared. That's how [What works](#what-works) was checked, and it showed what should happen where ROO311 misbehaved.
+- **The settings a CMOS reset gives.** The CMOS was reset under 3.11 (Delete held at power on) and the settings were read back. From that, ROO311's reset table for these machines sets drive 0, NoBoot and mouse step 3, and leaves out the Risc PC's later settings. The source's own comments record that Boot and drive 4 replaced NoBoot and drive 0 in September 1993, so mouse step 3 is the only value that depends on the readback.
+- **Testing.** The same games, commands and CMOS resets were run on both ROMs and the screens were compared. That's how [What works](#what-works) was checked. Where ROO311 misbehaved, the same run on 3.11 showed the correct behaviour.
 
 ### Reading names and text out of the ROM file
 
-This reads the ROM image as data, without disassembling any code. It's what `*ROMModules` and `*Help` show on a real machine, and what's on its screen.
+This group reads the ROM image as data, and no code is disassembled. The same information is shown by `*ROMModules` and `*Help` on a real machine, or is visible on its screen.
 
-- **The module list and its order.** A script walked the 3.11 ROM's chain of modules. `Sources/MODULES` builds 70 of those modules in that order (Squash apart), and the list decided which components were imported. It's published too, and a [listing of `*ROMModules` on 3.11](https://www.chiark.greenend.org.uk/~theom/riscos/mods/311.html) gives the same order.
-- **The date in DOSFS's help string.** The header tool stamps the day of the build there, which made every build different, so it was given the date DOSFS 0.62 carries in the 3.60 ROM, 01 Mar 1995. Any fixed date would have done. This is one of the 2 faults that were down to the build setup.
-- **The teletext font.** One character was missing from ROO311's, and comparing the font table with 3.11's showed which. The cause was the assembler, AsAsm, which carries a comment that ends in a backslash on to the next line, and the font itself is in the source. This is the other fault that was down to the build tools.
+- **The module list and its order.** A script read the list of modules from the 3.11 ROM image. `Sources/MODULES` builds 70 of those modules in the same order, except Squash, and the list determined which components were imported. The list is also public, and a [listing of `*ROMModules` on 3.11](https://www.chiark.greenend.org.uk/~theom/riscos/mods/311.html) gives the same order.
+- **The date in DOSFS's help string.** The header tool stamps the build date into this string, which made every build different. The string was given a fixed date instead, 01 Mar 1995, which is the date DOSFS 0.62 carries in the 3.60 ROM. Any fixed date would have worked. This is one of the 2 faults caused by the build setup.
+- **The teletext font.** One character was missing from ROO311's font, and comparing its font table with 3.11's showed which one. The cause was the assembler, AsAsm, which treats a comment ending in a backslash as continuing on the next line, so one line of the font was lost. The font data itself comes from the source. This is the other fault caused by the build tools.
 
 ### Disassembling code
 
-These are the places where the ROM's code was read. The fix that went in was written for ROO311 in each case, and a comment in the source says the ROM was consulted.
+These are the cases where the ROM's code was read. In each case the fix was written for ROO311, and a comment in the source notes that the ROM was consulted.
 
-- **The first word of the ROM** (3.11, `&03800000`). Some games reset the machine by copying this word to address 0 and jumping to it. With the later source's word the machine came back half reset, so 3.11's was read, and it's a branch that still works from address 0. ROO311's is a branch of the same kind, worked out from its own reset address. A real fault, in that the later source had changed how a reset is entered.
-- **`*ScreenLoad`'s palette** (3.11, `&0381C4C0`). A 256 colour picture loaded with a black palette. 3.11's routine takes the sprite pointer from R2, where ROO311's read a register nothing had set on a kernel without mode selectors. The fix uses R2, and the source alone shows the fault. A real fault.
-- **Changing a dynamic area's size** (3.11, `&0380AAC0`). The kernel reported CAM Map Corrupt at start-up. Lining its code up against 3.11's showed a branch that had ended up inside the wrong case, so a MEMC1 build returned to a stale address. The source's own branch is back where it belongs. A real fault.
-- **The Podule manager's loop over extension ROMs.** The machine hung at start-up with an extension ROM fitted. 3.11's Podule module was disassembled to compare, and it has no such loop. ROO311's kept its count in a register its callees overwrite, and the fix is new code. A real fault, in code the Risc PC builds had switched off.
-- **Where the VDU variables are.** Lining the kernel's code up against 3.11's showed that some VDU variables sit at different addresses, which [How it works](#how-it-works) records.
+- **The first word of the ROM** (3.11, `&03800000`). Some games reset the machine by copying this word to address 0 and jumping to it. With the word the later source produces, the machine was only partly reset. The word in the 3.11 ROM was read and found to be a branch that still works from address 0. ROO311 now has a branch of the same kind, calculated from its own reset address. This was a real fault, because the later source had changed how a reset is entered.
+- **`*ScreenLoad`'s palette** (3.11, `&0381C4C0`). A 256 colour picture loaded with a black palette. The routine in 3.11 takes the sprite pointer from R2. ROO311's routine read it from a register that is never set on a kernel without mode selectors. The fix uses R2, and the fault can be seen from the source alone. This was a real fault.
+- **Changing a dynamic area's size** (3.11, `&0380AAC0`). The kernel reported CAM Map Corrupt at start-up. Comparing its code with 3.11's showed that a branch had ended up inside the wrong conditional case, so a MEMC1 build returned to a stale address. The branch was moved back to the correct place. This was a real fault.
+- **The Podule manager's loop over extension ROMs.** The machine hung at start-up with an extension ROM fitted. 3.11's Podule module was disassembled to compare, and it has no such loop. The loop in ROO311 kept its count in a register that the routines it calls overwrite, and the fix is new code. This was a real fault, in code that the Risc PC builds had switched off.
+- **Where the VDU variables are.** Comparing the kernel's code with 3.11's showed that some VDU variables are at different addresses, which is recorded under [How it works](#how-it-works).
 
 ## Features
 
@@ -136,7 +136,7 @@ The machine starts in the desktop, where the Apps icon on the icon bar opens the
 
 Configure sets the machine up, and its Screen window has menus for the monitor type, the colours and the resolution. **Set** changes the screen straight away and keeps the choice for the next start, and **Cancel** puts back what was there.
 
-Files get onto the machine on a floppy image or through HostFS, which Arculator's support ROM provides.
+Files reach the machine on a floppy image or through HostFS, which Arculator's support ROM provides.
 
 ## How it works
 
@@ -146,7 +146,7 @@ The components listed in `Sources/NEWER` come from the current RISC OS Open sour
 
 The assembler sources were written for Acorn's AAsm and ObjAsm and are assembled with AsAsm. The C parts were written for the Norcroft compiler and are compiled with GCC 4.7.4, the last GCC that can target an ARM2 or ARM3, and they're the SharedCLibrary with RISC_OSLib inside it, Edit, Draw, Paint, Configure, Filer_Action, Squash and DOSFS. Each application is a module in the ROM that calls the library in the ROM directly, the way RISC OS 3 held Edit, Draw and Paint. [toolchain/README.md](toolchain/README.md) has the compiler options, the changes the sources needed and the 2 compiler faults that had to be fixed.
 
-Fitting in 2MB takes the same methods the original build used. The message files are tokenized against the kernel's dictionary and Help's tokens, and Chars and Help, which are BASIC programs, go through BASIC's `CRUNCH` and the build's Squish tool, both ported to Python here. Together that frees 59K, which is what lets Configure in. ColourTrans's ready-made tables for plotting 16 and 32 bit per pixel sprites are left out (83K), and it builds a table the first time one is wanted. SpriteExtend is built with its all-assembler code generator and no JPEG, as RISC OS 3.11's was. The ROM has a single set of icons, the high resolution one, and in a mode whose pixels aren't square (mode 12 on a TV-standard monitor) the Window Manager scales them.
+Fitting in 2MB takes the same methods the original build used. The message files are tokenized against the kernel's dictionary and Help's tokens, and Chars and Help, which are BASIC programs, go through BASIC's `CRUNCH` and the build's Squish tool, both ported to Python here. Together that frees 59K, which is what makes room for Configure. ColourTrans's ready-made tables for plotting 16 and 32 bit per pixel sprites are left out (83K), and it builds a table the first time one is wanted. SpriteExtend is built with its all-assembler code generator and no JPEG, as RISC OS 3.11's was. The ROM has a single set of icons, the high resolution one, and in a mode whose pixels aren't square (mode 12 on a TV-standard monitor) the Window Manager scales them.
 
 Configure is the RISC OS 3.6 one, which was a disc application started by a boot application on disc. In the ROM it starts without the boot application, and what it kept in the CMOS RAM works. Its Screen window also keeps the monitor type and the desktop's mode in the CMOS RAM, as RISC OS 3.11 did (`*Configure MonitorType` and `WimpMode`), and its menus of colours and resolutions offer the numbered modes the chosen monitor can show, where before they came from the monitor definition files of later machines. What it kept in files of the boot application has nowhere to go yet.
 
@@ -164,7 +164,7 @@ The build runs on Linux and needs AsAsm from GCCSDK (`svn://svn.riscos.info/gccs
 ASASM=/path/to/asasm GCC=/path/to/arm-unknown-riscos-gcc sh build.sh
 ```
 
-The ROM ends up at `build/A5000/rom`, and each module's ELF file beside it holds source line numbers. The same sources always give the same image, so it doesn't matter where or when it's built.
+The ROM is written to `build/A5000/rom`, and each module's ELF file beside it holds source line numbers. The same sources always give the same image, so it doesn't matter where or when it's built.
 
 GitHub Actions runs this build from source on every push, compiler included (`.github/workflows/build.yml`), and a version tag publishes the image as `ROM311` in a release.
 
