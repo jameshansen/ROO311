@@ -1,5 +1,6 @@
 # Builds the ROM from source on every push and pull request. A tag of the form v1.2.3 also publishes the
-# image as ROM311 in a release of that name.
+# image as ROM311 in a release of that name, with docs/releases/v1.2.3.md and docs/releases/install.md as
+# its notes.
 #
 # The toolchain is built from source too (toolchain/README.md): GCC 4.7.4 for RISC OS and AsAsm, in the
 # Ubuntu 14.04 container toolchain/Dockerfile describes. That takes most of an hour, so the result is kept
@@ -94,11 +95,19 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.ref_name }}
+        # The release's own notes, what changed and what was fixed since the last release, are written in
+        # docs/releases/<tag>.md before the tag is pushed. Without them nothing is published.
         run: |
+          if [ ! -f "docs/releases/$TAG.md" ]; then
+            echo "::error::docs/releases/$TAG.md is missing. Write the release notes before tagging."
+            exit 1
+          fi
           {
             echo "ROO311 ${TAG#v}, built from source by GitHub Actions at this tag."
             echo
-            echo "\`ROM311\` is the 2MB ROM image. The README says how to put it in an emulator and what works so far."
+            cat "docs/releases/$TAG.md"
+            echo
+            cat docs/releases/install.md
             echo
             echo "SHA-256: \`$(cut -d' ' -f1 ROM311.sha256)\`"
             echo
@@ -106,6 +115,7 @@ jobs:
           } > notes.md
           if gh release view "$TAG" > /dev/null 2>&1; then
             gh release upload "$TAG" ROM311 --clobber
+            gh release edit "$TAG" --notes-file notes.md
           else
             gh release create "$TAG" ROM311 --verify-tag --title "ROO311 $TAG" --notes-file notes.md
           fi
