@@ -16,7 +16,13 @@ ROO311 is a port of RISC OS Open to the 26-bit Acorn Archimedes. It looks and wo
 
 An Archimedes emulator needs a RISC OS ROM image before it can start, and the RISC OS 3.11 one is commercial. ROO311 is a free and open ROM image that an emulator can load where it would load that one, so an emulated A5000 starts in the desktop with no commercial ROM and no hard disc. It boots a game from its floppy image, and it has Chars, Help, Edit, Draw, Paint, SciCalc and Configure in the ROM.
 
-The whole ROM is one 2MB file. It's unfinished, and [What works](#what-works) says how far along it is.
+The whole ROM is one 2MB file. It's unfinished, see [What works](#what-works).
+
+## Why
+
+I have been creating a number of tools to allow the easy launching of some of my, and my kids' favourite games on the Raspberry Pi, such as [Knytt](https://github.com/jameshansen/PiKnytt) and [Klass of 99](https://github.com/jameshansen/PiKlassOf99), and I have been sharing these projects here for other fans of these lesser known titles. I wanted to add the Risc OS version of Lemmings, along with other games freely released on [JASPP](https://forums.jaspp.org.uk/forum/index.php) to that list. The problem is that these old games require a commercial Risc OS 3.11 ROM, so this project was started to elimate that block to releasing this tool onto GitHub.
+
+After starting this project I learned of a similar project, [arc-libre](https://github.com/acorn-playground/arclibre/) which aims to do the same thing, with a slightly different approach.
 
 ## The original ROM
 
