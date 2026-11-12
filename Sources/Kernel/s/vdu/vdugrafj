@@ -1223,6 +1223,13 @@ WritePaletteFromSprite ROUT
         ;sprite mode words, and worse still tried to select a mode from a new sprite
         ;mode word. the rewrite above takes a more logical approach
 
+        ; ROO26: the palette loop below takes the sprite pointer from R6, which only the mode selector
+        ; code above sets. On this path (a kernel without mode selectors) R6 held whatever the caller
+        ; left in it, so *ScreenLoad set the palette from page zero: a 256 colour picture came up with
+        ; all sixteen palette entries black. RISC OS 3.11 uses R2, the sprite pointer, directly here
+        ; (ROM311 &0381C4C0), which this restores.
+        MOV     R6, R2
+
         CMP     R0, R1                  ; if already in correct mode
         BEQ     %FT10                   ; then skip
 
