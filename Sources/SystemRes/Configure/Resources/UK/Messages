@@ -379,3 +379,9 @@ SAVEAS:This box allows you to save data in a file, or transfer it to another app
 SAVEAS0:Click here to save the data with the current filename. If it is not a full pathname, you must drag the icon to a directory first.
 SAVEAS2:This shows the filename for this data. If it is not a full pathname, drag the icon into a directory display.
 SAVEAS3:Drag this icon to the directory in which you want to save the file. Or, drag it to the program into which you want to transfer the data.
+#
+# ROO26: the help for *Desktop_Configure, which the module that holds Configure in the ROM looks up here
+#{DictTokens}
+
+ConfigureHelp:The !Configure module runs the Configure desktop application 
+ConfigureSyntax:Syntax: *Desktop_Configure 

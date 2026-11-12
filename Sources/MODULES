@@ -69,7 +69,7 @@ HWSupport/Sound/Voices/Percussion     s/Percussion        Percussion
 Lib/RISC_OSLib                        @clib               SharedCLibrary
 Desktop/FilerAct                      @romapp             Filer_Action
 Programmer/Squash                     @squash             Squash
-- Configure (SystemRes/Configure, @romapp !Configure): builds, at 49K with 62K of resources, which is more than the 2MB image has left.
+SystemRes/Configure                   @romapp             !Configure
 Apps/Draw                             @romapp             !Draw
 Apps/Paint                            @romapp             !Paint
 Apps/EditApp                          @romapp             !Edit

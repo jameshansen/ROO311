@@ -9,8 +9,8 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 | Works | Not yet |
 |---|---|
 | Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | DOSFS is in the ROM but has not read a DOS disc yet |
-| 69 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program, and its BASIC needs crunching to fit) |
-| | Configure: it builds as a ROM application, but it and its resources (111K) do not fit in what the 2MB image has left |
+| 70 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program, and the image has no room left for it) |
+| Configure runs from the Apps folder: ten of its eleven windows open, and a setting changed in one reaches the CMOS RAM | Configure's Screen window: it wants the monitor definition files and ScreenModes module of later machines |
 | | Tactic does not start: it restores its saved configuration from the wrong disc data |
 | Supervisor prompt, keyboard, mouse, `*` commands | Palette utility on the icon bar |
 | BBC BASIC V 1.14 with graphics, FPEmulator 4.39 | Printing modules, Econet and NetFS |
@@ -25,7 +25,7 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 | SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC: a test program passes every check | |
 | Battle Chess (1992), a C game built with the Norcroft compiler, runs on that library | |
 
-The image uses 2.05MB of the 2MB (2,097,152 bytes), with 50K to spare.
+The image uses 2,094,272 of the 2MB (2,097,152 bytes), with 3K to spare. A5000 hardware and Arculator both stop at 2MB.
 
 ## Where everything comes from
 
@@ -35,6 +35,8 @@ Every file in the ROM comes from the RISC OS Open repositories or was written fo
 - Components listed in `Sources/NEWER` come from the current RISC OS Open sources and build against current headers (`Sources/Headers5`). FPEmulator is the first.
 - SpriteExtend is built with its all-assembler code generator and no JPEG, as RISC OS 3.11's was.
 - The calculator is SciCalc, the one RISC OS Open publishes. It was a disc application that needed BASIC64; in the ROM it runs on the ROM's BASIC, to 9 figures, unless BASIC64 has been loaded.
+- The message files are tokenised against the kernel's dictionary and Help's tokens, and Chars and Help are crunched and squished, as the original build did. Together that frees 59K, which is what lets Configure in.
+- Configure is the RISC OS 3.6 one. It was a disc application that a boot application on disc started; in the ROM it is a module like Edit, Draw and Paint, and it starts without the boot application. What it kept in the CMOS RAM works. What it kept in files of the boot application (the screen mode, the desktop font, the RAM disc) has nowhere to go yet.
 - ColourTrans's ready-made tables for plotting 16 and 32 bit per pixel sprites are left out of the ROM (83K). It builds a table when one is first wanted.
 - Changes to imported sources carry a comment starting `ROO26:` that says what changed. Where a commercial ROM was consulted to settle how something behaved, the comment names the ROM and the address.
 
@@ -60,7 +62,8 @@ The ROM is `build/A5000/rom`. Each module's ELF file beside it holds source line
 | `tools/fixcase.py` | Normalises imported sources for AsAsm on Linux (file name case, backslashes) |
 | `tools/romdiff.py` | Lines a built image up against a reference ROM and shows the code that differs |
 | `tools/whereis.py` | Names the module and source line behind a ROM address |
-| `tools/basic.py` | Lists a tokenised BBC BASIC file |
+| `tools/msgtok.py` | Tokenises the ROM's message files, as the original build's MsgTok tools did |
+| `tools/basic.py` | Lists a tokenised BBC BASIC file; crunches one as BASIC's `CRUNCH` does and squishes one as the build's Squish tool does |
 
 ## Differences from the imported sources that matter
 

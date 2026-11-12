@@ -882,8 +882,11 @@ static void check_for_global_update (void)
    BOOL network_boot;
 
    /*Get Choices$Write.*/
+   /* ROO26: Configure is in the ROM and has to run on a machine with no boot application on disc, which is
+      what sets this. Then there are no choices files and nothing global to warn of; the settings kept in
+      the CMOS RAM work as they are. */
    if ((env = getenv ("Choices$Write")) == NULL)
-      werr (TRUE, msgs_lookup ("NotSet"), "Choices$Write");
+      return;
 
    /*It's something like 'Choices:Boot': canonicalise it.*/
    _swi (OS_FSControl, _IN (0) | _IN (1) | _IN (2) | _IN (3) | _IN (4) | _IN (5),

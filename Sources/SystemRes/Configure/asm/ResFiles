@@ -1,5 +1,6 @@
 ; > asm.ResFiles
 
-        ResourceFile !Configure.Sprites,   Resources.Configure.Sprites
+; ROO26: the high resolution sprites, which serve every mode, as the ROM's other icons do
+        ResourceFile Resources.Sprites22,   Resources.Configure.Sprites
 
         END

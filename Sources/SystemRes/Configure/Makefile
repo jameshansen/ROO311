@@ -163,6 +163,17 @@ install_FontMerge: ${FONTFILES}
 	|
 	@echo FontMerge: Application installed (Disc)
 
+# ROO26: Configure is held in the ROM with the other applications. Its program is a module (!Configure),
+# which registers the sprites; these go into the Messages module.
+RESDIR = <resource$dir>.Resources.Configure
+RESAPP = <resource$dir>.Apps.!Configure
+resources:
+	${CP} ${RDIR}.ROM.!Boot ${RESAPP}.!Boot ${CPFLAGS}
+	${CP} ${LDIR}.!Help     ${RESAPP}.!Help ${CPFLAGS}
+	${CP} ${RDIR}.ROM.!Run  ${RESAPP}.!Run  ${CPFLAGS}
+	${CP} ${LDIR}.Messages  ${RESDIR}.Messages ${CPFLAGS}
+	${CP} ${LDIR}.Templates ${RESDIR}.Templates ${CPFLAGS}
+
 clean:
 	${WIPE} o.* ${WFLAGS}
 	${RM} abs.!RunImage
