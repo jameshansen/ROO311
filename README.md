@@ -26,14 +26,36 @@ ROO311 is built from those sources. The kernel and most modules are RISC OS 3.60
 
 ROO311 is an unofficial project and isn't affiliated with RISC OS Open Ltd.
 
-I consulted a commercial ROM in 4 places, where the published source went wrong on this hardware and I needed to know how RISC OS had behaved. Each one has a comment in the source that names the ROM, and the address where there is one, and the fix that went in is my own.
+## How the commercial ROMs were used
 
-| Where | ROM consulted | What it settled | What was done |
-| --- | --- | --- | --- |
-| `Sources/Kernel/s/Kernel` | RISC OS 3.11, `&03800000` | The first word of the ROM is a branch that still works when it's copied to address 0, which is how some games reset the machine | The first word is that kind of branch again. It had been a load through a table in RAM, which left the machine half reset |
-| `Sources/Kernel/s/vdu/vdugrafj` | RISC OS 3.11, `&0381C4C0` | `*ScreenLoad` takes the sprite pointer from R2 when it sets the palette | It uses R2 again. On a kernel without mode selectors nothing had set the register it used, so a 256 colour picture loaded with a black palette |
-| `Sources/Kernel/s/ChangeDyn` | RISC OS 3.11, `&0380AAC0` | Where the code goes when there's no free pool and a dynamic area's size changes by less than was asked | The branch goes to the same place. It had ended up inside another case, so a MEMC1 build returned to a stale address |
-| `Sources/FileSys/ImageFS/DOSFS/cmhg/DOSFShdr` | RISC OS 3.60, the help string of DOSFS 0.62 | The date that version of DOSFS carries | DOSFS is given that date, 01 Mar 1995. The header generator had stamped the day of the build, which made every build different |
+I had the commercial ROMs to hand the whole way through, so it's worth being exact about what they were used for. No code or data in ROO311 is copied from them. Some facts about RISC OS 3.11 did come from one, and they were what I tested against. This lists everything ROO311 has from them and every fault they helped find, starting with the lightest kind of look.
+
+They helped find 6 faults. 4 were real faults in the published source, all in code for these older machines that nothing had built since RISC OS 3.5, and 2 were down to my own build tools and setup.
+
+### Watching RISC OS 3.11 run in the emulator
+
+Nothing here looks inside the ROM. It's what anyone with a RISC OS 3.11 machine can see by using it.
+
+- **The settings a CMOS reset gives.** I reset the CMOS under 3.11 (Delete held at power on) and read the settings back. ROO311's reset table for these machines has drive 0, NoBoot and mouse step 3 from that, and leaves out the Risc PC's later settings. The source's own comments record that Boot and drive 4 replaced NoBoot and drive 0 in September 1993, so only mouse step 3 rests on the readback alone.
+- **Testing.** I ran the same games, commands and CMOS resets on both ROMs and compared the screens. That's how [What works](#what-works) was checked, and how I saw what should happen where ROO311 misbehaved.
+
+### Reading names and text out of the ROM file
+
+This reads the ROM image as data, without disassembling any code. It's what `*ROMModules` and `*Help` show on a real machine, and what's on its screen.
+
+- **The module list and its order.** A script walked the 3.11 ROM's chain of modules. `Sources/MODULES` builds 70 of those modules in that order (Squash apart), and the list decided which components I imported. It's published too, and a [listing of `*ROMModules` on 3.11](https://www.chiark.greenend.org.uk/~theom/riscos/mods/311.html) gives the same order.
+- **The date in DOSFS's help string.** The header tool stamps the day of the build there, which made every build different, so I gave it the date DOSFS 0.62 carries in the 3.60 ROM, 01 Mar 1995. Any fixed date would have done. This is one of the 2 faults that were down to my setup.
+- **The teletext font.** One character was missing from ours, and comparing the font table with 3.11's showed which. The cause was my assembler, which carries a comment that ends in a backslash on to the next line, and the font itself is in the source. This is the other fault that was down to my build tools.
+
+### Disassembling code
+
+These are the places where I read the ROM's code. The fix that went in is my own in each case, and a comment in the source says the ROM was consulted.
+
+- **The first word of the ROM** (3.11, `&03800000`). Some games reset the machine by copying this word to address 0 and jumping to it. With the later source's word the machine came back half reset, so I read 3.11's, which is a branch that still works from address 0. ROO311's is a branch of the same kind, worked out from its own reset address. A real fault, in that the later source had changed how a reset is entered.
+- **`*ScreenLoad`'s palette** (3.11, `&0381C4C0`). A 256 colour picture loaded with a black palette. 3.11's routine takes the sprite pointer from R2, where ours read a register nothing had set on a kernel without mode selectors. The fix uses R2, and the source alone shows the fault. A real fault.
+- **Changing a dynamic area's size** (3.11, `&0380AAC0`). The kernel reported CAM Map Corrupt at start-up. Lining its code up against 3.11's showed a branch that had ended up inside the wrong case, so a MEMC1 build returned to a stale address. The source's own branch is back where it belongs. A real fault.
+- **The Podule manager's loop over extension ROMs.** The machine hung at start-up with an extension ROM fitted. I disassembled 3.11's Podule module to compare, and it has no such loop. Ours kept its count in a register its callees overwrite, and the fix is new code. A real fault, in code the Risc PC builds had switched off.
+- **Where the VDU variables are.** Lining the kernel's code up against 3.11's showed that some VDU variables sit at different addresses, which [How it works](#how-it-works) records.
 
 ## Features
 
@@ -52,24 +74,38 @@ I consulted a commercial ROM in 4 places, where the published source went wrong 
 
 I've booted the ROM in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB), driven by a script.
 
-| Works | Not yet |
-|---|---|
-| Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | DOSFS is in the ROM but hasn't read a DOS disc yet |
-| 70 ROM modules initialize | Alarm (its machine code helper is assembled by a BASIC program, and the image has no room left for it) |
-| Configure runs from the Apps folder. Its Screen window sets the monitor type and the desktop's mode, and the screen changes at once and comes back the same after a reset | Configure's settings that live in a boot application on disc, which are the desktop font, the RAM disc and the background texture |
-| | Tactic doesn't start. It restores its saved configuration from the wrong disc data |
-| Supervisor prompt, keyboard, mouse, `*` commands | Palette utility on the icon bar |
-| BBC BASIC V 1.14 with graphics, FPEmulator 4.39 | Printing modules, Econet and NetFS |
-| Desktop with the RISC OS Open look | Power-on self test |
-| Filer operations through Filer_Action (delete and count tried) | Hard disc access is untested |
-| Chars, Help, Edit, Draw, Paint and SciCalc run from the Apps folder | Sound hasn't been listened to |
-| Outline fonts (Font Manager and ROM fonts), scaled sprites (SpriteExtend), Squash | Copy-protected floppy images (they need a track-level image format) |
-| ADFS floppy access on the 82C711, including `ADFS_DiscOp` writes | Most games are untried |
-| HostFS from Arculator's support ROM (extension ROM loading) | Other emulators and real hardware are untried |
-| RISC OS 3.11's CMOS defaults | |
-| Blaston (1991) boots from its floppy image and runs, with no ADFFS | |
-| SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC. A test program passes every check | |
-| Battle Chess (1992) runs on that library | |
+### Works
+
+- Kernel on MEMC1/IOC/VIDC1, 26-bit throughout
+- 70 ROM modules initialize
+- Configure runs from the Apps folder. Its Screen window sets the monitor type and the desktop's mode, and the screen changes at once and comes back the same after a reset
+- Supervisor prompt, keyboard, mouse, `*` commands
+- BBC BASIC V 1.14 with graphics, FPEmulator 4.39
+- Desktop with the RISC OS Open look
+- Filer operations through Filer_Action (delete and count tried)
+- Chars, Help, Edit, Draw, Paint and SciCalc run from the Apps folder
+- Outline fonts (Font Manager and ROM fonts), scaled sprites (SpriteExtend), Squash
+- ADFS floppy access on the 82C711, including `ADFS_DiscOp` writes
+- HostFS from Arculator's support ROM (extension ROM loading)
+- RISC OS 3.11's CMOS defaults
+- Blaston (1991) boots from its floppy image and runs, with no ADFFS
+- SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC. A test program passes every check
+- Battle Chess (1992) runs on that library
+
+### Not yet
+
+- DOSFS is in the ROM but hasn't read a DOS disc yet
+- Alarm (its machine code helper is assembled by a BASIC program, and the image has no room left for it)
+- Configure's settings that live in a boot application on disc, which are the desktop font, the RAM disc and the background texture
+- Tactic doesn't start. It restores its saved configuration from the wrong disc data
+- Palette utility on the icon bar
+- Printing modules, Econet and NetFS
+- Power-on self test
+- Hard disc access is untested
+- Sound hasn't been listened to
+- Copy-protected floppy images (they need a track-level image format)
+- Most games are untried
+- Other emulators and real hardware are untried
 
 The image uses 2,090,888 of the 2MB (2,097,152 bytes), and A5000 hardware and Arculator both stop at 2MB.
 

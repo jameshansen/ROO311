@@ -1,4 +1,7 @@
 # The modules that follow the kernel in the ROM, in ROM order (the order RISC OS 3.11 had them).
+# That order is the one *ROMModules prints on RISC OS 3.11. A listing is published at
+# https://www.chiark.greenend.org.uk/~theom/riscos/mods/311.html and agrees with this file, Squash apart:
+# it is built from C here, so it comes after the C library.
 # <folder under Sources/>  <source file>  <module file name>
 # A source of the form @name is built by the function of that name in build.sh.
 # A line starting with "-" is a module RISC OS 3.11 had that is not built yet, with the reason.
