@@ -69,14 +69,14 @@ clean:
 resources:
 	${MKDIR} ${RESDIR}.${COMPONENT}
 	${CP} Resources.${LOCALE}.Messages   ${RESDIR}.${COMPONENT}.Messages   ${CPFLAGS}
-# ROO26: the flat window tools go into the ROM in place of the 3D ones (Tools3d), for the RISC OS 3 look, and
-# the high resolution sprites (Sprites22, 219K) stay out, as they did from the RISC OS 3.11 ROM. The
-# templates stay Template3D: this Window Manager's error box code fills in that layout, and with the flat
-# Templates file the message is missing and the button text is wrong. With 3D borders configured off, as
-# ROO26's CMOS defaults have them, the box is drawn flat. All the files are still in Resources.
+# ROO26: the ROM has the 3D window tools and one set of icons, the high resolution one, under the name
+# Sprites: the Window Manager falls back to that name in every mode, and scales the icons where pixels are
+# not square. tools/prepare.py makes it from Sprites22 (Resources.UK.ROM.Sprites): the 256 and 32 thousand
+# colour window tiles are left out, and the task bar icon is the cog of the current RISC OS Open sources.
+# The lower resolution set (Sprites) is still in Resources and not in the ROM.
 	${CP} Resources.${LOCALE}.Template3D ${RESDIR}.${COMPONENT}.Templates  ${CPFLAGS}
-	${CP} Resources.${LOCALE}.Sprites    ${RESDIR}.${COMPONENT}.Sprites    ${CPFLAGS}
-	${CP} Resources.${LOCALE}.Tools      ${RESDIR}.${COMPONENT}.Tools      ${CPFLAGS}
+	${CP} Resources.${LOCALE}.ROM.Sprites ${RESDIR}.${COMPONENT}.Sprites   ${CPFLAGS}
+	${CP} Resources.${LOCALE}.Tools3d    ${RESDIR}.${COMPONENT}.Tools      ${CPFLAGS}
 	@echo ${COMPONENT}: resource files copied
 
 ${TARGET}: ${SOURCE}

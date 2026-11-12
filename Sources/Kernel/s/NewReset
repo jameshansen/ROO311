@@ -978,21 +978,19 @@ DefaultCMOSTable ; list of non-zero options wanted :
 ; byte pairs of offset, value
 ; terminated by offset &FF
 
-; ROO26: the table had become the Risc PC's: boot from hard disc 4, a 3D desktop in Homerton, a 64K font
-; cache. On an IOC machine the values are the ones RISC OS 3.11 sets, so that a machine with no hard disc
-; starts as it always did and the desktop has the RISC OS 3 look. They were found by resetting CMOS under
-; each ROM in the emulator (Delete held at power on) and reading the CMOS RAM back; they are the defaults
-; *Status shows on a new RISC OS 3.11 machine. The locations that differ are Start, DBTB, Font, FileSwitch,
-; DesktopFeatures, Protection, MouseStep, SystemSpeed, FontMax2/3, AlarmAndTime, FSLock and CDROMFS.
+; ROO26: the table had become the Risc PC's, which boots from hard disc 4. On an IOC machine the values
+; that decide how the machine starts are the ones RISC OS 3.11 sets, so that a machine with no hard disc
+; starts as it always did: drive 0, NoBoot, mouse step 3. They were found by resetting CMOS under each ROM
+; in the emulator (Delete held at power on) and reading the CMOS RAM back; they are the defaults *Status
+; shows on a new RISC OS 3.11 machine. The locations that differ from the Risc PC's are Start, DBTB,
+; Protection, MouseStep, SystemSpeed, FontMax2/3, AlarmAndTime, FSLock and CDROMFS.
+; The desktop's look is RISC OS Open's: 3D borders, Homerton, tiled window backgrounds, solid drags and
+; the 64K font cache an outline desktop font wants.
         GBLL    RO3Defaults
 RO3Defaults SETL IO_Type <> "IOMD"
         =       KeyDelCMOS,     32
         =       FileLangCMOS,   8
- [ RO3Defaults
-        =       FontCMOS,       8       ; 32K
- |
         =       FontCMOS,       16      ; TMD 15-Dec-93: Changed to 64K from 32K - fixes MED-01774
- ]
         =       PigCMOS,        10
         =       KeyRepCMOS,     8
         =       RMASizeCMOS,    0
@@ -1046,12 +1044,14 @@ RO3Defaults SETL IO_Type <> "IOMD"
         =       DesktopCMOS,    2_01000000      ; verbose ON
         =       WimpFlagsCMOS,  2_01101111      ; instant effects, drags off screen
  [ RO3Defaults
-        =       DesktopFeaturesCMOS,(0:SHL:0) :OR: (0:SHL:1) :OR: (1:SHL:7)
-                              ;      flat look
-                              ;                     system font
-                              ;                                    plain window backgrounds
+        =       DesktopFeaturesCMOS,(1:SHL:0) :OR: (8:SHL:1) :OR: (0:SHL:7)
+                              ;      3D look
+                              ;                     Homerton.Medium
+                              ;                                    tiled window background
         =       MouseStepCMOS,  3
-        =       FileSwitchCMOS,(1:SHL:0)        ; truncate names; drags show outlines
+        =       FileSwitchCMOS,(1:SHL:0) :OR: (1:SHL:1)
+                              ; truncate names
+                              ;                Use DragASprite
         =       SystemSpeedCMOS,(1:SHL:2):OR:(1:SHL:4)
                               ; Delete-etc reset
                               ;               WimpMode auto

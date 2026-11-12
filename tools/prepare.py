@@ -151,8 +151,21 @@ def c_app(name, version_tag):
     return make
 
 
+def wimp(comp):
+    """Resources.UK.ROM.Sprites: the ROM's one set of icons. It is the high resolution set without the window
+    tiles for 256 and 32 thousand colour modes (100K; the 16 colour tile serves every mode), and with the task
+    bar icon of the current RISC OS Open sources, the cog, which their Desktop module calls "id"."""
+    import sprites
+    uk = comp / "Resources" / "UK"
+    (uk / "ROM").mkdir(exist_ok=True)
+    cog = comp.parent / "Desktop5" / "Resources" / "UK" / "Sovereign" / "Sprites,ff9"
+    sprites.write(uk / "ROM" / "Sprites,ff9",
+                  sprites.build(uk / "Sprites22,ff9", drop=("tile_1-16", "tile_1-8"), take=[(cog, "id", "switcher")]))
+
+
 GENERATORS = {"Internat/Territory/TerritoryManager": territory, "Video/Render/Super": supersample,
               "Internat/Inter": international, "Video/Render/Fonts/ROMFonts": romfonts,
+              "Desktop/Wimp": wimp,
               "Apps/Chars": basic_app("Resources/UK/!RunLink,ffb"),
               "Apps/Help": basic_app("Resources/UK/ROM/!RunLink,ffb", "HelpID"),
               "Apps/EditApp": c_app("Edit", "EditId"), "Apps/Draw": c_app("Draw", "DrawID"),

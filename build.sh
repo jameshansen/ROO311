@@ -92,7 +92,7 @@ romaddr() {
 C_DIALECT="-funsigned-bitfields -fno-strict-aliasing -fwrapv -fno-delete-null-pointer-checks"
 modcc() {
 	off=$1 out=$2 src=$3; shift 3
-	"$GCC" -mmodule -ffixed-sl -mno-poke-function-name -fno-section-anchors -ffreestanding -fno-common -O2 \
+	"$GCC" -mmodule -ffixed-sl -mno-poke-function-name -fno-section-anchors -ffreestanding -fno-common -Os \
 		-nostdinc $C_DIALECT -D__arm -D___type= "$@" -x c -S -o "${out%.o}.s" "$src" &&
 	sed -i -e "s/\[sl, #-536\]/[sl, #-$off]/" -e 's/(GOTOFF)$//' "${out%.o}.s" &&
 	"$GCC" -mmodule -c -o "$out" "${out%.o}.s"
