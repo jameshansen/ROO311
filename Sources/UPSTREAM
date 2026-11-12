@@ -96,3 +96,4 @@ FileSys/CDFS/CDFS                    FileSys/CDFS/CDFS                    6ce12e
 HWSupport/CD/CDFSDriver              HWSupport/CD/CDFSDriver              4ab9044  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/CDROM hdr/CDErrors
 HWSupport/CD/ATAPI                   HWSupport/CD/ATAPI                   e5462ee  RISC OS 3.60 source import (1996-11-05), exported headers only: hdr/ATAPI
 Desktop/Desktop5                     Desktop/Desktop                      affc2fc  current sources (2023-08-25), UK resources with the Sovereign banner only
+Desktop/Wimp5                        Desktop/Wimp                         09829ed  current sources (2025-01-18), the Sovereign sprites only, for the task bar icon

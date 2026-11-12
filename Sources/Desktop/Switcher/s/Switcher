@@ -1589,9 +1589,7 @@ Start   LDR     wp, [r12]               ; get workspace pointer
 
         MOVVC   r1, #VduExt_YEigFactor
         SWIVC   XOS_ReadModeVariable
-; ROO26: the icon stands on the icon bar's line. It was 8 units under it, for the Acorn logo (0.53). The cog
-; is artwork to its last row, so that left it 4 pixels low and close to the foot of the bar.
-        MOVVC   y0, #0
+        MOVVC   y0, #-8
         ADDVC   y1, y0, r4, LSL r2
 
         MOVVC   r0, #-8

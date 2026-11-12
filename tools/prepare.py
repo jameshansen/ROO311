@@ -179,13 +179,15 @@ def c_app(name, version_tag):
 def wimp(comp):
     """Resources.UK.ROM.Sprites: the ROM's one set of icons. It is the high resolution set without the window
     tiles for 256 and 32 thousand colour modes (100K; the 16 colour tile serves every mode), and with the task
-    bar icon of the current RISC OS Open sources, the cog, which their Desktop module calls "id"."""
+    bar icon of the current RISC OS Open sources: the cog their Task Manager puts on the icon bar, which is
+    "taskmanager" in their Window Manager's Sovereign sprites (Desktop/Wimp5). This Task Manager asks for
+    "switcher", so the cog goes in under that name."""
     import sprites
     uk = comp / "Resources" / "UK"
     (uk / "ROM").mkdir(exist_ok=True)
-    cog = comp.parent / "Desktop5" / "Resources" / "UK" / "Sovereign" / "Sprites,ff9"
+    cog = comp.parent / "Wimp5" / "Resources" / "UK" / "Sovereign" / "Sprites,ff9"
     sprites.write(uk / "ROM" / "Sprites,ff9",
-                  sprites.build(uk / "Sprites22,ff9", drop=("tile_1-16", "tile_1-8"), take=[(cog, "id", "switcher")]))
+                  sprites.build(uk / "Sprites22,ff9", drop=("tile_1-16", "tile_1-8"), take=[(cog, "taskmanager", "switcher")]))
 
 
 def desktop5(comp):

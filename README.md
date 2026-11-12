@@ -14,7 +14,7 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 | | Tactic does not start: it restores its saved configuration from the wrong disc data |
 | Supervisor prompt, keyboard, mouse, `*` commands | Palette utility on the icon bar |
 | BBC BASIC V 1.14 with graphics, FPEmulator 4.39 | Printing modules, Econet and NetFS |
-| Desktop with the RISC OS Open look: 3D windows, Homerton, textured backgrounds, high resolution icons, the cog on the icon bar, the RISC OS Open start-up banner |
+| Desktop with the RISC OS Open look: 3D windows, Homerton, textured backgrounds, high resolution icons, the multi-coloured cog on the icon bar, the RISC OS Open start-up banner |
 | Filer operations through Filer_Action (delete and count tried) | Power-on self test |
 | Chars, Help, Edit, Draw, Paint and SciCalc run from the Apps folder | Hard disc access is untested |
 | Outline fonts (Font Manager and ROM fonts), scaled sprites (SpriteExtend), Squash | Sound has not been listened to |
@@ -25,7 +25,7 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 | SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC: a test program passes every check | |
 | Battle Chess (1992), a C game built with the Norcroft compiler, runs on that library | |
 
-The image uses 2,090,456 of the 2MB (2,097,152 bytes), with 7K to spare. A5000 hardware and Arculator both stop at 2MB.
+The image uses 2,090,888 of the 2MB (2,097,152 bytes), with 6K to spare. A5000 hardware and Arculator both stop at 2MB.
 
 ## Where everything comes from
 
@@ -70,6 +70,7 @@ The ROM is `build/A5000/rom`. Each module's ELF file beside it holds source line
 - The kernel's MEMC1 build path had not been assembled since RISC OS 3.5. It assembles and runs again; `git log -- Sources/Kernel` lists each repair.
 - On an IOC machine a CMOS reset gives the RISC OS 3.11 settings for how the machine starts (drive 0, NoBoot, mouse step 3) and RISC OS Open's for how the desktop looks.
 - The ROM has one set of icons, the high resolution one. In a mode whose pixels are not square (mode 12 on a TV-standard monitor) the Window Manager scales them.
+- The cog on the icon bar is the current RISC OS Open one (`Sources/Desktop/Wimp5`), put into the sprite form the rest of the ROM's icons have. It shows its eight colours in a 256 colour mode. In a 16 colour mode its purple and pink teeth are grey, the nearest the desktop's palette has.
 - The Desktop module is the current RISC OS Open one, for its banner. The banner reads RISC OS, not RISC OS 5.
 - The Podule manager is arranged for 4 podules and extension ROMs, ADFS leaves out big disc support where the ST506 driver is present, and SoundDMA has only the 8-bit SWIs.
 - The kernel's workspace layout below `&1000` and in the VDU driver follows the RISC OS 3.60 sources, which moved some VDU variables relative to RISC OS 3.11. Software that reads those by address rather than through `OS_ReadVduVariables` will see different values.
