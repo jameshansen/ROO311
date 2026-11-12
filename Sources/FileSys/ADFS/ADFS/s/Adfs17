@@ -42,7 +42,9 @@ Adfs17Ed        * 07                    ; Edition number
 FlpIRQreenable  SETL {TRUE}             ; True for re-entrant IRQ handlers
 
         GBLL    FlpUseFIFO
-FlpUseFIFO      SETL    T       ; T to use FIFO in the SMC '665
+FlpUseFIFO      SETL    F       ; T to use FIFO in the SMC '665
+                                ; ROO311: was T. The 82C710 and 82C711 in IOC machines are not the '665,
+                                ; and a controller that rejects the Configure command stopped the boot.
 
 ;-----------------------------------------------------------------------;
 ; This file provides routines to control the '765 FDC and the disk      ;
