@@ -11,6 +11,11 @@ MTitle:Mouse type
 MMHDR:Monitor type
 MMAUTO:Auto
 MONUK:Unknown
+MON0:TV standard
+MON1:Multiscan
+MON2:Hi-res mono
+MON3:VGA
+MON4:Super VGA
 CMHDR:Colours
 CME0:Black/white
 CME1:4 greys
