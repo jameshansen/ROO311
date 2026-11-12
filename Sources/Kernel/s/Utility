@@ -139,7 +139,10 @@ Util_Die   ROUT
 
 UtilModTitle =  "UtilityModule", 0
 
-UtilHelpStr  =  "MOS Utilities", 9, "$VersionNo", 0
+; ROO311: the version is RISC OS 3.11's, since software tests it with *RMEnsure UtilityModule 3.50 to
+; decide whether it is on RISC OS 3.5 or later and so on a Risc PC (Zool does), and takes paths this
+; machine doesn't have. It was $VersionNo, the 3.60 the sources are.
+UtilHelpStr  =  "MOS Utilities", 9, "3.11 ($Date)", 0
 
 UtilHelpTab
            Command   Break,       0,  0, International_Help   ; just help
