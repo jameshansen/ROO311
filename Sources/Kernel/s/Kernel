@@ -361,6 +361,11 @@ AdXPreVeneer    *       ProcVecPreVeneers+(.-DefaultPreVeneers)
 ; code will only work when copied to 0!
 
 MOSROMVecs
+  [ ResetIndirected :LAND: MEMC_Type <> "IOMD"
+        ; ROO311: a branch to CONT that works from address 0, as in the ProcessorVectors table above
+        ; (RISC OS 3.11 has EAE00069 here). Games reset the machine by copying this word to 0.
+        &       &EA000000 + (((CONT - 8) :SHR: 2) :AND: &00FFFFFF)
+  |
   [ ResetIndirected
         LDR     pc, MOSROMVecs+ResetIndirection ; load PC, PC relative
   |
@@ -370,6 +375,7 @@ MOSROMVecs
         BWrap   MOSROMVecs+CONT                 ; executed out of ROM or RAM
                                                 ; or not at all if test software present
    ]
+  ]
   ]
 
   [ CPU_Type = "ARM600"

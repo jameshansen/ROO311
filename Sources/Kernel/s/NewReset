@@ -2050,7 +2050,9 @@ BranchThroughZeroInstruction2
  [ ProcessorVectors
         LDR     PC, .+ProcVec_Branch0
  |
-        B       .+(RESET1-0)
+        ; ROO311: copied to 0 and run there. RESET1 is more than 32MB away, so the branch wraps round
+        ; the 26-bit address space, as RISC OS 3.11's does.
+        &       &EA000000 + (((RESET1 - 8) :SHR: 2) :AND: &00FFFFFF)
  ]
 
 MonitorKeypadTable      ; internal key number, CMOS bits
@@ -2181,7 +2183,9 @@ RealIRQHandler
  [ ProcessorVectors
         LDR     PC, .-&18+ProcVec_IRQ
  |
-        B     Initial_IRQ_Code+.-&18
+        ; ROO311: copied to &18 and run there, a branch that wraps round to the IRQ code in the ROM as
+        ; RISC OS 3.11's does.
+        &       &EA000000 + (((Initial_IRQ_Code - &18 - 8) :SHR: 2) :AND: &00FFFFFF)
  ]
 
 ; +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

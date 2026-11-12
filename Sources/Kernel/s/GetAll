@@ -369,7 +369,10 @@ AssemblePointerV        SETL    {TRUE}          ; Use PointerV.
 PollMouse               SETL    {FALSE}         ; Poll mouse.
 
                         GBLL    ProcessorVectors
-ProcessorVectors        SETL    {TRUE}          ; Processor vectors indirected through 0 page.
+ProcessorVectors        SETL    {FALSE}         ; ROO311: was {TRUE}, which indirects the processor vectors through 0
+                                                ; page with LDR PC. RISC OS 3.11 has branches at &08 and &18, and games
+                                                ; that follow the IRQ vector by decoding its branch (SWIV, Nebulus)
+                                                ; jumped to nowhere.
 
                     GBLS  GetUnsqueeze
  [ SqueezeMods
