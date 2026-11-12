@@ -104,7 +104,7 @@ The ROM is tested in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 
 - ADFS floppy access on the 82C711, including `ADFS_DiscOp` writes
 - HostFS from Arculator's support ROM (extension ROM loading)
 - RISC OS 3.11's CMOS defaults
-- 102 of the 127 JASPP games that ran on RISC OS 3.11 start the same way, with no ADFFS, see [JASPP games](#jaspp-games)
+- 105 of the 127 JASPP games that ran on RISC OS 3.11 start the same way, with no ADFFS, see [JASPP games](#jaspp-games)
 - SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC. A test program passes every check
 - Battle Chess (1992) runs on that library
 
@@ -118,7 +118,7 @@ The ROM is tested in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 
 - Power-on self test
 - Hard disc access is untested
 - Sound hasn't been listened to
-- 7 JASPP games that run on RISC OS 3.11 don't run yet, see [JASPP games](#jaspp-games). 4 of them resize memory areas from a desktop task, which the kernel refuses
+- 4 JASPP games that run on RISC OS 3.11 don't run yet, see [JASPP games](#jaspp-games)
 - MAME's A5000 gets as far as the desktop and stops while drawing the start-up banner. The banner's sprites unpack wrongly there, and the cause hasn't been found. The keyboard and mouse are untried in MAME
 - Red Squirrel shows no mouse pointer
 - ArcEm's hard disc, an ST506 drive, gets no icon, and ADFS says the drive isn't known
@@ -141,7 +141,7 @@ The image uses 2,093,664 of the 2MB (2,097,152 bytes), and A5000 hardware and Ar
 
 ## JASPP games
 
-[JASPP](https://www.jaspp.org.uk), the Archimedes Software Preservation Project, releases Archimedes games with their publishers' permission, and its release page for each game on the [JASPP forum](https://forums.jaspp.org.uk/forum/index.php) lists the versions of RISC OS the original release ran on. 127 of the releases ran on RISC OS 3.11, and each one was started on ROO311 and on RISC OS 3.11 to compare them. 102 reach the same screen on both ROMs, 7 don't run on ROO311 yet and 18 couldn't be judged.
+[JASPP](https://www.jaspp.org.uk), the Archimedes Software Preservation Project, releases Archimedes games with their publishers' permission, and its release page for each game on the [JASPP forum](https://forums.jaspp.org.uk/forum/index.php) lists the versions of RISC OS the original release ran on. 127 of the releases ran on RISC OS 3.11, and each one was started on ROO311 and on RISC OS 3.11 to compare them. 105 reach the same screen on both ROMs, 4 don't run on ROO311 yet and 18 couldn't be judged.
 
 Each game's first floppy went in drive 0 of an emulated ARM3 machine with 4MB and no ADFFS. The 800K discs used the 1772 floppy controller of the A3000 and A400 series, and the 1.6MB discs used the A5000's 82C711. A disc that boots was booted with Shift held at power on, and any other was opened in the desktop and its game run, as a double-click would. Screens from 35 seconds to 2.5 minutes in were then compared with RISC OS 3.11's. Reaching a title screen, a demo or a request for the next disc counts as starting, and none of the games were played through. The floppy images are JASPP's own, turned into plain sector images or, for copy-protected discs, bit-level HFE images.
 
@@ -171,7 +171,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | 🟢 | Bug Hunter & Moondash | 1990 | Full screen |  |
 | 🟢 | Bug Hunter in Space | 1990 | Full screen |  |
 | 🟢 | Cannon Fodder | 1994 | Full screen |  |
-| 🔴 | Carnage Inc | 1993 | Full screen | Stops with "Application may have gone wrong" |
+| 🟢 | Carnage Inc | 1993 | Full screen |  |
 | ⚪ | Cartoon Line part one | 1991 | Not seen | Doesn't start on RISC OS 3.11 in this test either |
 | 🟢 | Cascade | 1992 | Full screen |  |
 | 🟢 | Casino | 1989 | Not seen |  |
@@ -218,7 +218,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | 🟢 | Jet Fighter | 1988 | Full screen |  |
 | 🟢 | The Krisalis Collection | 1993 | Full screen |  |
 | 🟢 | The Last Days of Doom and Hezarin | 1990 | Full screen |  |
-| 🔴 | The Legend of the Lost Temple | 1992 | Full screen | Says there isn't enough memory |
+| 🟢 | The Legend of the Lost Temple | 1992 | Full screen |  |
 | 🟢 | Lemmings | 1991 | Full screen |  |
 | 🟢 | Lemmings 2: The Tribes | 1994 | Full screen |  |
 | 🟢 | Lotus Turbo Challenge 2 | 1992 | Full screen |  |
@@ -242,7 +242,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | 🟢 | Omar Sharif's Bridge | 1992 | Full screen |  |
 | 🟢 | Orion | 1988 | Full screen |  |
 | 🟢 | Pac-mania | 1989 | Full screen |  |
-| 🔴 | Pandora's Box | 1991 | Full screen | Says there isn't enough memory |
+| 🟢 | Pandora's Box | 1991 | Full screen |  |
 | 🟢 | Pipe Mania | 1989 | Full screen |  |
 | 🟢 | Poizone | 1991 | Not seen |  |
 | 🟢 | Populous | 1992 | Full screen |  |
@@ -257,7 +257,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | 🟢 | Rockfall | 1991 | Full screen |  |
 | 🟢 | S.W.I.V. | 1992 | Full screen |  |
 | 🟢 | S.W.I.V. [BUZZ version] | 1993 | Full screen |  |
-| 🔴 | Saloon Cars | 1991 | Full screen | Returns to the desktop |
+| 🔴 | Saloon Cars | 1991 | Full screen | Hangs loading its copy protection module, which writes 232 bytes past its own end. ROO311 loads it into the 32K gap the start-up banner leaves in the module area, where those bytes overwrite the module that follows it. On RISC OS 3.11 they land in unused space |
 | 🟢 | Saloon Cars Deluxe | 1992 | Full screen |  |
 | 🟢 | Sensible Soccer | 1993 | Full screen |  |
 | 🟢 | Serpents | 1993 | Full screen |  |
@@ -344,6 +344,7 @@ These make ROO311 behave as RISC OS 3.11 did where software depends on it.
 - **Branches at the processor vectors.** The vectors at `&00` to `&1C` are branches again (`ProcessorVectors` off), where the 3.60 sources load each address from page zero. Krisalis's music module in SWIV and Nebulus finds the IRQ handler by decoding the branch at `&18`, and with the load instruction there it jumped to `&27FFF54`. The branches copied to page zero wrap round the 26-bit address space to reach the ROM, as RISC OS 3.11's do.
 - **The reset word.** The first word of the ROM is a branch that works from address 0, as in RISC OS 3.11. Jet Fighter, Orion and Tactic reset the machine by copying it to address 0 and jumping to it, and the load instruction that was there left the machine half reset.
 - **Version numbers.** `OS_Byte 129` returns `&A4` and UtilityModule's help string gives 3.11, RISC OS 3.11's values, where the sources had 3.60's. Software tests these for RISC OS 3.5 and takes its Risc PC path when it finds it, which is how Zool and Raw Power failed. The title `*FX 0` prints still names the 3.60 sources.
+- **Emptying the font cache.** Shrinking the font cache moves whatever FontManager can give up and doesn't report an error. FontManager keeps 32K while any font is claimed, and the outline font desktop always claims some, so Pandora's Box, The Legend of the Lost Temple and Carnage Inc, which empty the font cache to make room, stopped with "Memory cannot be moved". A partial move of any other area is still an error.
 - **CMOS defaults.** A CMOS reset on an IOC machine sets how the machine starts as RISC OS 3.11 did, with drive 0, NoBoot, mouse step 3, one floppy drive and no hard discs. The table had become the Risc PC's, which boots from hard disc 4. How the desktop looks still follows RISC OS Open.
 
 ### Archimedes hardware

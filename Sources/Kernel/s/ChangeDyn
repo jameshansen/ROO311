@@ -486,14 +486,28 @@ Access_Rights
         BCS     %FT15                           ; (TMD 15-Oct-91); was GE)
 
 ; moving less than asked for: set up an error for exit
-        ADR     r0, ErrorBlock_ChDynamNotAllMoved
+ [ :LNOT: NewStyle_FontArea
+; ROO311: shrinking the font cache moves what FontManager can give up and doesn't report an error.
+; FontManager keeps at least 32K while any font is claimed, and the outline font desktop always
+; claims fonts, so a game that empties the font cache to make room, as RISC OS 3.11 allowed, stopped
+; with "Memory cannot be moved". Every other area still reports a partial move as an error.
+        CMP     r11, #ChangeDyn_FontArea
+        BEQ     %FT12
+ ]
+        ADRL    r0, ErrorBlock_ChDynamNotAllMoved
         STR     r0, [stack]
         LDR     r0, [stack, #4*10]
         ORR     r0, r0, #V_bit
         STR     r0, [stack, #4*10]
+12
         SUB     r0, r6, #1                      ; and make amount moveable
         BICS    r10, r10, r0                    ; a pagesize multiple
-        BEQ     CDS_PostServiceWithRestore
+        BNE     %FT15
+ [ :LNOT: NewStyle_FontArea
+        CMP     r11, #ChangeDyn_FontArea        ; ROO311: nothing to move from the font cache,
+        BEQ     CDS_PostService                 ; and no error to translate
+ ]
+        B       CDS_PostServiceWithRestore
 
 ; IF CAO in ApplWork AND UpCall not claimed THEN Error ChDynamCAO
 
