@@ -88,6 +88,7 @@ Workspace               #       4
 nactive                 #       4               ; no of active tasks when we started
 nactive1                #       4
 privatesprites          #       4               ; our sprites for the banner
+bannerspritesold        #       4               ; ROO311: system sprite area's size before the banner, -1 if in the RMA
 BannerCloseTime         #       4
 NewWelcomeWorkspace     #       4
 IconHandle              #       4
@@ -283,6 +284,8 @@ Desktop_Start ROUT
         SWI     OS_Module
 
         MOV     r12, r2
+        ADR     r13, Working_StackEnd   ; ROO311: off the application space stack before the
+                                        ; banner's sprites take memory from application space
 
         ; open message file
         ADR     r0, MessageBlock
@@ -313,9 +316,8 @@ Desktop_Start ROUT
 
         ; Allocate the block to decompress into
         LDRVC   r3, [r10, #4]           ; get uncompressed length
-        MOVVC   r0, #ModHandReason_Claim
         ADDVC   r3, r3, #4              ; make it a sprite area
-        SWIVC   XOS_Module
+        BLVC    ClaimBannerSprites      ; ROO311: at the end of the system sprite area if it can grow
         MOVVS   r9, r0
         BVS     %FT24
         STR     r2, privatesprites
@@ -374,9 +376,7 @@ Desktop_Start ROUT
         B       %FT30
 23
         ; Free sprite area
-        LDR     r2, privatesprites
-        MOV     r0, #ModHandReason_Free
-        SWI     XOS_Module
+        BL      FreeBannerSprites
 24
         ; Free squashed file buffer
         MOV     r2, r10
@@ -799,12 +799,7 @@ Exit2
         SWI     XMessageTrans_CloseFile
 
         ; free sprites
-        LDR     r2, privatesprites
-        TEQ     r2, #0
-        MOVNE   r0, #ModHandReason_Free
-        SWINE   XOS_Module
-        MOV     r0, #0
-        STR     r0, privatesprites
+        BL      FreeBannerSprites
 
         ; free workspace
         MOV     r0, #ModHandReason_Free
@@ -1764,16 +1759,65 @@ FreeFontsEtc
         MOV     R0,#ModHandReason_Free
         SWI     XOS_Module
 
-        LDR     R2, privatesprites
-        TEQ     R2,#0
-        MOVNE   R0,#ModHandReason_Free
-        SWINE   XOS_Module
-        MOV     R0, #0
-        STR     R0, privatesprites
+        BL      FreeBannerSprites
 
         Pull    R0
         Pull    "R1-R7,PC"
 
  ]
+
+; ROO311: the banner's sprites (32K) go at the end of the system sprite area, which grows for them
+; and shrinks back when the banner closes. In the RMA they were freed after the module tasks had
+; claimed space above them, which left a 32K gap there, and RISC OS 3.11 started with none. A game
+; module that writes past its own end, as Saloon Cars's copy protection does, then landed in the gap
+; and damaged the module after it. The system sprite area keeps its own end where it was, so its
+; sprite operations never reach the banner. If the area can't grow, the sprites go in the RMA.
+;
+; In    r3 = size of sprite area wanted
+; Out   r2 -> sprite area, VS => r0 -> error
+ClaimBannerSprites Entry "r0,r1,r3-r5"
+        MOV     r0, #3
+        SWI     XOS_ReadDynamicArea     ; r0 = base, r1 = current size
+        BVS     %FT50
+        MOV     r4, r0
+        MOV     r5, r1
+        MOV     r0, #3
+        ADD     r1, r3, #saExten        ; room for an empty system area's header too
+        SWI     XOS_ChangeDynamicArea
+        BVS     %FT50
+        STR     r5, bannerspritesold
+        TEQ     r5, #0                  ; the system area was created for us,
+        MOVEQ   r5, #saExten            ; so leave it an empty header
+        STR     r5, [r4, #saEnd]        ; the system area ends where it did
+        ADD     r2, r4, r5              ; and the banner's area follows it
+        EXIT
+50
+        CLRV
+        MVN     r0, #0
+        STR     r0, bannerspritesold
+        MOV     r0, #ModHandReason_Claim
+        SWI     XOS_Module
+        STRVS   r0, [sp]
+        EXIT
+
+FreeBannerSprites Entry "r0-r2"
+        LDR     r2, privatesprites
+        TEQ     r2, #0
+        EXIT    EQ
+        MOV     r0, #0
+        STR     r0, privatesprites
+        LDR     r1, bannerspritesold
+        CMN     r1, #1
+        MOVEQ   r0, #ModHandReason_Free
+        SWIEQ   XOS_Module
+        EXIT    EQ
+        MOV     r0, #3
+        SWI     XOS_ReadDynamicArea     ; r1 = current size
+        LDRVC   r2, bannerspritesold
+        SUBVC   r1, r2, r1              ; shrink back to the size before the banner
+        MOVVC   r0, #3
+        SWIVC   XOS_ChangeDynamicArea
+        CLRV
+        EXIT
 
         END

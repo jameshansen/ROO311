@@ -104,7 +104,7 @@ The ROM is tested in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 
 - ADFS floppy access on the 82C711, including `ADFS_DiscOp` writes
 - HostFS from Arculator's support ROM (extension ROM loading)
 - RISC OS 3.11's CMOS defaults
-- 105 of the 127 JASPP games that ran on RISC OS 3.11 start the same way, with no ADFFS, see [JASPP games](#jaspp-games)
+- 106 of the 127 JASPP games that ran on RISC OS 3.11 start the same way, with no ADFFS, see [JASPP games](#jaspp-games)
 - SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC. A test program passes every check
 - Battle Chess (1992) runs on that library
 
@@ -118,7 +118,7 @@ The ROM is tested in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 
 - Power-on self test
 - Hard disc access is untested
 - Sound hasn't been listened to
-- 4 JASPP games that run on RISC OS 3.11 don't run yet, see [JASPP games](#jaspp-games)
+- 3 JASPP games that run on RISC OS 3.11 don't run yet, see [JASPP games](#jaspp-games)
 - MAME's A5000 gets as far as the desktop and stops while drawing the start-up banner. The banner's sprites unpack wrongly there, and the cause hasn't been found. The keyboard and mouse are untried in MAME
 - Red Squirrel shows no mouse pointer
 - ArcEm's hard disc, an ST506 drive, gets no icon, and ADFS says the drive isn't known
@@ -137,11 +137,11 @@ ROO311 starts in the desktop with 512K of RAM or more. The table shows what's le
 
 ROO311 leaves about 64K less at every size. 1MB is the least it's usable with, since the 56K left on a 512K machine runs almost nothing.
 
-The image uses 2,093,664 of the 2MB (2,097,152 bytes), and A5000 hardware and Arculator both stop at 2MB.
+The image uses 2,093,780 of the 2MB (2,097,152 bytes), and A5000 hardware and Arculator both stop at 2MB.
 
 ## JASPP games
 
-[JASPP](https://www.jaspp.org.uk), the Archimedes Software Preservation Project, releases Archimedes games with their publishers' permission, and its release page for each game on the [JASPP forum](https://forums.jaspp.org.uk/forum/index.php) lists the versions of RISC OS the original release ran on. 127 of the releases ran on RISC OS 3.11, and each one was started on ROO311 and on RISC OS 3.11 to compare them. 105 reach the same screen on both ROMs, 4 don't run on ROO311 yet and 18 couldn't be judged.
+[JASPP](https://www.jaspp.org.uk), the Archimedes Software Preservation Project, releases Archimedes games with their publishers' permission, and its release page for each game on the [JASPP forum](https://forums.jaspp.org.uk/forum/index.php) lists the versions of RISC OS the original release ran on. 127 of the releases ran on RISC OS 3.11, and each one was started on ROO311 and on RISC OS 3.11 to compare them. 106 reach the same screen on both ROMs, 3 don't run on ROO311 yet and 18 couldn't be judged.
 
 Each game's first floppy went in drive 0 of an emulated ARM3 machine with 4MB and no ADFFS. The 800K discs used the 1772 floppy controller of the A3000 and A400 series, and the 1.6MB discs used the A5000's 82C711. A disc that boots was booted with Shift held at power on, and any other was opened in the desktop and its game run, as a double-click would. Screens from 35 seconds to 2.5 minutes in were then compared with RISC OS 3.11's. Reaching a title screen, a demo or a request for the next disc counts as starting, and none of the games were played through. The floppy images are JASPP's own, turned into plain sector images or, for copy-protected discs, bit-level HFE images.
 
@@ -257,7 +257,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | 🟢 | Rockfall | 1991 | Full screen |  |
 | 🟢 | S.W.I.V. | 1992 | Full screen |  |
 | 🟢 | S.W.I.V. [BUZZ version] | 1993 | Full screen |  |
-| 🔴 | Saloon Cars | 1991 | Full screen | Hangs loading its copy protection module, which writes 232 bytes past its own end. ROO311 loads it into the 32K gap the start-up banner leaves in the module area, where those bytes overwrite the module that follows it. On RISC OS 3.11 they land in unused space |
+| 🟢 | Saloon Cars | 1991 | Full screen | Stops with "File 'WindowManager:Sprites24' not found" on both ROMs |
 | 🟢 | Saloon Cars Deluxe | 1992 | Full screen |  |
 | 🟢 | Sensible Soccer | 1993 | Full screen |  |
 | 🟢 | Serpents | 1993 | Full screen |  |
@@ -345,6 +345,7 @@ These make ROO311 behave as RISC OS 3.11 did where software depends on it.
 - **The reset word.** The first word of the ROM is a branch that works from address 0, as in RISC OS 3.11. Jet Fighter, Orion and Tactic reset the machine by copying it to address 0 and jumping to it, and the load instruction that was there left the machine half reset.
 - **Version numbers.** `OS_Byte 129` returns `&A4` and UtilityModule's help string gives 3.11, RISC OS 3.11's values, where the sources had 3.60's. Software tests these for RISC OS 3.5 and takes its Risc PC path when it finds it, which is how Zool and Raw Power failed. The title `*FX 0` prints still names the 3.60 sources.
 - **Emptying the font cache.** Shrinking the font cache moves whatever FontManager can give up and doesn't report an error. FontManager keeps 32K while any font is claimed, and the outline font desktop always claims some, so Pandora's Box, The Legend of the Lost Temple and Carnage Inc, which empty the font cache to make room, stopped with "Memory cannot be moved". A partial move of any other area is still an error.
+- **No gap in the module area.** The start-up banner's sprites (32K) sit at the end of the system sprite area, which grows for them and shrinks back when the banner closes, and the system sprite area's own end stays where it was. In the module area they were freed after other modules had claimed space above them, which left a 32K gap where RISC OS 3.11 starts with none. Saloon Cars's copy protection module writes 232 bytes past its own end, and loaded into that gap it damaged the module after it and hung the machine.
 - **CMOS defaults.** A CMOS reset on an IOC machine sets how the machine starts as RISC OS 3.11 did, with drive 0, NoBoot, mouse step 3, one floppy drive and no hard discs. The table had become the Risc PC's, which boots from hard disc 4. How the desktop looks still follows RISC OS Open.
 
 ### Archimedes hardware
