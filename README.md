@@ -151,4 +151,4 @@ The icon is the cog from the ROM's own icon bar.
 
 ## Licence
 
-The RISC OS sources in `Sources/` are free software under the Apache License, version 2.0. Each component carries its own `LICENSE` file, and 3 of them name other terms for some of their files (the New BSD licence and those of the Independent JPEG Group). The changes made to the sources here are under the same licences.
+ROO311 is free software under the [Apache License, version 2.0](LICENSE). That covers the build scripts, tools and tests written for this project, and the RISC OS sources in `Sources/` are under it too. Each component carries its own `LICENSE` file, and 3 of them name other terms for some of their files (the New BSD licence and those of the Independent JPEG Group). The changes made to the sources here are under the same licences.
