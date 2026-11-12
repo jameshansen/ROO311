@@ -66,9 +66,9 @@ The image uses 2,090,888 of the 2MB (2,097,152 bytes), and A5000 hardware and Ar
 
 ## Install
 
-1. Download `rom` from the [latest release](../../releases/latest), or build it as [Building the ROM](#building-the-rom) describes.
+1. Download `ROM311` from the [latest release](../../releases/latest), or build it as [Building the ROM](#building-the-rom) describes.
 2. In Arculator's folder, open `roms/riscos311`, which is where Arculator looks for its RISC OS 3.11 ROM, and move the files in it somewhere else, since Arculator loads every file in that folder, in name order, as one ROM.
-3. Copy `rom` into `roms/riscos311`.
+3. Copy `ROM311` into `roms/riscos311`.
 4. Set up an A5000 with RISC OS 3.11 as its ROM (that's Arculator's name for the slot ROO311 now fills), and start it.
 
 | Machine | Notes |
@@ -119,7 +119,9 @@ The build runs on Linux and needs AsAsm from GCCSDK (`svn://svn.riscos.info/gccs
 ASASM=/path/to/asasm GCC=/path/to/arm-unknown-riscos-gcc sh build.sh
 ```
 
-The ROM ends up at `build/A5000/rom`, and each module's ELF file beside it holds source line numbers.
+The ROM ends up at `build/A5000/rom`, and each module's ELF file beside it holds source line numbers. The same sources always give the same image, so it doesn't matter where or when it's built.
+
+GitHub Actions runs this build from source on every push, compiler included (`.github/workflows/build.yml`), and a version tag publishes the image as `ROM311` in a release.
 
 | File | What it does |
 | --- | --- |

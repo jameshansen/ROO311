@@ -1,0 +1,111 @@
+# Builds the ROM from source on every push and pull request. A tag of the form v1.2.3 also publishes the
+# image as ROM311 in a release of that name.
+#
+# The toolchain is built from source too (toolchain/README.md): GCC 4.7.4 for RISC OS and AsAsm, in the
+# Ubuntu 14.04 container toolchain/Dockerfile describes. That takes most of an hour, so the result is kept
+# in the cache under a key made from the files that define it, and is only built again when they change.
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rom:
+    name: Build the ROM
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore the toolchain
+        id: toolchain
+        uses: actions/cache@v4
+        with:
+          path: ~/gccsdk-cross
+          key: gccsdk-cross-${{ runner.os }}-${{ hashFiles('toolchain/Dockerfile', 'toolchain/fetch.sh', 'toolchain/SHA256SUMS') }}
+
+      - name: Build the toolchain
+        if: steps.toolchain.outputs.cache-hit != 'true'
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q subversion
+          sh toolchain/fetch.sh "$RUNNER_TEMP/gccsdk"
+          docker build -t roo311-gcc "$RUNNER_TEMP/gccsdk"
+          docker create --name roo311-gcc-x roo311-gcc
+          docker cp roo311-gcc-x:/gccsdk/cross "$HOME/gccsdk-cross"
+          docker rm roo311-gcc-x
+
+      - name: Install binutils for ARM
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q binutils-arm-none-eabi
+
+      - name: Check the build tools
+        run: |
+          python3 tools/basic.py
+          python3 tools/msgtok.py
+          python3 tools/sprites.py
+
+      - name: Build the ROM
+        run: |
+          export ASASM="$HOME/gccsdk-cross/bin/asasm" GCC="$HOME/gccsdk-cross/bin/arm-unknown-riscos-gcc"
+          "$ASASM" -version 2>&1 | head -1 || true
+          "$GCC" --version | head -1 || true
+          sh build.sh rom
+          cp build/A5000/rom ROM311
+          test "$(stat -c %s ROM311)" = 2097152
+          sha256sum ROM311 | tee ROM311.sha256
+
+      - name: Show the build log if the build failed
+        if: failure()
+        run: |
+          for f in build/A5000/*.log; do echo "::group::$f"; tail -n 40 "$f"; echo "::endgroup::"; done 2>/dev/null || true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ROM311
+          path: |
+            ROM311
+            ROM311.sha256
+          if-no-files-found: error
+
+  release:
+    name: Publish the release
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: rom
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ROM311
+
+      - name: Publish ROM311
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          {
+            echo "ROO311 ${TAG#v}, built from source by GitHub Actions at this tag."
+            echo
+            echo "\`ROM311\` is the 2MB ROM image. The README says how to put it in an emulator and what works so far."
+            echo
+            echo "SHA-256: \`$(cut -d' ' -f1 ROM311.sha256)\`"
+            echo
+            echo "ROO311 is free software under the Apache License, version 2.0. The LICENSE file in the repository has the text."
+          } > notes.md
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" ROM311 --clobber
+          else
+            gh release create "$TAG" ROM311 --verify-tag --title "ROO311 $TAG" --notes-file notes.md
+          fi
