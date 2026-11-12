@@ -22,9 +22,18 @@ The whole thing is one 2MB file. It's unfinished, and [What works](#what-works) 
 
 RISC OS 3.11 is the last version of RISC OS that Acorn released for the Archimedes, and its ROM image is commercial. [RISC OS Open](https://www.riscosopen.org) publishes the sources of later versions, the oldest of which is RISC OS 3.60 from 1995.
 
-ROO311 is built from those sources. The kernel and most modules are RISC OS 3.60's, which was the last version to carry the code for the Archimedes's MEMC1 memory controller, and a few parts come from the current sources. Every file in the ROM comes from the RISC OS Open repositories or was written for this project, and nothing is copied from a commercial ROM. Where I consulted a commercial ROM to settle how RISC OS 3.11 behaved, a comment in the source names the ROM and the address.
+ROO311 is built from those sources. The kernel and most modules are RISC OS 3.60's, which was the last version to carry the code for the Archimedes's MEMC1 memory controller, and a few parts come from the current sources. Every file in the ROM comes from the RISC OS Open repositories or was written for this project, and nothing is copied from a commercial ROM.
 
 ROO311 is an unofficial project and isn't affiliated with RISC OS Open Ltd.
+
+I consulted a commercial ROM in 4 places, where the published source went wrong on this hardware and I needed to know how RISC OS had behaved. Each one has a comment in the source that names the ROM, and the address where there is one, and the fix that went in is my own.
+
+| Where | ROM consulted | What it settled | What was done |
+| --- | --- | --- | --- |
+| `Sources/Kernel/s/Kernel` | RISC OS 3.11, `&03800000` | The first word of the ROM is a branch that still works when it's copied to address 0, which is how some games reset the machine | The first word is that kind of branch again. It had been a load through a table in RAM, which left the machine half reset |
+| `Sources/Kernel/s/vdu/vdugrafj` | RISC OS 3.11, `&0381C4C0` | `*ScreenLoad` takes the sprite pointer from R2 when it sets the palette | It uses R2 again. On a kernel without mode selectors nothing had set the register it used, so a 256 colour picture loaded with a black palette |
+| `Sources/Kernel/s/ChangeDyn` | RISC OS 3.11, `&0380AAC0` | Where the code goes when there's no free pool and a dynamic area's size changes by less than was asked | The branch goes to the same place. It had ended up inside another case, so a MEMC1 build returned to a stale address |
+| `Sources/FileSys/ImageFS/DOSFS/cmhg/DOSFShdr` | RISC OS 3.60, the help string of DOSFS 0.62 | The date that version of DOSFS carries | DOSFS is given that date, 01 Mar 1995. The header generator had stamped the day of the build, which made every build different |
 
 ## Features
 
