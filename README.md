@@ -318,7 +318,7 @@ Files reach the machine on a floppy image or through HostFS, which Arculator's s
 
 ## How it works
 
-The kernel and most modules are the RISC OS 3.60 sources, the oldest RISC OS Open publishes, and `Sources/UPSTREAM` records the repository and commit behind each folder. The kernel's MEMC1 build path hadn't been assembled since RISC OS 3.5, and it now assembles and runs again, with `git log -- Sources/Kernel` listing each repair. Changes to imported sources carry a comment starting `ROO311:` that says what changed.
+The kernel and most modules are the RISC OS 3.60 sources, the oldest RISC OS Open publishes, and `Sources/UPSTREAM` records the repository and commit behind each folder. The kernel's MEMC1 build path hadn't been assembled since RISC OS 3.5, and it now assembles and runs again, with `git log -- Sources/Kernel` listing each repair. [Changes to the sources](#changes-to-the-sources) lists every change made to the imported sources and why.
 
 The components listed in `Sources/NEWER` come from the current RISC OS Open sources and build against current headers (`Sources/Headers5`). FPEmulator is one of them, and the Desktop module is another, for its start-up banner, which reads RISC OS and not RISC OS 5. The cog on the icon bar is the current one too (`Sources/Desktop/Wimp5`), put into the same sprite form as the rest of the ROM's icons. It shows its 8 colours in a 256 colour mode, and in a 16 colour mode its purple and pink teeth are grey, the nearest the desktop's palette has.
 
@@ -330,11 +330,72 @@ Configure is the RISC OS 3.6 one, which was a disc application started by a boot
 
 The calculator is SciCalc, the one RISC OS Open publishes. It was a disc application that needed BASIC64, and in the ROM it runs on the ROM's BASIC, to 9 figures, unless BASIC64 has been loaded.
 
-On an IOC machine a CMOS reset gives the RISC OS 3.11 settings for how the machine starts (drive 0, NoBoot, mouse step 3) and RISC OS Open's for how the desktop looks. The Podule manager is set up for 4 podules and extension ROMs, ADFS leaves out big disc support where the ST506 driver is present, and SoundDMA only has the 8-bit SWIs. ADFS also leaves the floppy controller's FIFO off, since the command that turns it on was added for the Risc PC's controller, and after an I2C acknowledge the kernel takes the clock line low before the data line, so the clock chip never sees the two fall together.
-
 The kernel's workspace layout below `&1000` and in the VDU driver follows the RISC OS 3.60 sources, which moved some VDU variables compared to RISC OS 3.11, so software that reads those by address and not through `OS_ReadVduVariables` will see different values.
 
-Three things in the kernel are as RISC OS 3.11 had them, not as the 3.60 sources do. The UK keyboard handler is built in, so the keyboard keeps working when a game unplugs the InternationalKeyboard module. The processor vectors at `&00` to `&1C` are branches, which games that follow the IRQ vector rely on. And ROO311 gives software RISC OS 3.11's version numbers (`&A4` from `OS_Byte 129` and 3.11 for UtilityModule), so programs that test for RISC OS 3.5 don't take their Risc PC paths.
+## Changes to the sources
+
+Every change made to an imported source file carries a comment starting `ROO311:` that says what was there before and why it changed, and `git log -- Sources` has the history. This section collects them by reason. The RISC OS 3.60 sources were last built for the Risc PC by Acorn's own tools, so most of the changes either bring back what an Archimedes needs or let other tools build the sources.
+
+### RISC OS 3.11 compatibility
+
+These make ROO311 behave as RISC OS 3.11 did where software depends on it.
+
+- **Keyboard handler built in.** The UK keyboard handler is part of the kernel again (`AssembleA1KeyHandler`), as it was in RISC OS 3.11. Without it the InternationalKeyboard module was the only handler, and a game that unplugs that module to free memory, as StarTrader does, left the machine with no keyboard.
+- **Branches at the processor vectors.** The vectors at `&00` to `&1C` are branches again (`ProcessorVectors` off), where the 3.60 sources load each address from page zero. Krisalis's music module in SWIV and Nebulus finds the IRQ handler by decoding the branch at `&18`, and with the load instruction there it jumped to `&27FFF54`. The branches copied to page zero wrap round the 26-bit address space to reach the ROM, as RISC OS 3.11's do.
+- **The reset word.** The first word of the ROM is a branch that works from address 0, as in RISC OS 3.11. Jet Fighter, Orion and Tactic reset the machine by copying it to address 0 and jumping to it, and the load instruction that was there left the machine half reset.
+- **Version numbers.** `OS_Byte 129` returns `&A4` and UtilityModule's help string gives 3.11, RISC OS 3.11's values, where the sources had 3.60's. Software tests these for RISC OS 3.5 and takes its Risc PC path when it finds it, which is how Zool and Raw Power failed. The title `*FX 0` prints still names the 3.60 sources.
+- **CMOS defaults.** A CMOS reset on an IOC machine sets how the machine starts as RISC OS 3.11 did, with drive 0, NoBoot, mouse step 3, one floppy drive and no hard discs. The table had become the Risc PC's, which boots from hard disc 4. How the desktop looks still follows RISC OS Open.
+
+### Archimedes hardware
+
+The 3.60 sources still hold the code for MEMC1, IOC and VIDC1 machines, but much of it was switched off or set up for the Risc PC.
+
+- **Podules.** The Podule manager is set up for 4 podules and extension ROMs, as RISC OS 3.11's was. It had been fixed at the Risc PC's 8 podules, network podule and EASI space, and reading EASI space on an IOC machine is an address exception.
+- **ADFS.** ADFS takes the A1 settings and finds out at run time whether the floppy controller is a 1772 or an 82C710 or 82C711, as RISC OS 3.11's did. Big disc support is left out where the ST506 driver is present, since that driver works in byte addresses, so hard discs stay limited to 512MB, as under RISC OS 3.11.
+- **Sound.** SoundDMA has the 4 SWIs RISC OS 3.11's had, and the three 16-bit sound SWIs are left for later hardware. It finds the loudspeaker control and the address of its buffers in workspace values an IOC machine has.
+- **Keyboard type.** The InternationalKeyboard module takes the A1 keyboard, which every Archimedes has.
+- **SpriteExtend.** SpriteExtend is the all-assembler module RISC OS 3.11 had, with the original code generator, no JPEG and no SWIs. The newer form needs C code and dynamic areas, which a MEMC1 kernel doesn't provide.
+- **Code for later machines.** Options that select IOMD, Morris or mode selector code are off, and the kernel's test commands use the ARM3's cache registers.
+- **Power-on self test.** The test is left out for now, since it was reworked for the Risc PC and no longer assembles for MEMC1. RISC OS 3.11 ran it, which is where its coloured borders at power on came from.
+
+### Faults in the published source
+
+These are in code paths nothing had built since RISC OS 3.5, and they had broken there without anyone noticing.
+
+- **OS_ChangeDynamicArea.** A branch had ended up inside the free pool case, so on MEMC1 a call that couldn't move all it was asked for returned to a stale address, and the kernel reported CAM Map Corrupt at start-up.
+- **The Podule manager's loop.** The count of extension ROMs was kept in a register the routines it calls overwrite, so with an extension ROM fitted the machine hung at start-up.
+- **`*ScreenLoad`.** The palette code took the sprite pointer from a register only the mode selector code sets, so a 256 colour picture came up with a black palette.
+- **ADFS_DiscOp writes.** FileCore's test for a floppy drive never passed, and with no FSLock module, which RISC OS 3.11 didn't have either, every floppy write a game made failed with "SWI &44781 not known".
+
+### Emulators
+
+- **I2C timing.** After checking an I2C acknowledge the kernel takes the clock line low before the data line. Dropping both in one write made MAME's clock chip see a new start, so the CMOS RAM read back as `&FF` and the machine stopped at the supervisor prompt.
+- **Floppy FIFO.** ADFS leaves the floppy controller's FIFO off. The command that turns it on was added for the Risc PC's controller, and when MAME's 82C711 refused it the boot stopped.
+
+### Building with AsAsm and GCC
+
+The sources were written for Acorn's AAsm and ObjAsm assemblers and the Norcroft C compiler, which ran under RISC OS. ROO311 is built on Linux with AsAsm and GCC 4.7.4 instead.
+
+- **Assembler syntax.** Constructs AsAsm doesn't accept are rewritten. They are a register name given as a number, a label that no longer exists, a module title in quotes, a macro name AsAsm reads as an instruction, flags defined after the values built from them, and the `LEADR` directive, which only set a load address. Branches to targets more than 32MB away, which AAsm wrapped round the 26-bit address space, are written out as instruction words (`BWrap`).
+- **File names.** `tools/fixcase.py` gives the sources the file name case a Linux file system needs and keeps AsAsm from reading backslashes as escapes, and the ROM fonts' `/Base0` file is copied to a name AsAsm can open.
+- **The C library.** The SharedCLibrary's assembler no longer relies on C code returning with the flags it was called with, which Norcroft code did and GCC code doesn't, and `va_start`, the maths functions and `bsearch` follow GCC's conventions. Programs built with Norcroft still call the library as before. [toolchain/README.md](toolchain/README.md) has the details and the 2 compiler faults that were fixed.
+- **Headers.** A few headers had moved on or were never published. The registration header's international reason codes had grown past a table's end, one header kept a workspace name another had changed, the ShareD SWI numbers ADFSFiler names come from the public chunk list, and the ARM3 cache SWIs are left out of the C library's SWI list.
+- **C source.** Draw declared two arrays with the second size left to the initialiser, which GCC doesn't accept.
+
+### Fitting the ROM and its applications
+
+- **Applications in the ROM.** Configure and SciCalc were disc applications, and both now run from the ROM's Apps folder. Configure runs without the boot application that used to start it, and SciCalc uses the ROM's BASIC when BASIC64 isn't loaded. Configure's Screen window keeps the monitor type and mode in the CMOS RAM, as RISC OS 3.11 did.
+- **Resources.** The Window Manager's ROM sprites are the single high resolution set, and the message token dictionary goes into the ROM's resources, since the ROM's messages are built here and not by the original tools.
+- **ColourTrans tables.** The ready-made tables for plotting 16 and 32 bit per pixel sprites (83K), which RISC OS 3.11 didn't have, are left out, and ColourTrans builds a table the first time one is wanted.
+- **Desktop banner.** The start-up banner keeps its copyright line as the template has it, instead of taking the year of the kernel's date.
+
+### Reproducible builds
+
+- **Dates.** ResourceFS's file date stamps, DOSFS's help string date and the C library's version date are fixed, where each had been the day of the build, so the same sources give the same ROM wherever and whenever they're built.
+
+### Components from the current sources
+
+FPEmulator 4.39 comes from the current RISC OS Open sources, since the RISC OS 3.60 import has no source for its floating point core, which RISC OS Open published in 2010. The Desktop module comes from them too, for its start-up banner, and so does the icon bar's cog. `Sources/NEWER` lists the components built this way, against a second, newer set of headers.
 
 ## Building the ROM
 
