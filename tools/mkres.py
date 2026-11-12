@@ -13,6 +13,8 @@ length, access, name, length + 4, data; then a zero word.
 
 A file's type comes from a ",xxx" suffix on its name, or from the usual names (Templates, Sprites),
 or else it is text. Date stamps are zero so the same sources always give the same ROM.
+
+The message files are then tokenised as the original build tokenised them (tools/msgtok.py).
 """
 import re
 import struct
@@ -123,6 +125,8 @@ def main():
         gather(Path(c), locale, files, missing)
     for m in missing:
         print(f"mkres: not found: {m}", file=sys.stderr)
+    import msgtok
+    print(f"tokenising the messages saved {msgtok.tokenise(files)} bytes")
     if out == "--list":
         for name, (data, ftype) in files.items():
             print(f"{ftype:03x} {len(data):7d} {name}")
