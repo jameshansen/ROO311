@@ -359,7 +359,8 @@ Reset_PoduleOrCallBackCorrupt   * 9
 ; Flags for RISC OS Blue changes
 ;
                         GBLL    AssembleA1KeyHandler
-AssembleA1KeyHandler    SETL    {FALSE}
+AssembleA1KeyHandler    SETL    {TRUE}           ; ROO311: was {FALSE}. RISC OS 3.11 has the UK keyboard handler built in, so
+                                                ; the keyboard still works when a game *UNPLUGs InternationalKeyboard.
                         GBLL    AssembleKEYV
 AssembleKEYV            SETL    {TRUE}          ; Use KEYV.
                         GBLL    AssemblePointerV
