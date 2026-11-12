@@ -5,7 +5,7 @@ ROO311 builds with two open tools and nothing proprietary.
 | Tool | Version | Used for |
 |---|---|---|
 | AsAsm | 2.01, GCCSDK svn r7800 | Every assembler source (the kernel and most modules) |
-| GCC for RISC OS | 4.7.4, GCCSDK release 6, with binutils 2.24 | The C parts: SharedCLibrary, SpriteExtend, Filer_Action, the applications |
+| GCC for RISC OS | 4.7.4, GCCSDK release 6, with binutils 2.24 | The C parts: SharedCLibrary, Filer_Action, Squash, DOSFS, the applications |
 
 Plus `binutils-arm-none-eabi` (any recent version) for linking and Python 3 for the build scripts.
 
