@@ -22,7 +22,13 @@ The whole ROM is one 2MB file. It's unfinished, see [What works](#what-works).
 
 I have been creating a number of tools to allow the easy launching of some of my, and my kids' favourite games on the Raspberry Pi, such as [Knytt](https://github.com/jameshansen/PiKnytt) and [Klass of 99](https://github.com/jameshansen/PiKlassOf99), and I have been sharing these projects here for other fans of these lesser known titles. I wanted to add the Risc OS version of Lemmings, along with other games freely released on [JASPP](https://forums.jaspp.org.uk/forum/index.php) to that list. The problem is that these old games require a commercial Risc OS 3.11 ROM, so the ultimate purpose of this project to eliminate that block to releasing a future tool to do this onto GitHub.
 
-After starting this project I learned of a similar project, [arclibre](https://github.com/acorn-playground/arclibre/) which aims to do the same thing, with a slightly different approach, and changes may be made to this ROO311 project to improve integration with any future tools I release.
+As such, the goal of this project is two-fold:
+* Support all of the JASPP game releases that supported Risc OS 3.11 out of the box.
+* Retain the look and feel of RISC OS Open, rather than 3.11.
+* Consider quality of life improvements and other modernizations to be added to the ROM.
+* Tweak ROM to improve integration with any future tools I release if needed.
+
+I also want to give a quick shout out to a similar project called [arclibre](https://github.com/acorn-playground/arclibre/) by James Randall.
 
 ## The original ROM
 
