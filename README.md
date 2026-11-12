@@ -1,6 +1,6 @@
 # RISC OS Open 26-bit (ROO26)
 
-A RISC OS ROM for Archimedes machines with an ARM3 and MEMC1 (an A5000 is the reference machine), built from the RISC OS Open sources with open tools. It is a free replacement for the commercial RISC OS 3 ROMs in Archimedes emulators, and it fits a 2MB ROM.
+A RISC OS ROM for Archimedes machines with an ARM3 and MEMC1 (an A5000 is the reference machine), built from the RISC OS Open sources with open tools. It is a port of RISC OS Open to 26-bit machines: it looks and works like RISC OS Open, runs what RISC OS 3.11 ran, needs no hard disc, and fits a 2MB ROM. It is a free replacement for the commercial RISC OS 3 ROMs in Archimedes emulators.
 
 ## Status
 
@@ -10,10 +10,11 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 |---|---|
 | Kernel on MEMC1/IOC/VIDC1, 26-bit throughout | DOSFS is in the ROM but has not read a DOS disc yet |
 | 69 ROM modules initialise | Alarm (its machine code helper is assembled by a BASIC program, and its BASIC needs crunching to fit) |
-| | Configure: RISC OS Open's is a hard disc application, and the RISC OS 3.11 one was never published |
+| | Configure: it builds as a ROM application, but it and its resources (111K) do not fit in what the 2MB image has left |
+| | Tactic does not start: it restores its saved configuration from the wrong disc data |
 | Supervisor prompt, keyboard, mouse, `*` commands | Palette utility on the icon bar |
 | BBC BASIC V 1.14 with graphics, FPEmulator 4.39 | Printing modules, Econet and NetFS |
-| Desktop with the RISC OS 3 look: icon bar, Filer windows, error boxes, Task Manager |
+| Desktop with the RISC OS Open look: 3D windows, Homerton, textured backgrounds, high resolution icons, the cog on the icon bar, the RISC OS Open start-up banner |
 | Filer operations through Filer_Action (delete and count tried) | Power-on self test |
 | Chars, Help, Edit, Draw, Paint and SciCalc run from the Apps folder | Hard disc access is untested |
 | Outline fonts (Font Manager and ROM fonts), scaled sprites (SpriteExtend), Squash | Sound has not been listened to |
@@ -24,7 +25,7 @@ The ROM boots in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB)
 | SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC: a test program passes every check | |
 | Battle Chess (1992), a C game built with the Norcroft compiler, runs on that library | |
 
-The image uses 2.01MB of the 2MB, with 83K to spare.
+The image uses 2.05MB of the 2MB (2,097,152 bytes), with 50K to spare.
 
 ## Where everything comes from
 
@@ -64,6 +65,8 @@ The ROM is `build/A5000/rom`. Each module's ELF file beside it holds source line
 ## Differences from the imported sources that matter
 
 - The kernel's MEMC1 build path had not been assembled since RISC OS 3.5. It assembles and runs again; `git log -- Sources/Kernel` lists each repair.
-- On an IOC machine a CMOS reset gives the RISC OS 3.11 settings (drive 0, NoBoot, 32K font cache, flat desktop in the system font, mouse step 3).
+- On an IOC machine a CMOS reset gives the RISC OS 3.11 settings for how the machine starts (drive 0, NoBoot, mouse step 3) and RISC OS Open's for how the desktop looks.
+- The ROM has one set of icons, the high resolution one. In a mode whose pixels are not square (mode 12 on a TV-standard monitor) the Window Manager scales them.
+- The Desktop module is the current RISC OS Open one, for its banner. The banner reads RISC OS, not RISC OS 5.
 - The Podule manager is arranged for 4 podules and extension ROMs, ADFS leaves out big disc support where the ST506 driver is present, and SoundDMA has only the 8-bit SWIs.
 - The kernel's workspace layout below `&1000` and in the VDU driver follows the RISC OS 3.60 sources, which moved some VDU variables relative to RISC OS 3.11. Software that reads those by address rather than through `OS_ReadVduVariables` will see different values.

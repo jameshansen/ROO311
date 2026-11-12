@@ -47,7 +47,7 @@ Checked on the built compiler: the `scl/hard/fpa` and `scl-module/hard/fpa` copi
 | `-ffixed-sl` | The compiler reserves the stack limit register only when stack checks are on. Module code finds its statics through it either way, so it is reserved by hand |
 | `-mapcs-stack-check` | Module mode turns the stack limit check off. The library runs on its clients' stacks, which grow in chunks, so it needs the check. `c.alloc` and `c.signal` are compiled without it, as their `#pragma -s1` asks: the allocator is called by the code that grows the stack, and the signal code runs when the stack has overflowed |
 | `-mno-poke-function-name` | Function names ahead of each function cost ROM space. The original build left them out too (`cc -ff`) |
-| `-O2` | Not `-Os`. See the compiler faults below |
+| `-Os` | The ROM is nearly full, and `-Os` code is 9% smaller than `-O2`. It needs the two compiler fixes below |
 | `-fno-section-anchors` | See the compiler faults below |
 | `-ffreestanding` | Stops GCC replacing a library function's body with a call to the same function, or `printf` with `puts` |
 | `-fno-common` | Every static lands in `.data` or `.bss`, where the linker script lays out the library's static data |
@@ -89,7 +89,7 @@ Programs that call the library still get their flags back from the assembler par
 
 ### Compiler faults found
 
-- **`-Os` pushes every register.** In a function with no frame pointer, the prologue code that pads the register list to make stack room (`arm_expand_prologue`, the `optimize_size` branch) can compute a negative frame size, and the mask it builds from that covers all sixteen registers, `sp` and `pc` included. `c.alloc` (`internal_coalesce`) triggers it, and the compiler then overruns a 100-byte buffer writing the instruction out and aborts. `-O2` does not take that path.
+- **`-Os` pushed every register.** In a function with no frame pointer, the prologue code that pads the register list to make stack room (`arm_expand_prologue`, the `optimize_size` branch) could take a negative frame size for a register count, and the mask it built from that covered all sixteen registers, `sp` and `pc` included. `c.alloc` (`internal_coalesce`) triggered it, as did 26 other library files. The compiler then overran the 100-character buffer it writes the push instruction into (`*push_multi` in `arm.md`) and aborted. The Dockerfile makes the padding apply only to a positive frame size and gives the buffer 256 characters. With those the whole library compiles at `-Os`, and the library test, the applications and Battle Chess run on the result.
 - **Section anchors with module data.** At `-O1` and above `c.signal` stops the compiler with "insn does not satisfy its constraints" in `reload_cse_simplify_operands`, on a store through a section anchor plus the relocation offset. `-fno-section-anchors` avoids it.
 
 ### Testing
@@ -126,10 +126,11 @@ docker create --name roo26-gcc-x roo26-gcc && docker cp roo26-gcc-x:/gccsdk/cros
 
 ## What was changed from stock GCCSDK
 
-All three changes are in `toolchain/Dockerfile`.
+All four changes are in `toolchain/Dockerfile`.
 
 - **C only.** `GCC_LANGUAGES` is `c`, not `c,c++`.
 - **No loop optimiser libraries.** `GCC_USE_PPL_CLOOG` is `no`. PPL and CLooG take longer to build than GCC and ROO26 gains nothing from them.
+- **Two fixes to the ARM back end**, which make `-Os` usable. See the compiler faults below. Only the compiler proper (`cc1`) is rebuilt after them.
 - **The build is retried.** `build-world` runs up to three times. A parallel build of GCC 4.7 can compile fixincludes' generated `fixincl.x` while it is still being written (`'apz' undeclared`); the next pass finds the file complete and carries on.
 
 ## AsAsm

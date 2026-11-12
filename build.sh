@@ -175,6 +175,14 @@ hdrlinks() {
 			ln -sf "$PWD/$h" "$inc/$v.h"; ln -sf "$PWD/$h" "$inc/h.$v"
 		done
 	done
+	# and any other spelling the component's sources use for one of its own or the library's headers
+	grep -ho '#include *"[^"]*"' c/* h/* 2>/dev/null | sed 's/.*"\(.*\)"/\1/' | sort -u | while read n; do
+		[ -e "$inc/$n" ] || [ -e "$B/clib/inc/$n" ] && continue
+		for d in "$inc" "$B/clib/inc"; do
+			m=$(ls "$d" | grep -i -x -F "$n" | head -1)
+			if [ -n "$m" ]; then ln -sf "$(readlink -f "$d/$m")" "$inc/$n"; break; fi
+		done
+	done
 }
 
 # romapp <name>: a C application held in the ROM as a module, the way RISC OS 3 held Edit, Draw and Paint.
@@ -182,9 +190,12 @@ hdrlinks() {
 # library in the ROM directly. It comes after the SharedCLibrary in Sources/MODULES, under the module's
 # title (!Edit).
 romapp() {
-	asms=
+	asms= defs=
 	case $1 in
 	!Edit) srcs="edit editv message slist" ;;
+	!Configure) srcs="Apps CMOS configfile Configure econet Filer Floppies Fonts HardDiscs Keyboard Lock Memory
+		Mouse Printer Screen Sound System version WimpFlags"
+		defs="-DBLUEROM -DSTANDALONE" ;;
 	!Draw) srcs="Draw DrawAction DrawCheck DrawDispl DrawDXF DrawEdit DrawEnter DrawFileIO DrawGrid DrawHelp
 		DrawMenu DrawObject DrawPrint DrawScan DrawSelect DrawTextC DrawTrans DrawUndo bezierarc"
 		asms="asm/jpeg" ;;
@@ -198,7 +209,7 @@ romapp() {
 		"$ASASM" -Uppercase -NOWarn -G -apcs 3/26bit -o "$O/${s##*/}.o" "$s" || return 1
 	done
 	for c in $srcs; do
-		modcc 536 "$O/$c.o" c/$c -mapcs-stack-check -I"$O/inc" -I"$B/clib/inc" || return 1
+		modcc 536 "$O/$c.o" c/$c -mapcs-stack-check -I"$O/inc" -I"$B/clib/inc" $defs || return 1
 	done
 	"$("$GCC" -print-prog-name=ld)" -T "$ROOT/tools/romapp.ld" -T "$B/clib/abssym.ld" --defsym ROMADDR="$(romaddr "$1")" \
 		-Map "$B/$1.map" -o "$B/$1.elf" "$O"/*.o "$B/clib/romstubs.obj" "$("$GCC" -mmodule -print-libgcc-file-name)" &&

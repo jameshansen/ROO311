@@ -22,4 +22,9 @@ RUN ./build-world || true
 # build-world can be run again after a failure and carries on. A parallel build of GCC 4.7 sometimes compiles
 # fixincludes' generated fixincl.x while it is still being written; the second pass finds it complete.
 RUN bash -c 'export MAKEFLAGS="-j$(nproc)"; ./build-world || ./build-world || ./build-world' || (tail -n 150 build-cross-output.txt; false)
+# ROO26: two faults in this GCC's ARM back end, both on the -Os path (toolchain/README.md has the story).
+# The prologue code that pads the register list to make stack room takes a negative frame size for a count,
+# and the buffer the push instruction is written into holds 100 characters where 15 registers need more.
+# Only the compiler proper is rebuilt.
+RUN cd /gccsdk/gcc4/srcdir/gcc/gcc/config/arm &&     sed -i 's/if (frame \&\& n \* 4 >= frame)/if (frame > 0 \&\& n * 4 >= frame)/' arm.c &&     sed -i 's/char pattern\[100\];/char pattern[256];/' arm.c arm.md &&     grep -q 'frame > 0 && n \* 4 >= frame' arm.c &&     cd /gccsdk/gcc4/builddir/cross-gcc/gcc && make -j$(nproc) cc1 &&     cp cc1 /gccsdk/cross/libexec/gcc/arm-unknown-riscos/4.7.4/cc1
 ENV PATH=/gccsdk/cross/bin:/gccsdk/env/bin:$PATH
