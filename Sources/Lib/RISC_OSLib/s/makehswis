@@ -248,7 +248,7 @@ string2 SETS    "&":CC:(:STR:value)
         GET     Hdr:ATAPI
         GET     Hdr:BASICTrans
         GET     Hdr:Buffer
-; ROO26: Hdr:ARM3Cache is not among the published sources; its SWIs are left out of swis.h
+; ROO311: Hdr:ARM3Cache is not among the published sources; its SWIs are left out of swis.h
 ;       GET     Hdr:ARM3Cache
         GET     Hdr:CDROM
         GET     Hdr:CDFS

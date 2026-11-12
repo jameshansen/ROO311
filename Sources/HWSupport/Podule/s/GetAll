@@ -18,7 +18,7 @@
         GET     Hdr:ListOpts
         GET     Hdr:Macros
         GET     Hdr:System
-        GET     Hdr:Machine.<Machine>           ; ROO26: for IO_Type, which sets the podule arrangement
+        GET     Hdr:Machine.<Machine>           ; ROO311: for IO_Type, which sets the podule arrangement
         GET     Hdr:CMOS
         GET     Hdr:ModHand
         GET     Hdr:Debug

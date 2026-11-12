@@ -59,7 +59,7 @@ NewClockChip    SETL    {TRUE}
                 GBLS    Keyboard_Type
 Keyboard_Type   SETS    "A1A500"
 
-; ROO26: the kernel tests these two on every machine, and only the Morris header set them
+; ROO311: the kernel tests these two on every machine, and only the Morris header set them
                 GBLL    MorrisSupport
 MorrisSupport   SETL    {FALSE}
                 GBLL    StorkPowerSave

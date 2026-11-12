@@ -29,7 +29,7 @@
 ;       R1 set to bytes moved.
 ;******************************************************************************
 
-; ROO26: the flag bits below sat further down, beside DynamicAreaSWI. The AP_ values that follow are built
+; ROO311: the flag bits below sat further down, beside DynamicAreaSWI. The AP_ values that follow are built
 ; from them, and AsAsm cannot pool a literal whose value is still a forward reference, so they are defined first.
 
 ; Bits in dynamic area flags (and page flags)
@@ -344,7 +344,7 @@ gotsizeandshrink
         MOVNE   r5, r2                                  ; but save amount we are taking from freepool
         B       %FT10
  |
-; ROO26: without a free pool there is nothing more to try, and a source other than application space may
+; ROO311: without a free pool there is nothing more to try, and a source other than application space may
 ; move less than was asked for. The branch had ended up inside the UseFreePool case above, so a MEMC1 build
 ; fell through into testrestoreheapend and returned to a stale lr. RISC OS 3.11 branches here too
 ; (ROM311 &0380AAC0, BNE to the same place when the source is not application space).

@@ -65,7 +65,7 @@ clean:
 	${RM} ${TARGET}
 	@echo ${COMPONENT}: cleaned
 
-# ROO26: the ROM leaves out Palettes and Tables, the ready-made tables for plotting 16 and 32 bit per
+# ROO311: the ROM leaves out Palettes and Tables, the ready-made tables for plotting 16 and 32 bit per
 # pixel sprites in the standard 16 and 256 colour palettes (83K, which RISC OS 3.11 did not have).
 # ColourTrans builds a table when it is first wanted if the ROM has none (s.Tables32K).
 resources:

@@ -69,7 +69,7 @@ clean:
 resources:
 	${MKDIR} ${RESDIR}.${COMPONENT}
 	${CP} Resources.${LOCALE}.Messages   ${RESDIR}.${COMPONENT}.Messages   ${CPFLAGS}
-# ROO26: the ROM has the 3D window tools and one set of icons, the high resolution one, under the name
+# ROO311: the ROM has the 3D window tools and one set of icons, the high resolution one, under the name
 # Sprites: the Window Manager falls back to that name in every mode, and scales the icons where pixels are
 # not square. tools/prepare.py makes it from Sprites22 (Resources.UK.ROM.Sprites): the 256 and 32 thousand
 # colour window tiles are left out, and the task bar icon is the cog of the current RISC OS Open sources.

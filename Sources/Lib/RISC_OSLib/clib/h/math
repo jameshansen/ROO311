@@ -56,7 +56,7 @@ extern double atan2(double /*x*/, double /*y*/);
    /* a domain error occurs if both args are zero, and -HUGE_VAL returned. */
    /* Returns: the arc tangent of y/x, in the range -Pi to Pi. */
 
-/* ROO26: __d_atan, __d_sin, __d_cos and __d_abs are operations the Norcroft */
+/* ROO311: __d_atan, __d_sin, __d_cos and __d_abs are operations the Norcroft */
 /* compiler does inline. GCC calls the library's atan, sin and cos and does */
 /* fabs inline under its own name.                                          */
 #ifndef __GNUC__

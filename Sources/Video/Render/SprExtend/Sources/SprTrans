@@ -568,7 +568,7 @@ coords_passed_in
         Debug   ag,"spWidth is",R10 
         Debug   ag,"sprite is at",R1
         ADD     R10, R10, #1
-        MOV     R10, R10, LSL #2        ; ROO26: was the LSL macro, which AsAsm reads as the instruction
+        MOV     R10, R10, LSL #2        ; ROO311: was the LSL macro, which AsAsm reads as the instruction
 ;                           
         MLA     R11, R10, R4, R2
         ADD     R11, R11, R1

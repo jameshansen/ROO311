@@ -163,7 +163,7 @@ install_FontMerge: ${FONTFILES}
 	|
 	@echo FontMerge: Application installed (Disc)
 
-# ROO26: Configure is held in the ROM with the other applications. Its program is a module (!Configure),
+# ROO311: Configure is held in the ROM with the other applications. Its program is a module (!Configure),
 # which registers the sprites; these go into the Messages module.
 RESDIR = <resource$dir>.Resources.Configure
 RESAPP = <resource$dir>.Apps.!Configure

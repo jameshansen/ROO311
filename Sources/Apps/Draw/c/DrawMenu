@@ -1970,7 +1970,7 @@ static menu mColour;
 
 /* Definition of the standard grid sizes - must match the menu entries:
    indexed by inch,cm, then menu subdivision */
-/* ROO26: gridSpace and gridDivide were declared [] [], the second size left to the initialiser.
+/* ROO311: gridSpace and gridDivide were declared [] [], the second size left to the initialiser.
    The Norcroft compiler took that; C wants it stated. */
 static  double gridSpace [] [5]  = {{1, 1,  1,  1, -1},
                                   {1, 1,  -1, 0, 0}};

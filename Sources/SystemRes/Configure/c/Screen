@@ -103,7 +103,7 @@
 #define ScreenWindow_OK               35
 
 
-/* ROO26: the monitor type and the screen mode are the ones the CMOS RAM holds, as RISC OS 3.11 kept them
+/* ROO311: the monitor type and the screen mode are the ones the CMOS RAM holds, as RISC OS 3.11 kept them
    (*Configure MonitorType and WimpMode). The colours and resolutions menus offer the numbered modes this
    machine and its monitor can show. The window had worked from the monitor definition files and the
    ScreenModes module of later machines. */

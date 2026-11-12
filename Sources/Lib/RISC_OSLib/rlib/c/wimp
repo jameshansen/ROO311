@@ -28,7 +28,7 @@
 #include <stdarg.h>
 
 #include "os.h"
-#include "trace.h"      /* ROO26: was "trace .h", which only RISC OS finds */
+#include "trace.h"      /* ROO311: was "trace .h", which only RISC OS finds */
 #ifndef __wimp_h
 #define __WIMP_COMPILE
 #include "wimp.h"

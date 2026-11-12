@@ -1,4 +1,4 @@
-; ROO26: the SWIs of the ShareFS module's ShareD interface, as far as ADFSFiler names them.
+; ROO311: the SWIs of the ShareFS module's ShareD interface, as far as ADFSFiler names them.
 ;
 ; ShareFS (Acorn Access) was not released as source and its exported header is not in the RISC OS Open
 ; tree. ADFSFiler offers its "Share" menu entries only when it finds the ShareFS module, so on a machine

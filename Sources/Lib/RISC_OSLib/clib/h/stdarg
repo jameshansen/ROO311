@@ -45,7 +45,7 @@ typedef char *va_list[1];       /* see <stdio.h> */
     */
 
 #ifdef __GNUC__
-/* ROO26: for GCC. va_list keeps its type, since a pointer to it is what   */
+/* ROO311: for GCC. va_list keeps its type, since a pointer to it is what   */
 /* every program built with the Norcroft compiler passes to vprintf and   */
 /* friends. GCC puts only the unnamed arguments in memory on entry, so    */
 /* the first one comes from GCC's own va_start, not from the address of   */

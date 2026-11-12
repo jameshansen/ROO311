@@ -212,7 +212,7 @@ ROMFonts
         MyDesk  Fonts.Corpus.Medium.Oblique.Outlines0
         MyDesk  Fonts.Corpus.Medium.Outlines0
 
-; ROO26: the file is "/Base0" to RISC OS and ".Base0" in the source tree. AsAsm does not make that
+; ROO311: the file is "/Base0" to RISC OS and ".Base0" in the source tree. AsAsm does not make that
 ; translation, so the build copies it to Base0 (tools/prepare.py) and the two names are given apart.
         ResourceFile Fonts.Encodings.Base0, Fonts.Encodings./Base0
         MyDesk  Fonts.Encodings.Latin1

@@ -18,5 +18,5 @@ Set Configure$Path <Obey$Dir>.,Resources:$.Resources.Configure.
 | Set the WimpSlot last
 |
 WimpSlot -min 64K -max 64K
-| ROO26: the program is the !Configure module in the ROM
+| ROO311: the program is the !Configure module in the ROM
 Desktop_Configure %*0

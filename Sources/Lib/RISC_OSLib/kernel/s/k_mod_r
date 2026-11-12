@@ -79,7 +79,7 @@ CV_Entries SETL {TRUE}
         MOV     r13, r10                ; sl
         MOV     r10, r11                ; fp
         LDR     r14, [r10, #-4]         ; link to stackunextend created by extend code
-        ; ROO26: was ORR r14, r14, #&40000000, to set Z in it and so mark the veneer. The mark is now
+        ; ROO311: was ORR r14, r14, #&40000000, to set Z in it and so mark the veneer. The mark is now
         ; the address itself: StackOverflowExitA, two instructions after StackOverflowExit (k_body).
         ADD     r14, r14, #8
         STR     r14, [r10, #-4]

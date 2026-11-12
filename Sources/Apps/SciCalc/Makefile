@@ -72,7 +72,7 @@ install: ${FILES}
 	Access ${INSTDIR}.* lr/r
 	@echo ${COMPONENT}: Application installed {Disc}
 
-# ROO26: SciCalc was a disc application only. This rule puts it in the ROM's Apps folder, with a !Run
+# ROO311: SciCalc was a disc application only. This rule puts it in the ROM's Apps folder, with a !Run
 # that does without BASIC64 (Resources.UK.ROM.!Run).
 RESAPP = <resource$dir>.Apps.${APP}
 

@@ -100,7 +100,7 @@
         Entry   exit, imported, , , 1
         Entry   getenv, imported, , , 1
         Entry   system, imported, , , 1
-        ; ROO26: was "Entry bsearch, imported, , __bsearch, , IMPORT", a second bsearch compiled for the
+        ; ROO311: was "Entry bsearch, imported, , __bsearch, , IMPORT", a second bsearch compiled for the
         ; old calling standard (cc -zkA), which GCC cannot produce. Old clients now reach the one bsearch
         ; through the veneer, as they do qsort; it calls their comparison function with _call_client_2.
         Entry   bsearch, imported, , , 5

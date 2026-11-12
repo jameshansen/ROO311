@@ -373,7 +373,7 @@ UpdateLatchB
         Pull    "R2, R3, PC"
 
 
- [ MorrisSupport                ; ROO26: only called under MorrisSupport, and it writes IOMD registers
+ [ MorrisSupport                ; ROO311: only called under MorrisSupport, and it writes IOMD registers
 ; *****************************************************************************
 ;
 ;       UpdateMonitorTypeLatch - update monitor type latch and soft copy

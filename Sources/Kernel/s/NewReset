@@ -897,7 +897,7 @@ skipskipforTC
  [ IO_Type = "IOMD"
         MOV     r1, #&41                ; floppies=1, ST506=0, IDE=1 (changed 01-Sep-93)
  |
-        MOV     r1, #&01                ; ROO26: floppies=1, no hard discs, as RISC OS 3.11 sets (see below)
+        MOV     r1, #&01                ; ROO311: floppies=1, no hard discs, as RISC OS 3.11 sets (see below)
  ]
         BL      Write
 not_full_reset
@@ -978,7 +978,7 @@ DefaultCMOSTable ; list of non-zero options wanted :
 ; byte pairs of offset, value
 ; terminated by offset &FF
 
-; ROO26: the table had become the Risc PC's, which boots from hard disc 4. On an IOC machine the values
+; ROO311: the table had become the Risc PC's, which boots from hard disc 4. On an IOC machine the values
 ; that decide how the machine starts are the ones RISC OS 3.11 sets, so that a machine with no hard disc
 ; starts as it always did: drive 0, NoBoot, mouse step 3. They were found by resetting CMOS under each ROM
 ; in the emulator (Delete held at power on) and reading the CMOS RAM back; they are the defaults *Status

@@ -165,7 +165,7 @@ DDEUtils_GetCL     EQU X+&42584
         MOVNE   r10, fp
         MOV     lr, pc
         MOV     pc, $r
-        ; ROO26: the test is made again here. It used to rest on the client returning with the flags
+        ; ROO311: the test is made again here. It used to rest on the client returning with the flags
         ; it was called with, which C built with GCC does not do. lr is the one register that is free
         ; under both calling standards at this point.
         LDRB    lr, [v6, #O_APCS_A_Client]
@@ -191,7 +191,7 @@ movne_sla_sl
         MOVNE   r10, fp
         MOV     lr, pc
         MOV     pc, a4
-        LDRB    lr, [v6, #O_APCS_A_Client]      ; ROO26: tested again, as in CallClient
+        LDRB    lr, [v6, #O_APCS_A_Client]      ; ROO311: tested again, as in CallClient
         CMP     lr, #0
         MOVNE   fp, r10
 movne_sl_sla
@@ -1092,7 +1092,7 @@ FCH_NextLanguage Keep
         CMP     v5, a1
         MOV     a1, v1
         LDR     a2, [sp, #uwb_size+4]
-        ; ROO26: was MOVEQ lr, pc / MOVEQ pc, r2 / BEQ FCH_ClientCalled, which called the handler a
+        ; ROO311: was MOVEQ lr, pc / MOVEQ pc, r2 / BEQ FCH_ClientCalled, which called the handler a
         ; second time (through CallClient) if it came back with Z clear. C built with GCC can.
         BNE     FCH_CallClient
         MOV     lr, pc
@@ -1740,13 +1740,13 @@ default_unwind_handler Keep
         ; were saved in this frame.
         MOV     ip, #1
         ADD     v2, a4, #frame_prevfp
-        MOV     v3, #9                  ; ROO26: was #v6, a register name as a number, which AsAsm rejects
+        MOV     v3, #9                  ; ROO311: was #v6, a register name as a number, which AsAsm rejects
         ADD     v4, a1, #uwb_r4-r4*4
 01      TST     v1, ip, ASL v3
         LDRNE   r14, [v2, #-4]!
         STRNE   r14, [v4, v3, ASL #2]
         SUB     v3, v3, #1
-        CMP     v3, #4                  ; ROO26: was #v1
+        CMP     v3, #4                  ; ROO311: was #v1
         BGE     %B01
 
         ; now look for floating point stores immediately after the savemask
@@ -2527,7 +2527,7 @@ StackOverflowExit Keep
 ; stack-description registers here and permute them back at the end.
 ; We do not do the expected ..EQ operations here, in order to keep the
 ; event handler happy - APCS change expected to be unconditional or NE.
-; ROO26: the Z flag no longer says which. It came from the return address in the frame, where the
+; ROO311: the Z flag no longer says which. It came from the return address in the frame, where the
 ; veneer set the bit, and reached the flags only when the procedure returned with LDM ..^. C built with
 ; GCC returns without restoring flags, so for an extension made under APCS_A the veneer
 ; (_kernel_stkovfs_v) now moves the return address in the frame back to StackOverflowExitA.
@@ -2562,7 +2562,7 @@ DeallocateChunkLoop
         MOV     a1, v2
         LDR     ip, [v2,#SC_deallocate] ; deallocate proc for this chunk
         CMPS    ip, #0                  ; if there is one...
-        ; ROO26: was conditional instructions either side of the call, which rest on the deallocate
+        ; ROO311: was conditional instructions either side of the call, which rest on the deallocate
         ; proc returning with the flags it was called with. free() built with GCC does not.
         MOVEQ   v1, v2                  ; no deallocate proc: try next chunk
         BEQ     DeallocateChunkNext

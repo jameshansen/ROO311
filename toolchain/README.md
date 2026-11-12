@@ -1,6 +1,6 @@
-# The ROO26 toolchain
+# The ROO311 toolchain
 
-ROO26 builds with two open tools and nothing proprietary.
+ROO311 builds with two open tools and nothing proprietary.
 
 | Tool | Version | Used for |
 |---|---|---|
@@ -17,11 +17,11 @@ It is the last GCC that can produce code for these machines.
 - RISC OS floating point is FPA, through the FPEmulator module on a machine with no FPA chip. GCC 4.8 removed FPA.
 - The SharedCLibrary expects the RISC OS procedure call standard: a frame pointer chain, a stack limit in `sl` checked on entry to each function, and floating point results in `f0`. GCCSDK's `-mlibscl` target generates that.
 
-The RISC OS Open sources were written for the Norcroft C compiler from Acorn's DDE, which is not free. GCC stands in for it, and the changes that takes are made in the sources with `ROO26:` comments.
+The RISC OS Open sources were written for the Norcroft C compiler from Acorn's DDE, which is not free. GCC stands in for it, and the changes that takes are made in the sources with `ROO311:` comments.
 
 ## What the compiler does by default
 
-With `-mlibscl` (code that uses the SharedCLibrary) or `-mmodule` (code inside a module) the defaults are already the ones ROO26 needs. `arm-unknown-riscos-gcc -Q --help=target -mlibscl` reports:
+With `-mlibscl` (code that uses the SharedCLibrary) or `-mmodule` (code inside a module) the defaults are already the ones ROO311 needs. `arm-unknown-riscos-gcc -Q --help=target -mlibscl` reports:
 
 | Option | Value |
 |---|---|
@@ -75,7 +75,7 @@ A C application on disc links with `tools/app.ld` and the library's stubs (`clib
 
 ### Changes to the sources for GCC
 
-Each has a `ROO26:` comment.
+Each has a `ROO311:` comment.
 
 | File | Change |
 |---|---|
@@ -111,7 +111,7 @@ sh toolchain/fetch.sh /some/work/dir
 ```
 
 ```bash
-docker build -t roo26-gcc /some/work/dir
+docker build -t roo311-gcc /some/work/dir
 ```
 
 `fetch.sh` checks out GCCSDK's build recipe at revision 7800 and downloads the source archives the recipe needs, each checked against `SHA256SUMS`. The recipe itself checks GCC out from the closed `gcc-4_7-branch` of GCC's Subversion repository during the build, so the build needs the network.
@@ -119,7 +119,7 @@ docker build -t roo26-gcc /some/work/dir
 The compiler ends up in the image at `/gccsdk/cross/bin` (`arm-unknown-riscos-gcc` and binutils), with GCCSDK's tools beside it (`cmunge`, `elf2aif`, `asasm`). To use it outside the container, copy it out; it runs from any folder:
 
 ```bash
-docker create --name roo26-gcc-x roo26-gcc && docker cp roo26-gcc-x:/gccsdk/cross ./cross && docker cp roo26-gcc-x:/gccsdk/env ./env && docker rm roo26-gcc-x
+docker create --name roo311-gcc-x roo311-gcc && docker cp roo311-gcc-x:/gccsdk/cross ./cross && docker cp roo311-gcc-x:/gccsdk/env ./env && docker rm roo311-gcc-x
 ```
 
 `build.sh` takes the compiler from `GCC` (the path of `arm-unknown-riscos-gcc`) or from `PATH`.
@@ -129,7 +129,7 @@ docker create --name roo26-gcc-x roo26-gcc && docker cp roo26-gcc-x:/gccsdk/cros
 All four changes are in `toolchain/Dockerfile`.
 
 - **C only.** `GCC_LANGUAGES` is `c`, not `c,c++`.
-- **No loop optimiser libraries.** `GCC_USE_PPL_CLOOG` is `no`. PPL and CLooG take longer to build than GCC and ROO26 gains nothing from them.
+- **No loop optimiser libraries.** `GCC_USE_PPL_CLOOG` is `no`. PPL and CLooG take longer to build than GCC and ROO311 gains nothing from them.
 - **Two fixes to the ARM back end**, which make `-Os` usable. See the compiler faults below. Only the compiler proper (`cc1`) is rebuilt after them.
 - **The build is retried.** `build-world` runs up to three times. A parallel build of GCC 4.7 can compile fixincludes' generated `fixincl.x` while it is still being written (`'apz' undeclared`); the next pass finds the file complete and carries on.
 
@@ -137,7 +137,7 @@ All four changes are in `toolchain/Dockerfile`.
 
 AsAsm is built from `svn://svn.riscos.info/gccsdk/trunk/tools/asasm` in the usual way (`autoreconf --install`, `configure --target=arm-unknown-riscos --disable-building-tools`, `make`). The GCC image also holds a copy at `/gccsdk/env/bin/asasm`.
 
-The RISC OS 3.60 sources were written for Acorn's AAsm, and AsAsm differs from it in ways that matter. `tools/fixcase.py` normalises the imported sources for the first three; the rest are source edits marked `ROO26:`.
+The RISC OS 3.60 sources were written for Acorn's AAsm, and AsAsm differs from it in ways that matter. `tools/fixcase.py` normalises the imported sources for the first three; the rest are source edits marked `ROO311:`.
 
 | Difference | Effect | Handling |
 |---|---|---|

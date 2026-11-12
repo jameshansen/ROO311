@@ -23,4 +23,4 @@ get https://ftp.gnu.org/gnu/mpc/mpc-1.1.0.tar.gz
 get https://ftp.gnu.org/gnu/mpfr/mpfr-3.0.1.tar.bz2
 sha256sum -c "$HERE/SHA256SUMS"
 cp "$HERE/Dockerfile" ../..
-echo "ready: docker build -t roo26-gcc $(cd ../.. && pwd)"
+echo "ready: docker build -t roo311-gcc $(cd ../.. && pwd)"

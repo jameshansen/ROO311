@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build ROO26 on Linux with open tools: AsAsm (GCCSDK) and GNU binutils for ARM.
+# Build ROO311 on Linux with open tools: AsAsm (GCCSDK) and GNU binutils for ARM.
 # usage: sh build.sh [rom | kernel | modules | module <folder> <source> <name>]
 #   ASASM    path to the asasm binary (default: asasm on PATH)
 #   GCC      path to GCC 4.7.4 for RISC OS, for the C parts (default: arm-unknown-riscos-gcc on PATH)

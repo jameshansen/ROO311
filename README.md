@@ -1,6 +1,6 @@
-# RISC OS Open 26-bit (ROO26)
+# ROO311: a RISC OS 3.11 replacement ROM built from the RISC OS Open sources
 
-A RISC OS ROM for Archimedes machines with an ARM3 and MEMC1 (an A5000 is the reference machine), built from the RISC OS Open sources with open tools. It is a port of RISC OS Open to 26-bit machines: it looks and works like RISC OS Open, runs what RISC OS 3.11 ran, needs no hard disc, and fits a 2MB ROM. It is a free replacement for the commercial RISC OS 3 ROMs in Archimedes emulators.
+A RISC OS ROM for Archimedes machines with an ARM3 and MEMC1 (an A5000 is the reference machine), built from the RISC OS Open sources with open tools. It is a port of RISC OS Open to 26-bit machines: it looks and works like RISC OS Open, runs what RISC OS 3.11 ran, needs no hard disc, and fits a 2MB ROM. It is a free, drop-in replacement for the commercial RISC OS 3.11 ROM in Archimedes emulators. It is not affiliated with RISC OS Open Ltd.
 
 ## Status
 
@@ -38,7 +38,7 @@ Every file in the ROM comes from the RISC OS Open repositories or was written fo
 - The message files are tokenised against the kernel's dictionary and Help's tokens, and Chars and Help are crunched and squished, as the original build did. Together that frees 59K, which is what lets Configure in.
 - Configure is the RISC OS 3.6 one. It was a disc application that a boot application on disc started; in the ROM it is a module like Edit, Draw and Paint, and it starts without the boot application. What it kept in the CMOS RAM works. Its Screen window keeps the monitor type and the desktop's mode in the CMOS RAM too, as RISC OS 3.11 did (`*Configure MonitorType` and `WimpMode`): its menus of colours and resolutions offer the numbered modes the chosen monitor can show, where they had come from the monitor definition files of later machines. What it kept in files of the boot application (the desktop font, the RAM disc, the background texture) has nowhere to go yet.
 - ColourTrans's ready-made tables for plotting 16 and 32 bit per pixel sprites are left out of the ROM (83K). It builds a table when one is first wanted.
-- Changes to imported sources carry a comment starting `ROO26:` that says what changed. Where a commercial ROM was consulted to settle how something behaved, the comment names the ROM and the address.
+- Changes to imported sources carry a comment starting `ROO311:` that says what changed. Where a commercial ROM was consulted to settle how something behaved, the comment names the ROM and the address.
 
 ## Building
 

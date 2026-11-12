@@ -1212,7 +1212,7 @@ JumpTable
         B       Sound0Enable            ; enable control
         B       Sound0Stereo            ; stereo positioning
         B       Sound0Speaker           ; loudspeaker control
- [ VIDC_Type = "VIDC20"         ; ROO26: these three SWIs exist only with 16-bit sound. On VIDC1 the module
+ [ VIDC_Type = "VIDC20"         ; ROO311: these three SWIs exist only with 16-bit sound. On VIDC1 the module
                                 ; has the four SWIs RISC OS 3.11's SoundDMA 1.20 had.
         B       Sound0Mode              ; mode control/status (16-bit/mu-law etc)
         B       Sound0LinearHandler     ; 16-bit sound generator interface

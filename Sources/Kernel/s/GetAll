@@ -179,7 +179,7 @@ Module          SETL    {FALSE}
  [ MorrisSupport
 IncludeTestSrc  SETL    {TRUE}
  |
-; ROO26: the power-on self test in TestSrc was reworked for the Risc PC and no longer assembles for a
+; ROO311: the power-on self test in TestSrc was reworked for the Risc PC and no longer assembles for a
 ; MEMC1 machine (32-bit mode macros, a missing Mem1MEMC1a), so it is left out for now. RISC OS 3.11 ran it:
 ; the coloured borders at power on. Without it the ROM starts at the reset code in s.Kernel.
 IncludeTestSrc  SETL    {FALSE}
@@ -195,7 +195,7 @@ RISCPCBurstMode SETL    {FALSE}
 ;>>>could be replaced by NormalSpeedROMS
 
                 GBLL    Select16BitSound
-Select16BitSound SETL   MEMC_Type = "IOMD"      ; ROO26: was {TRUE}; the code it selects reads IOMD registers
+Select16BitSound SETL   MEMC_Type = "IOMD"      ; ROO311: was {TRUE}; the code it selects reads IOMD registers
 
                 GBLL    Simulator               ; running on simulator?
 Simulator       SETL    {FALSE}
@@ -515,7 +515,7 @@ largest_rma_size    * (128*1024)                 ; and the ceiling for rma use
         GET     s.PMF.Def          ; Common with 6502 code in the keyboard
         Protocol
 
-; ROO26: a branch to a target more than 32MB away, for code that is copied to page zero and branches back
+; ROO311: a branch to a target more than 32MB away, for code that is copied to page zero and branches back
 ; into ROM. AAsm wrapped such an offset within the 26-bit address space and assembled a plain B; AsAsm
 ; refuses it, so the same instruction word is written out as data.
         MACRO

@@ -38,7 +38,7 @@ include AAsmModule
 
 # Dynamic dependencies:
 
-# ROO26: the rule the ROO26 build reads for the files that go into the ROM's resources. The files under
+# ROO311: the rule the ROO311 build reads for the files that go into the ROM's resources. The files under
 # Resources.UK.ROM are made by tools/prepare.py, which stands in for the shared rules above.
 resources:
 	${MKDIR} <resource$dir>.Resources.Desktop

@@ -61,7 +61,7 @@ EscapeBit       bit 6           ;escape if this bit set in ESC_Status
 ; BigDisc - if true then use sector addressing, false use byte
 
 	GBLL	BigDisc
-BigDisc	SETL	:LNOT: Top16Write	; ROO26: was {TRUE}. The ST506 driver an IOC machine carries (Top16Write)
+BigDisc	SETL	:LNOT: Top16Write	; ROO311: was {TRUE}. The ST506 driver an IOC machine carries (Top16Write)
 					; works in byte addresses only, and Adfs11 asserts as much. Discs are
 					; limited to 512MB, as under RISC OS 3.11.
 

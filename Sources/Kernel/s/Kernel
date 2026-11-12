@@ -252,7 +252,7 @@ DoMorrisROMHeader SETS  ""
 
   [ :LNOT: IncludeTestSrc :LAND: :LNOT: MorrisSupport
    [ ResetIndirected :LAND: MEMC_Type <> "IOMD"
-        ; ROO26: the first word of the ROM is a branch to CONT that works from address 0, wrapping round
+        ; ROO311: the first word of the ROM is a branch to CONT that works from address 0, wrapping round
         ; the 26-bit address space, as it is in RISC OS 3.11 (ROM311 &03800000: EAE00069). It was
         ; LDR pc, .+ResetIndirection, which reaches CONT only while the ROM itself is at address 0.
         ; Games reset the machine by copying this word to address 0 and jumping to it (Minerva's Auto

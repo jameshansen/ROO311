@@ -1,4 +1,4 @@
-; ROO26: the A5000 is an IOC machine and takes the A1 settings. The module finds at run time whether
+; ROO311: the A5000 is an IOC machine and takes the A1 settings. The module finds at run time whether
 ; the floppy controller is a 1772 or an 82C710/711, as RISC OS 3.11 ADFS did.
 
         GET     Version

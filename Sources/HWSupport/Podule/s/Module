@@ -57,7 +57,7 @@ FixLoaderBug    SETL    True
         ;   The following assembly-time variables control the final
         ; form of the podule manager, and should be changed with care.
 
-; ROO26: these four were fixed at the Risc PC's arrangement (8 podules, the network podule, EASI space, no
+; ROO311: these four were fixed at the Risc PC's arrangement (8 podules, the network podule, EASI space, no
 ; extension ROMs). An IOC machine has 4 podules and none of the rest, and reading the EASI address of a
 ; podule there is an address exception. It does have extension ROMs, between &03400000 and the main ROM,
 ; as RISC OS 3.11's Podule 1.26 supported. The source already allowed for each case.
@@ -735,7 +735,7 @@ TryNextPodule
         DLINE   " extension ROMs"
   ]
         TEQ     r10, #0
-        BEQ     ExitLoadLoaders                         ; ROO26: was %99, a label that no longer exists
+        BEQ     ExitLoadLoaders                         ; ROO311: was %99, a label that no longer exists
         MOV     r8, #-2
 LoadExtensionROMLoop
   [  DebugModule
@@ -758,7 +758,7 @@ ExtensionChunkLoop
         TEQ     r0, #0                                  ; Is this the last chunk?
         BNE     ExtensionChunkLoop                      ; No, so get another one
 NextExtensionROM
-; ROO26: the count of ROMs left to do was kept in r10 across EnumerateChunks, whose loaders use r10 as
+; ROO311: the count of ROMs left to do was kept in r10 across EnumerateChunks, whose loaders use r10 as
 ; scratch, so with an extension ROM fitted the loop ran on through tens of thousands of ROM numbers and the
 ; machine sat there at start-up. The count is now taken from the workspace each time: the ROMs are numbered
 ; -2 downwards, so after the last one r8 + number_of_extension_roms is -2. RISC OS 3.11's Podule 1.26 has no

@@ -849,7 +849,7 @@ cpr14	CN	14
 cpr15	CN	15
 
  [ MEMM_Type <> "ARM600"
-; ROO26: SetCop and ReadCop come from Hdr:MEMM.ARM600, which a MEMC1 machine does not include. An ARM3 keeps
+; ROO311: SetCop and ReadCop come from Hdr:MEMM.ARM600, which a MEMC1 machine does not include. An ARM3 keeps
 ; its cache control registers in coprocessor 15 as well, so the two commands below work there unchanged.
 ts_SysCop	CP	15
 
