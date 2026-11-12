@@ -42,14 +42,15 @@ ROO311 is an unofficial project and isn't affiliated with RISC OS Open Ltd.
 
 The commercial ROMs were available throughout development, and this section sets out exactly how they were used. No code or data in ROO311 is copied from them. Some facts about RISC OS 3.11 were taken from its ROM, and ROO311 was tested against that ROM. The lists below cover everything ROO311 takes from the commercial ROMs and every fault they helped find, ordered from observing the ROM as it runs to disassembling its code.
 
-The ROMs helped find 6 faults. Of those, 4 were real faults in the published source, all in code for these older machines that nothing had built since RISC OS 3.5. The other 2 were caused by this project's own build tools and setup.
+The ROMs helped find 8 faults. Of those, 4 were real faults in the published source, all in code for these older machines that nothing had built since RISC OS 3.5. Another 2 only showed in MAME, where the published source does something MAME's A5000 doesn't accept. The other 2 were caused by this project's own build tools and setup.
 
 ### Watching RISC OS 3.11 run in the emulator
 
 Nothing in this group looks inside the ROM. It's what anyone can see by using a RISC OS 3.11 machine.
 
 - **The settings a CMOS reset gives.** The CMOS was reset under 3.11 (Delete held at power on) and the settings were read back. From that, ROO311's reset table for these machines sets drive 0, NoBoot and mouse step 3, and leaves out the Risc PC's later settings. The source's own comments record that Boot and drive 4 replaced NoBoot and drive 0 in September 1993, so mouse step 3 is the only value that depends on the readback.
-- **Testing.** The same games, commands and CMOS resets were run on both ROMs and the screens were compared. That's how [What works](#what-works) was checked. Where ROO311 misbehaved, the same run on 3.11 showed the correct behaviour.
+- **Testing.** The same games, commands and CMOS resets were run on both ROMs and the screens were compared, in Arculator and then in ArcEm and MAME. That's how [What works](#what-works) was checked, and the memory figures there were read from each ROM's Task Manager. Where ROO311 misbehaved, the same run on 3.11 showed the correct behaviour.
+- **The 2 faults that stopped ROO311 in MAME.** RISC OS 3.11 started in the desktop in MAME's A5000 and ROO311 stopped before it, which showed the faults were ROO311's and not the emulator's. Both were then found with MAME's debugger, from ROO311's source and MAME's, and nothing in the 3.11 ROM was read for either. The kernel dropped the I2C clock and data lines in one write after an acknowledge, which MAME's model of the clock chip reads as a new start, so the CMOS RAM couldn't be read. ADFS sent the floppy controller the command that turns on its FIFO, which the source added for the Risc PC's controller, and when MAME's controller refused it the error path jumped to address 0.
 
 ### Reading names and text out of the ROM file
 
@@ -84,7 +85,7 @@ These are the cases where the ROM's code was read. In each case the fix was writ
 
 ## What works
 
-The ROM has been booted in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB), driven by a script.
+The ROM is tested in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 4MB), driven by a script. It has also been started in ArcEm 1.50.2 and in MAME 0.285's A5000, and in Arculator with less memory.
 
 ### Works
 
@@ -92,6 +93,9 @@ The ROM has been booted in Arculator on an A5000-style machine (ARM3, MEMC1a, 82
 - 70 ROM modules initialize
 - Configure runs from the Apps folder. Its Screen window sets the monitor type and the desktop's mode, and the screen changes at once and comes back the same after a reset
 - Supervisor prompt, keyboard, mouse, `*` commands
+- The mouse pointer in every desktop mode tried (0, 12, 13, 15, 20, 21, 27, 28 and 31), with its double-click shape, the hourglass and `*Pointer`
+- Starts in the desktop with 512K, 1MB, 2MB and 4MB of RAM, see [Memory](#memory)
+- ArcEm starts in the desktop too, and the pointer and menus work there
 - BBC BASIC V 1.14 with graphics, FPEmulator 4.39
 - Desktop with the RISC OS Open look
 - Filer operations through Filer_Action (delete and count tried)
@@ -117,9 +121,25 @@ The ROM has been booted in Arculator on an A5000-style machine (ARM3, MEMC1a, 82
 - Sound hasn't been listened to
 - Copy-protected floppy images (they need a track-level image format)
 - Most games are untried
-- Other emulators and real hardware are untried
+- MAME's A5000 gets as far as the desktop and stops while drawing the start-up banner. The banner's sprites unpack wrongly there, and the cause hasn't been found. The keyboard and mouse are untried in MAME
+- Red Squirrel shows no mouse pointer
+- ArcEm's hard disc, an ST506 drive, gets no icon, and ADFS says the drive isn't known
+- Real hardware is untried
 
-The image uses 2,090,888 of the 2MB (2,097,152 bytes), and A5000 hardware and Arculator both stop at 2MB.
+### Memory
+
+ROO311 starts in the desktop with 512K of RAM or more. The table shows what's left for applications once the desktop is up in a 640 by 480 mode with 16 colours, which is Next plus Free in the Task Manager, beside the same figure for RISC OS 3.11.
+
+| RAM | ROO311 | RISC OS 3.11 |
+| --- | --- | --- |
+| 4MB | 3584K | 3648K |
+| 2MB | 1568K | 1632K |
+| 1MB | 568K | 632K |
+| 512K | 56K | 128K |
+
+ROO311 leaves about 64K less at every size. 1MB is the least it's usable with, since the 56K left on a 512K machine runs almost nothing.
+
+The image uses 2,090,784 of the 2MB (2,097,152 bytes), and A5000 hardware and Arculator both stop at 2MB.
 
 ## Install
 
@@ -131,7 +151,10 @@ The image uses 2,090,888 of the 2MB (2,097,152 bytes), and A5000 hardware and Ar
 | Machine | Notes |
 | --- | --- |
 | A5000 (ARM3, MEMC1a, 82C711 floppy controller, 4MB) | The machine it's built for and tested on. |
+| The same machine with 2MB, 1MB or 512K | Starts in the desktop, see [Memory](#memory). |
 | Other Archimedes models | Untried. |
+
+ArcEm takes the image with `--rom ROM311`, or as a file named `ROM` in the folder it's started from.
 
 With an empty CMOS RAM the machine has no filing system configured, so hold Delete as it starts to set RISC OS 3.11's defaults, and it'll then start in the desktop.
 
@@ -164,7 +187,7 @@ Configure is the RISC OS 3.6 one, which was a disc application started by a boot
 
 The calculator is SciCalc, the one RISC OS Open publishes. It was a disc application that needed BASIC64, and in the ROM it runs on the ROM's BASIC, to 9 figures, unless BASIC64 has been loaded.
 
-On an IOC machine a CMOS reset gives the RISC OS 3.11 settings for how the machine starts (drive 0, NoBoot, mouse step 3) and RISC OS Open's for how the desktop looks. The Podule manager is set up for 4 podules and extension ROMs, ADFS leaves out big disc support where the ST506 driver is present, and SoundDMA only has the 8-bit SWIs.
+On an IOC machine a CMOS reset gives the RISC OS 3.11 settings for how the machine starts (drive 0, NoBoot, mouse step 3) and RISC OS Open's for how the desktop looks. The Podule manager is set up for 4 podules and extension ROMs, ADFS leaves out big disc support where the ST506 driver is present, and SoundDMA only has the 8-bit SWIs. ADFS also leaves the floppy controller's FIFO off, since the command that turns it on was added for the Risc PC's controller, and after an I2C acknowledge the kernel takes the clock line low before the data line, so the clock chip never sees the two fall together.
 
 The kernel's workspace layout below `&1000` and in the VDU driver follows the RISC OS 3.60 sources, which moved some VDU variables compared to RISC OS 3.11, so software that reads those by address and not through `OS_ReadVduVariables` will see different values.
 
@@ -204,7 +227,7 @@ ROO311 was built using [Claude Code](https://claude.com/claude-code) with Claude
 
 RISC OS was written by Acorn Computers. The sources ROO311 is built from are published by [RISC OS Open](https://www.riscosopen.org), and the cog on the icon bar and the start-up banner are theirs too.
 
-The ROM is assembled with AsAsm and compiled with GCC 4.7.4 for RISC OS, both from [GCCSDK](https://www.riscos.info/index.php/GCCSDK), and it's tested in [Arculator](https://github.com/sarah-walker-pcem/arculator) by Sarah Walker.
+The ROM is assembled with AsAsm and compiled with GCC 4.7.4 for RISC OS, both from [GCCSDK](https://www.riscos.info/index.php/GCCSDK), and it's tested in [Arculator](https://github.com/sarah-walker-pcem/arculator) by Sarah Walker. It has also been run in [ArcEm](https://arcem.sourceforge.net) and [MAME](https://www.mamedev.org).
 
 The icon is the cog from the ROM's own icon bar.
 
