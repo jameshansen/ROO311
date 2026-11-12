@@ -104,7 +104,7 @@ The ROM is tested in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 
 - ADFS floppy access on the 82C711, including `ADFS_DiscOp` writes
 - HostFS from Arculator's support ROM (extension ROM loading)
 - RISC OS 3.11's CMOS defaults
-- 97 of the 127 JASPP games that ran on RISC OS 3.11 start the same way, with no ADFFS, see [JASPP games](#jaspp-games)
+- 95 of the 127 JASPP games that ran on RISC OS 3.11 start the same way, with no ADFFS, see [JASPP games](#jaspp-games)
 - SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC. A test program passes every check
 - Battle Chess (1992) runs on that library
 
@@ -141,7 +141,7 @@ The image uses 2,090,784 of the 2MB (2,097,152 bytes), and A5000 hardware and Ar
 
 ## JASPP games
 
-[JASPP](https://www.jaspp.org.uk), the Archimedes Software Preservation Project, releases Archimedes games with their publishers' permission, and its release page for each game on the [JASPP forum](https://forums.jaspp.org.uk/forum/index.php) lists the versions of RISC OS the original release ran on. 127 of the releases ran on RISC OS 3.11, and each one was started on ROO311 and on RISC OS 3.11 to compare them. 97 reach the same screen on both ROMs, 1 starts with a difference, 13 don't run on ROO311 yet and 16 couldn't be judged.
+[JASPP](https://www.jaspp.org.uk), the Archimedes Software Preservation Project, releases Archimedes games with their publishers' permission, and its release page for each game on the [JASPP forum](https://forums.jaspp.org.uk/forum/index.php) lists the versions of RISC OS the original release ran on. 127 of the releases ran on RISC OS 3.11, and each one was started on ROO311 and on RISC OS 3.11 to compare them. 95 reach the same screen on both ROMs, 1 starts with a difference, 13 don't run on ROO311 yet and 18 couldn't be judged.
 
 Each game's first floppy went in drive 0 of an emulated ARM3 machine with 4MB and no ADFFS. The 800K discs used the 1772 floppy controller of the A3000 and A400 series, and the 1.6MB discs used the A5000's 82C711. A disc that boots was booted with Shift held at power on, and any other was opened in the desktop and its game run, as a double-click would. Screens from 35 seconds to 2.5 minutes in were then compared with RISC OS 3.11's. Reaching a title screen, a demo or a request for the next disc counts as starting, and none of the games were played through. The floppy images are JASPP's own, turned into plain sector images or, for copy-protected discs, bit-level HFE images.
 
@@ -150,135 +150,137 @@ Each game's first floppy went in drive 0 of an emulated ARM3 machine with 4MB an
 - 🔴 Runs on RISC OS 3.11 but not on ROO311
 - ⚪ Not judged, since it has no floppy image, has to be installed to a hard disc first, or doesn't start on RISC OS 3.11 in this test either
 
-| | Game | Year | Notes |
-| --- | --- | --- | --- |
-| 🟢 | Acheton and Kingdom of Hamil | 1987 |  |
-| ⚪ | Alone In the Dark | 1995 | Has to be installed to a hard disc first |
-| 🟢 | Apocalypse | 1990 |  |
-| 🟢 | Avon and Murdac | 1989 |  |
-| ⚪ | Ballarena | 1990 | Doesn't start on RISC OS 3.11 in this test either |
-| 🟢 | Battle Chess | 1993 | Asks for its original disc on both ROMs |
-| 🟢 | Battle Tank | 1990 |  |
-| 🟢 | Black Angel [16-02-1993] | 1993 |  |
-| 🟢 | Blaston | 1991 |  |
-| 🟢 | Bobby Blockhead vs The Dark Planet | 1991 |  |
-| ⚪ | Botkiller | 1995 | No floppy image to boot |
-| 🟢 | Botkiller2 | 1999 |  |
-| 🟢 | Break 147 & Superpool | 1991 |  |
-| ⚪ | Bubble Fair | 1991 | Doesn't start on RISC OS 3.11 in this test either |
-| 🟢 | Bug Hunter & Moondash | 1990 |  |
-| 🟢 | Bug Hunter in Space | 1990 |  |
-| 🟢 | Cannon Fodder | 1994 |  |
-| 🔴 | Carnage Inc | 1993 | Stops with "Application may have gone wrong" |
-| ⚪ | Cartoon Line part one | 1991 | Doesn't start on RISC OS 3.11 in this test either |
-| 🟢 | Cascade | 1992 |  |
-| 🟢 | Casino | 1989 |  |
-| 🟢 | Caverns | 1991 |  |
-| 🟢 | Chequered Flag [RO3 version] | 1992 |  |
-| 🟢 | Chocks Away Compendium [Mark 2 version] | 1991 |  |
-| 🟢 | Chuck Rock | 1991 |  |
-| 🟢 | The Cobalt Seed | 1995 |  |
-| 🟢 | Command Ship | 1995 | Asks for its original disc on both ROMs |
-| 🟢 | Crisis | 1990 |  |
-| 🟢 | Cyber Ape | 1995 |  |
-| 🟢 | Cycloids | 1993 |  |
-| 🟡 | Drifter | 1997 | Asks for the monitor type, which RISC OS 3.11 doesn't |
-| ⚪ | Drifter [SA version] | 2000 | Has to be installed to a hard disc first |
-| 🟢 | Drop Ship | 1990 |  |
-| ⚪ | Dune II - Battle for Arrakis [CD version] | 1997 | No floppy image to boot |
-| 🟢 | E-Type | 1989 |  |
-| 🟢 | E-Type Compendium | 1991 |  |
-| ⚪ | E-Type II | 1994 | Doesn't get past loading on RISC OS 3.11 in this test |
-| 🟢 | Empire Soccer 94 | 1995 |  |
-| 🟢 | Enter The Realm | 1991 |  |
-| ⚪ | Exodus [32bit version] | 2018 | No floppy image to boot |
-| 🟢 | The Exotic Adventures of Sylvia Layne | 1993 |  |
-| 🟢 | F.R.E.D. | 1993 |  |
-| ⚪ | Fine Racer | 1991 | Doesn't start on RISC OS 3.11 in this test either |
-| 🟢 | Fire & Ice | 1995 |  |
-| 🟢 | Fireball II | 1990 |  |
-| 🟢 | Formula Two Thousand | 1994 | Asks for its original disc on both ROMs |
-| 🟢 | Freddy's Folly | 1988 |  |
-| 🟢 | Giant Killer | 1990 |  |
-| 🟢 | Gods | 1992 |  |
-| 🔴 | Grievous Bodily 'ARM | 1992 | Shows its title, but an abort on data transfer has stopped it behind the title |
-| 🟢 | Haunted House | 1993 |  |
-| 🟢 | Heimdall | 1993 |  |
-| 🟢 | Hero Quest | 1991 |  |
-| ⚪ | Holed Out!! | 1989 | Asks for its disc to be write-protected on both ROMs, even when it is |
-| 🟢 | Holed Out!! Compendium | 1991 |  |
-| 🟢 | Hoverbod | 1988 |  |
-| 🟢 | Humanoids and Robotix | 1993 |  |
-| 🟢 | Ibix the Viking | 1989 |  |
-| 🟢 | Ixion | 1992 |  |
-| 🟢 | Jahangir Khan World Championship Squash | 1991 |  |
-| 🟢 | James Pond | 1990 |  |
-| 🟢 | Jet Fighter | 1988 |  |
-| 🟢 | The Krisalis Collection | 1993 |  |
-| 🟢 | The Last Days of Doom and Hezarin | 1990 |  |
-| 🔴 | The Legend of the Lost Temple | 1992 | Says there isn't enough memory |
-| 🟢 | Lemmings | 1991 |  |
-| 🟢 | Lemmings 2: The Tribes | 1994 |  |
-| 🟢 | Lotus Turbo Challenge 2 | 1992 |  |
-| 🟢 | Mad Professor Mariarti | 1990 |  |
-| 🟢 | Maddingly Hall | 1989 |  |
-| 🟢 | Magic Pockets | 1993 |  |
-| 🟢 | Mah-Jong Patience | 1990 |  |
-| 🟢 | Man at Arms | 1990 |  |
-| ⚪ | Manchester United | 1990 | Its disc isn't an ADFS disc, so it can't be started without ADFFS |
-| 🟢 | Manchester United Europe | 1991 |  |
-| 🟢 | Memory Magic | 1990 |  |
-| 🟢 | MicroDrive | 1990 |  |
-| 🟢 | MicroDrive Designer | 1992 |  |
-| 🟢 | MicroDrive World Edition | 1991 |  |
-| ⚪ | Minotaur | 1987 | Doesn't start on RISC OS 3.11 in this test either |
-| 🟢 | Mirror Image and Merp | 1996 |  |
-| 🟢 | Missile Control | 1988 |  |
-| 🔴 | Nebulus | 1992 | Black screen after the Krisalis logo |
-| 🟢 | Nevryon | 1990 |  |
-| 🟢 | Oh, No! More Lemmings | 1992 | Asks for the original Lemmings disc on both ROMs |
-| 🟢 | Omar Sharif's Bridge | 1992 |  |
-| 🟢 | Orion | 1988 |  |
-| 🟢 | Pac-mania | 1989 |  |
-| 🔴 | Pandora's Box | 1991 | Says there isn't enough memory |
-| 🟢 | Pipe Mania | 1989 |  |
-| 🟢 | Poizone | 1991 |  |
-| 🟢 | Populous | 1992 |  |
-| ⚪ | Populous [RPC version] | 2001 | Can't find !System on either ROM |
-| 🟢 | Powerband [Mark 2 version] | 1990 |  |
-| 🟢 | Premier Manager | 1994 |  |
-| 🟢 | Pysanki | 1990 |  |
-| 🟢 | Quest For Gold | 1992 |  |
-| 🔴 | Raw Power | 1993 | Black screen after the title |
-| 🟢 | Redshift | 1990 |  |
-| 🟢 | Revelation! [BUZZ version] | 1993 |  |
-| 🟢 | Rockfall | 1991 |  |
-| 🔴 | S.W.I.V. | 1992 | Black screen |
-| 🔴 | S.W.I.V. [BUZZ version] | 1993 | Black screen |
-| 🔴 | Saloon Cars | 1991 | Returns to the desktop |
-| 🟢 | Saloon Cars Deluxe | 1992 |  |
-| 🔴 | Sensible Soccer | 1993 | Black screen partway through the intro |
-| 🟢 | Serpents | 1993 |  |
-| 🟢 | Silver Ball | 1997 |  |
-| 🟢 | SimCity | 1993 |  |
-| 🟢 | SpeedBall 2 | 1994 |  |
-| 🟢 | SpeedBall 2 [RPC version] | 2001 |  |
-| 🟢 | Spheres of Chaos | 1992 |  |
-| 🟢 | Spobbleoid | 1994 |  |
-| 🟢 | Spobbleoid Fantasy | 1994 |  |
-| 🔴 | StarTrader | 1989 | Waits for Shift to be let go, which it never sees |
-| 🟢 | Stunt Racer 2000 | 1993 |  |
-| ⚪ | SunBurst [32bit version] | 2015 | No floppy image to boot |
-| 🔴 | Tactic | 1990 | Stays at the command prompt |
-| 🟢 | Talisman | 1989 |  |
-| 🟢 | Terramex | 1988 |  |
-| 🟢 | Thundermonk | 1989 |  |
-| 🟢 | UIM | 1990 |  |
-| 🟢 | Virtual Golf [14-02-94] | 1993 |  |
-| ⚪ | Wolfenstein 3D [32bit version] | 2018 | No floppy image to boot |
-| 🟢 | WolfPack | 1992 |  |
-| 🟢 | WorldScape | 1990 |  |
-| 🔴 | Zool - Ninja of the 'Nth' Dimension [32bit version] | 2002 | Stops with "Application may have gone wrong" |
+The Starts column says how each game started on RISC OS 3.11. A full screen game takes over the screen as soon as it starts, and a desktop game opens in a window. Some put an icon on the icon bar first and start when it's clicked. Not seen means the test didn't get far enough to tell.
+
+| | Game | Year | Starts | Notes |
+| --- | --- | --- | --- | --- |
+| 🟢 | Acheton and Kingdom of Hamil | 1987 | Full screen |  |
+| ⚪ | Alone In the Dark | 1995 | Not seen | Has to be installed to a hard disc first |
+| 🟢 | Apocalypse | 1990 | Full screen |  |
+| 🟢 | Avon and Murdac | 1989 | Full screen |  |
+| ⚪ | Ballarena | 1990 | Not seen | Doesn't start on RISC OS 3.11 in this test either |
+| 🟢 | Battle Chess | 1993 | Full screen | Asks to confirm its original disc on both ROMs |
+| 🟢 | Battle Tank | 1990 | Full screen |  |
+| 🟢 | Black Angel [16-02-1993] | 1993 | Not seen |  |
+| 🟢 | Blaston | 1991 | Full screen |  |
+| 🟢 | Bobby Blockhead vs The Dark Planet | 1991 | Full screen |  |
+| ⚪ | Botkiller | 1995 | Not seen | No floppy image to boot |
+| 🟢 | Botkiller2 | 1999 | Full screen |  |
+| 🟢 | Break 147 & Superpool | 1991 | Full screen |  |
+| ⚪ | Bubble Fair | 1991 | Not seen | Doesn't start on RISC OS 3.11 in this test either |
+| 🟢 | Bug Hunter & Moondash | 1990 | Full screen |  |
+| 🟢 | Bug Hunter in Space | 1990 | Full screen |  |
+| 🟢 | Cannon Fodder | 1994 | Full screen |  |
+| 🔴 | Carnage Inc | 1993 | Full screen | Stops with "Application may have gone wrong" |
+| ⚪ | Cartoon Line part one | 1991 | Not seen | Doesn't start on RISC OS 3.11 in this test either |
+| 🟢 | Cascade | 1992 | Full screen |  |
+| 🟢 | Casino | 1989 | Not seen |  |
+| 🟢 | Caverns | 1991 | Full screen |  |
+| 🟢 | Chequered Flag [RO3 version] | 1992 | Full screen |  |
+| 🟢 | Chocks Away Compendium [Mark 2 version] | 1991 | Full screen |  |
+| 🟢 | Chuck Rock | 1991 | Full screen |  |
+| 🟢 | The Cobalt Seed | 1995 | Full screen |  |
+| ⚪ | Command Ship | 1995 | Not seen | Doesn't get past its disc check on RISC OS 3.11 in this test either |
+| 🟢 | Crisis | 1990 | Full screen |  |
+| 🟢 | Cyber Ape | 1995 | Full screen |  |
+| 🟢 | Cycloids | 1993 | Full screen |  |
+| 🟡 | Drifter | 1997 | Full screen | Asks for the monitor type, which RISC OS 3.11 doesn't |
+| ⚪ | Drifter [SA version] | 2000 | Not seen | Has to be installed to a hard disc first |
+| 🟢 | Drop Ship | 1990 | Full screen |  |
+| ⚪ | Dune II - Battle for Arrakis [CD version] | 1997 | Not seen | No floppy image to boot |
+| 🟢 | E-Type | 1989 | Full screen |  |
+| 🟢 | E-Type Compendium | 1991 | Full screen |  |
+| ⚪ | E-Type II | 1994 | Not seen | Doesn't get past loading on RISC OS 3.11 in this test |
+| 🟢 | Empire Soccer 94 | 1995 | Full screen |  |
+| 🟢 | Enter The Realm | 1991 | Full screen |  |
+| ⚪ | Exodus [32bit version] | 2018 | Not seen | No floppy image to boot |
+| 🟢 | The Exotic Adventures of Sylvia Layne | 1993 | Full screen |  |
+| 🟢 | F.R.E.D. | 1993 | Full screen |  |
+| ⚪ | Fine Racer | 1991 | Not seen | Doesn't start on RISC OS 3.11 in this test either |
+| 🟢 | Fire & Ice | 1995 | Full screen |  |
+| 🟢 | Fireball II | 1990 | Full screen |  |
+| ⚪ | Formula Two Thousand | 1994 | Not seen | Doesn't get past its disc check on RISC OS 3.11 in this test either |
+| 🟢 | Freddy's Folly | 1988 | Full screen |  |
+| 🟢 | Giant Killer | 1990 | Full screen |  |
+| 🟢 | Gods | 1992 | Full screen |  |
+| 🔴 | Grievous Bodily 'ARM | 1992 | Full screen | Shows its title, but an abort on data transfer has stopped it behind the title |
+| 🟢 | Haunted House | 1993 | Not seen |  |
+| 🟢 | Heimdall | 1993 | Full screen |  |
+| 🟢 | Hero Quest | 1991 | Full screen |  |
+| ⚪ | Holed Out!! | 1989 | Full screen | Asks for its disc to be write-protected on both ROMs, even when it is |
+| 🟢 | Holed Out!! Compendium | 1991 | Full screen |  |
+| 🟢 | Hoverbod | 1988 | Full screen |  |
+| 🟢 | Humanoids and Robotix | 1993 | Full screen |  |
+| 🟢 | Ibix the Viking | 1989 | Full screen |  |
+| 🟢 | Ixion | 1992 | Icon bar, then full screen |  |
+| 🟢 | Jahangir Khan World Championship Squash | 1991 | Full screen |  |
+| 🟢 | James Pond | 1990 | Full screen |  |
+| 🟢 | Jet Fighter | 1988 | Full screen |  |
+| 🟢 | The Krisalis Collection | 1993 | Full screen |  |
+| 🟢 | The Last Days of Doom and Hezarin | 1990 | Full screen |  |
+| 🔴 | The Legend of the Lost Temple | 1992 | Full screen | Says there isn't enough memory |
+| 🟢 | Lemmings | 1991 | Full screen |  |
+| 🟢 | Lemmings 2: The Tribes | 1994 | Full screen |  |
+| 🟢 | Lotus Turbo Challenge 2 | 1992 | Full screen |  |
+| 🟢 | Mad Professor Mariarti | 1990 | Full screen |  |
+| 🟢 | Maddingly Hall | 1989 | Full screen |  |
+| 🟢 | Magic Pockets | 1993 | Full screen |  |
+| 🟢 | Mah-Jong Patience | 1990 | Icon bar, then desktop |  |
+| 🟢 | Man at Arms | 1990 | Full screen |  |
+| ⚪ | Manchester United | 1990 | Not seen | Its disc isn't an ADFS disc, so it can't be started without ADFFS |
+| 🟢 | Manchester United Europe | 1991 | Full screen |  |
+| 🟢 | Memory Magic | 1990 | Full screen |  |
+| 🟢 | MicroDrive | 1990 | Full screen |  |
+| 🟢 | MicroDrive Designer | 1992 | Full screen |  |
+| 🟢 | MicroDrive World Edition | 1991 | Full screen |  |
+| ⚪ | Minotaur | 1987 | Not seen | Doesn't start on RISC OS 3.11 in this test either |
+| 🟢 | Mirror Image and Merp | 1996 | Full screen |  |
+| 🟢 | Missile Control | 1988 | Full screen |  |
+| 🔴 | Nebulus | 1992 | Full screen | Black screen after the Krisalis logo |
+| 🟢 | Nevryon | 1990 | Full screen |  |
+| 🟢 | Oh, No! More Lemmings | 1992 | Not seen | Asks for the original Lemmings disc on both ROMs |
+| 🟢 | Omar Sharif's Bridge | 1992 | Full screen |  |
+| 🟢 | Orion | 1988 | Full screen |  |
+| 🟢 | Pac-mania | 1989 | Full screen |  |
+| 🔴 | Pandora's Box | 1991 | Full screen | Says there isn't enough memory |
+| 🟢 | Pipe Mania | 1989 | Full screen |  |
+| 🟢 | Poizone | 1991 | Not seen |  |
+| 🟢 | Populous | 1992 | Full screen |  |
+| ⚪ | Populous [RPC version] | 2001 | Not seen | Can't find !System on either ROM |
+| 🟢 | Powerband [Mark 2 version] | 1990 | Full screen |  |
+| 🟢 | Premier Manager | 1994 | Icon bar, then desktop |  |
+| 🟢 | Pysanki | 1990 | Full screen |  |
+| 🟢 | Quest For Gold | 1992 | Full screen |  |
+| 🔴 | Raw Power | 1993 | Full screen | Black screen after the title |
+| 🟢 | Redshift | 1990 | Full screen |  |
+| 🟢 | Revelation! [BUZZ version] | 1993 | Full screen |  |
+| 🟢 | Rockfall | 1991 | Full screen |  |
+| 🔴 | S.W.I.V. | 1992 | Full screen | Black screen |
+| 🔴 | S.W.I.V. [BUZZ version] | 1993 | Full screen | Black screen |
+| 🔴 | Saloon Cars | 1991 | Full screen | Returns to the desktop |
+| 🟢 | Saloon Cars Deluxe | 1992 | Full screen |  |
+| 🔴 | Sensible Soccer | 1993 | Full screen | Black screen partway through the intro |
+| 🟢 | Serpents | 1993 | Full screen |  |
+| 🟢 | Silver Ball | 1997 | Full screen |  |
+| 🟢 | SimCity | 1993 | Icon bar, then desktop |  |
+| 🟢 | SpeedBall 2 | 1994 | Full screen |  |
+| 🟢 | SpeedBall 2 [RPC version] | 2001 | Full screen |  |
+| 🟢 | Spheres of Chaos | 1992 | Full screen |  |
+| 🟢 | Spobbleoid | 1994 | Full screen |  |
+| 🟢 | Spobbleoid Fantasy | 1994 | Full screen |  |
+| 🔴 | StarTrader | 1989 | Full screen | Waits for Shift to be let go, which it never sees |
+| 🟢 | Stunt Racer 2000 | 1993 | Full screen |  |
+| ⚪ | SunBurst [32bit version] | 2015 | Not seen | No floppy image to boot |
+| 🔴 | Tactic | 1990 | Not seen | Stays at the command prompt |
+| 🟢 | Talisman | 1989 | Full screen |  |
+| 🟢 | Terramex | 1988 | Full screen |  |
+| 🟢 | Thundermonk | 1989 | Full screen |  |
+| 🟢 | UIM | 1990 | Full screen |  |
+| 🟢 | Virtual Golf [14-02-94] | 1993 | Not seen |  |
+| ⚪ | Wolfenstein 3D [32bit version] | 2018 | Not seen | No floppy image to boot |
+| 🟢 | WolfPack | 1992 | Full screen |  |
+| 🟢 | WorldScape | 1990 | Full screen |  |
+| 🔴 | Zool - Ninja of the 'Nth' Dimension [32bit version] | 2002 | Full screen | Stops with "Application may have gone wrong" |
 
 7 more packages also reach the same screen on both ROMs, though JASPP's forum either doesn't list them or lists them as needing ADFFS on RISC OS 3.11. They are Adventures (the classic compilation), Champions, COPS, Killerbugs, Plague Planet, SpySnatcher and World Class Leaderboard.
 
