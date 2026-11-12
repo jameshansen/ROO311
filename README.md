@@ -79,7 +79,7 @@ These are the cases where the ROM's code was read. In each case the fix was writ
 - **No hard disc needed.** The machine starts in the desktop from the ROM alone, and holding Shift as it starts boots the floppy disc in drive 0, which is how Blaston (1991) starts from its floppy image.
 - **Old programs run.** The SharedCLibrary is in the ROM with RISC_OSLib inside it, the way RISC OS 3 had it, and Battle Chess (1992), a C game built with the Norcroft compiler, runs on it.
 - **RISC OS 3.11's settings.** A CMOS reset gives RISC OS 3.11's defaults, Configure keeps the monitor type and the desktop's mode in the CMOS RAM, and its Screen window changes the screen straight away.
-- **Fits in 2MB.** The message files are tokenized and the BASIC applications crunched and squished, the same way the original build did it, which leaves 6K spare.
+- **Fits in 2MB.** The message files are tokenized and the BASIC applications crunched and squished, the same way the original build did it, which leaves 3K spare.
 
 ![Configure's Screen window on the ROO311 desktop](docs/configure-screen.png)
 
@@ -104,7 +104,7 @@ The ROM is tested in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 
 - ADFS floppy access on the 82C711, including `ADFS_DiscOp` writes
 - HostFS from Arculator's support ROM (extension ROM loading)
 - RISC OS 3.11's CMOS defaults
-- 95 of the 127 JASPP games that ran on RISC OS 3.11 start the same way, with no ADFFS, see [JASPP games](#jaspp-games)
+- 102 of the 127 JASPP games that ran on RISC OS 3.11 start the same way, with no ADFFS, see [JASPP games](#jaspp-games)
 - SharedCLibrary 4.79 with RISC_OSLib inside it, the C parts compiled with GCC. A test program passes every check
 - Battle Chess (1992) runs on that library
 
@@ -118,7 +118,7 @@ The ROM is tested in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 
 - Power-on self test
 - Hard disc access is untested
 - Sound hasn't been listened to
-- 13 JASPP games that run on RISC OS 3.11 don't run yet, and Drifter asks a question RISC OS 3.11 doesn't, see [JASPP games](#jaspp-games)
+- 7 JASPP games that run on RISC OS 3.11 don't run yet, see [JASPP games](#jaspp-games). 4 of them resize memory areas from a desktop task, which the kernel refuses
 - MAME's A5000 gets as far as the desktop and stops while drawing the start-up banner. The banner's sprites unpack wrongly there, and the cause hasn't been found. The keyboard and mouse are untried in MAME
 - Red Squirrel shows no mouse pointer
 - ArcEm's hard disc, an ST506 drive, gets no icon, and ADFS says the drive isn't known
@@ -137,11 +137,11 @@ ROO311 starts in the desktop with 512K of RAM or more. The table shows what's le
 
 ROO311 leaves about 64K less at every size. 1MB is the least it's usable with, since the 56K left on a 512K machine runs almost nothing.
 
-The image uses 2,090,784 of the 2MB (2,097,152 bytes), and A5000 hardware and Arculator both stop at 2MB.
+The image uses 2,093,664 of the 2MB (2,097,152 bytes), and A5000 hardware and Arculator both stop at 2MB.
 
 ## JASPP games
 
-[JASPP](https://www.jaspp.org.uk), the Archimedes Software Preservation Project, releases Archimedes games with their publishers' permission, and its release page for each game on the [JASPP forum](https://forums.jaspp.org.uk/forum/index.php) lists the versions of RISC OS the original release ran on. 127 of the releases ran on RISC OS 3.11, and each one was started on ROO311 and on RISC OS 3.11 to compare them. 95 reach the same screen on both ROMs, 1 starts with a difference, 13 don't run on ROO311 yet and 18 couldn't be judged.
+[JASPP](https://www.jaspp.org.uk), the Archimedes Software Preservation Project, releases Archimedes games with their publishers' permission, and its release page for each game on the [JASPP forum](https://forums.jaspp.org.uk/forum/index.php) lists the versions of RISC OS the original release ran on. 127 of the releases ran on RISC OS 3.11, and each one was started on ROO311 and on RISC OS 3.11 to compare them. 102 reach the same screen on both ROMs, 7 don't run on ROO311 yet and 18 couldn't be judged.
 
 Each game's first floppy went in drive 0 of an emulated ARM3 machine with 4MB and no ADFFS. The 800K discs used the 1772 floppy controller of the A3000 and A400 series, and the 1.6MB discs used the A5000's 82C711. A disc that boots was booted with Shift held at power on, and any other was opened in the desktop and its game run, as a double-click would. Screens from 35 seconds to 2.5 minutes in were then compared with RISC OS 3.11's. Reaching a title screen, a demo or a request for the next disc counts as starting, and none of the games were played through. The floppy images are JASPP's own, turned into plain sector images or, for copy-protected discs, bit-level HFE images.
 
@@ -184,7 +184,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | 🟢 | Crisis | 1990 | Full screen |  |
 | 🟢 | Cyber Ape | 1995 | Full screen |  |
 | 🟢 | Cycloids | 1993 | Full screen |  |
-| 🟡 | Drifter | 1997 | Full screen | Asks for the monitor type, which RISC OS 3.11 doesn't |
+| 🟢 | Drifter | 1997 | Full screen |  |
 | ⚪ | Drifter [SA version] | 2000 | Not seen | Has to be installed to a hard disc first |
 | 🟢 | Drop Ship | 1990 | Full screen |  |
 | ⚪ | Dune II - Battle for Arrakis [CD version] | 1997 | Not seen | No floppy image to boot |
@@ -236,7 +236,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | ⚪ | Minotaur | 1987 | Not seen | Doesn't start on RISC OS 3.11 in this test either |
 | 🟢 | Mirror Image and Merp | 1996 | Full screen |  |
 | 🟢 | Missile Control | 1988 | Full screen |  |
-| 🔴 | Nebulus | 1992 | Full screen | Black screen after the Krisalis logo |
+| 🟢 | Nebulus | 1992 | Full screen |  |
 | 🟢 | Nevryon | 1990 | Full screen |  |
 | 🟢 | Oh, No! More Lemmings | 1992 | Not seen | Asks for the original Lemmings disc on both ROMs |
 | 🟢 | Omar Sharif's Bridge | 1992 | Full screen |  |
@@ -251,15 +251,15 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | 🟢 | Premier Manager | 1994 | Icon bar, then desktop |  |
 | 🟢 | Pysanki | 1990 | Full screen |  |
 | 🟢 | Quest For Gold | 1992 | Full screen |  |
-| 🔴 | Raw Power | 1993 | Full screen | Black screen after the title |
+| 🟢 | Raw Power | 1993 | Full screen |  |
 | 🟢 | Redshift | 1990 | Full screen |  |
 | 🟢 | Revelation! [BUZZ version] | 1993 | Full screen |  |
 | 🟢 | Rockfall | 1991 | Full screen |  |
-| 🔴 | S.W.I.V. | 1992 | Full screen | Black screen |
-| 🔴 | S.W.I.V. [BUZZ version] | 1993 | Full screen | Black screen |
+| 🟢 | S.W.I.V. | 1992 | Full screen |  |
+| 🟢 | S.W.I.V. [BUZZ version] | 1993 | Full screen |  |
 | 🔴 | Saloon Cars | 1991 | Full screen | Returns to the desktop |
 | 🟢 | Saloon Cars Deluxe | 1992 | Full screen |  |
-| 🔴 | Sensible Soccer | 1993 | Full screen | Black screen partway through the intro |
+| 🟢 | Sensible Soccer | 1993 | Full screen |  |
 | 🟢 | Serpents | 1993 | Full screen |  |
 | 🟢 | Silver Ball | 1997 | Full screen |  |
 | 🟢 | SimCity | 1993 | Icon bar, then desktop |  |
@@ -268,7 +268,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | 🟢 | Spheres of Chaos | 1992 | Full screen |  |
 | 🟢 | Spobbleoid | 1994 | Full screen |  |
 | 🟢 | Spobbleoid Fantasy | 1994 | Full screen |  |
-| 🔴 | StarTrader | 1989 | Full screen | Waits for Shift to be let go, which it never sees |
+| 🟢 | StarTrader | 1989 | Full screen |  |
 | 🟢 | Stunt Racer 2000 | 1993 | Full screen |  |
 | ⚪ | SunBurst [32bit version] | 2015 | Not seen | No floppy image to boot |
 | 🔴 | Tactic | 1990 | Not seen | Stays at the command prompt |
@@ -280,7 +280,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | ⚪ | Wolfenstein 3D [32bit version] | 2018 | Not seen | No floppy image to boot |
 | 🟢 | WolfPack | 1992 | Full screen |  |
 | 🟢 | WorldScape | 1990 | Full screen |  |
-| 🔴 | Zool - Ninja of the 'Nth' Dimension [32bit version] | 2002 | Full screen | Stops with "Application may have gone wrong" |
+| 🔴 | Zool - Ninja of the 'Nth' Dimension [32bit version] | 2002 | Full screen | Shows nothing when started from the desktop. Started from the command line it reaches its title after 2 minutes, where RISC OS 3.11 takes 30 seconds |
 
 7 more packages also reach the same screen on both ROMs, though JASPP's forum either doesn't list them or lists them as needing ADFFS on RISC OS 3.11. They are Adventures (the classic compilation), Champions, COPS, Killerbugs, Plague Planet, SpySnatcher and World Class Leaderboard.
 
@@ -333,6 +333,8 @@ The calculator is SciCalc, the one RISC OS Open publishes. It was a disc applica
 On an IOC machine a CMOS reset gives the RISC OS 3.11 settings for how the machine starts (drive 0, NoBoot, mouse step 3) and RISC OS Open's for how the desktop looks. The Podule manager is set up for 4 podules and extension ROMs, ADFS leaves out big disc support where the ST506 driver is present, and SoundDMA only has the 8-bit SWIs. ADFS also leaves the floppy controller's FIFO off, since the command that turns it on was added for the Risc PC's controller, and after an I2C acknowledge the kernel takes the clock line low before the data line, so the clock chip never sees the two fall together.
 
 The kernel's workspace layout below `&1000` and in the VDU driver follows the RISC OS 3.60 sources, which moved some VDU variables compared to RISC OS 3.11, so software that reads those by address and not through `OS_ReadVduVariables` will see different values.
+
+Three things in the kernel are as RISC OS 3.11 had them, not as the 3.60 sources do. The UK keyboard handler is built in, so the keyboard keeps working when a game unplugs the InternationalKeyboard module. The processor vectors at `&00` to `&1C` are branches, which games that follow the IRQ vector rely on. And ROO311 gives software RISC OS 3.11's version numbers (`&A4` from `OS_Byte 129` and 3.11 for UtilityModule), so programs that test for RISC OS 3.5 don't take their Risc PC paths.
 
 ## Building the ROM
 
