@@ -48,9 +48,13 @@ const char *_clib_version(void);
 
 #define str(x)  #x
 #define xstr(x) str(x)
+/* ROO311: the date here was the day of the build (__DATE__), which made each day's ROM different. It is the
+ * date of this version of the library, which s.version gives as 4.79 (01 Mar 1995), in the form __DATE__ has.
+ */
+#define LIB_DATE "Mar  1 1995"
 const char *_clib_version(void)
 {   return  LIB_SHARED "C Library vsn " xstr(__LIB_VERSION) "/" LIB_APCS
-            " [" __DATE__ "]\n";
+            " [" LIB_DATE "]\n";
 }
 #undef str
 #undef xstr
