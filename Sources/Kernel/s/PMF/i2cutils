@@ -221,6 +221,13 @@ Acknowledge ROUT
         MOV     R2, #IOC
         LDRB    R2, [R2, #IOCControl]   ; get the data from IOC
 
+; ROO311: take the clock low before the data. Dropping both in one write lets a
+; device that sees the data line first read it as a start condition, which is
+; what MAME's PCF8583 does, and every CMOS read then fails.
+        MOV     R0, #1
+        MOV     R1, #0                  ; clock lo, data still hi
+        BL      SetC1C0
+
         MOV     R0, #0
         MOV     R1, #0                  ; clock lo
         BL      SetC1C0
