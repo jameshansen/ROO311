@@ -11,7 +11,7 @@ Internat/MsgTrans                     s/MsgTrans          MessageTrans
 Internat/Territory/TerritoryManager   s/TerrMgr           TerritoryManager
 Internat/Territory/UK                 s/UK                UK
 Desktop/Wimp                          s/Wimp              WindowManager
-Desktop/Desktop                       s/Desktop           Desktop
+Desktop/Desktop5                      @desktop5           Desktop
 Desktop/Switcher                      s/Switcher          TaskManager
 Apps/Chars                            s/Main              !Chars
 Apps/Help                             s/Main              !Help

@@ -37,3 +37,11 @@ include StdTools
 include AAsmModule
 
 # Dynamic dependencies:
+
+# ROO26: the rule the ROO26 build reads for the files that go into the ROM's resources. The files under
+# Resources.UK.ROM are made by tools/prepare.py, which stands in for the shared rules above.
+resources:
+	${MKDIR} <resource$dir>.Resources.Desktop
+	${CP} Resources.${LOCALE}.ROM.Messages  <resource$dir>.Resources.Desktop.Messages  ${CPFLAGS}
+	${CP} Resources.${LOCALE}.ROM.Templates <resource$dir>.Resources.Desktop.Templates ${CPFLAGS}
+	${CP} Resources.${LOCALE}.ROM.Sprites   <resource$dir>.Resources.Desktop.Sprites   ${CPFLAGS}

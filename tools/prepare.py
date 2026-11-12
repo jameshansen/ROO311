@@ -163,9 +163,28 @@ def wimp(comp):
                   sprites.build(uk / "Sprites22,ff9", drop=("tile_1-16", "tile_1-8"), take=[(cog, "id", "switcher")]))
 
 
+def desktop5(comp):
+    """The resources of the current Desktop module, as its Makefile's shared rules make them.
+    Resources.UK.ROM.Messages: Messages with the command help (CmdHelp) on the end.
+    Resources.UK.ROM.Sprites: the banner sprites squashed, which is how the module wants them: a Squash
+    file is "SQSH", the length, load and exec addresses of the original, a zero word, then the data.
+    Resources.UK.ROM.Templates: the banner's template with its "RISC OS 5" reading "RISC OS", since this
+    is not RISC OS 5."""
+    import struct
+    uk = comp / "Resources" / "UK"
+    (uk / "ROM").mkdir(exist_ok=True)
+    (uk / "ROM" / "Messages").write_bytes((uk / "Messages").read_bytes() + (uk / "CmdHelp").read_bytes())
+    banner = (uk / "Sovereign" / "Sprites,ff9").read_bytes()
+    (uk / "ROM" / "Sprites,fca").write_bytes(b"SQSH" + struct.pack("<IIII", len(banner), 0xFFFFF900, 0, 0) + compress(banner))
+    template = (uk / "Templates,fec").read_bytes()
+    assert template.count(b"RISC OS 5") == 1
+    (uk / "ROM" / "Templates,fec").write_bytes(template.replace(b"RISC OS 5", b"RISC OS" + bytes(2)))
+
+
 GENERATORS = {"Internat/Territory/TerritoryManager": territory, "Video/Render/Super": supersample,
               "Internat/Inter": international, "Video/Render/Fonts/ROMFonts": romfonts,
               "Desktop/Wimp": wimp,
+              "Desktop/Desktop5": desktop5,
               "Apps/Chars": basic_app("Resources/UK/!RunLink,ffb"),
               "Apps/Help": basic_app("Resources/UK/ROM/!RunLink,ffb", "HelpID"),
               "Apps/EditApp": c_app("Edit", "EditId"), "Apps/Draw": c_app("Draw", "DrawID"),

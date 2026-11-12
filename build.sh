@@ -29,6 +29,9 @@ find Sources -type d -iname hdr | while read d; do
 	cp -r "$d"/* "$ROOT/build/Hdr/"
 	for n in $NEWER; do case "$d" in "$n"/*) cp -r "$d"/* "$ROOT/build/Hdr5/" ;; esac; done
 done
+# Hdr5 then takes what it still lacks from Hdr: the headers of the components that are only in the 3.60
+# sources (the Window Manager's, the Font Manager's), which a newer component can need too.
+cp -rn "$ROOT/build/Hdr/." "$ROOT/build/Hdr5/"
 
 # AsAsm reads RISC OS path and system variables from the environment in upper case
 export ASASM HDR_PATH="$ROOT/build/Hdr" MACHINE IMAGESIZE LOCALE=${LOCALE:-UK} SYSTEM=${SYSTEM:-Ursula}
@@ -70,6 +73,12 @@ newer() {
 fpemulator() {
 	newer -PreDefine='CoreDir SETS "../coresrc/s/"' -PreDefine='VeneerDir SETS "../vensrc/riscos/"' \
 		-PreDefine='FileExt SETS ""' -PreDefine='FPEAnchorType SETS "Low"' -I.. -o "$B/$1.o" s/Archimedes && link "$1"
+}
+
+# The Desktop module of the current RISC OS Open sources, which shows their start-up banner. The banner
+# and the options it is built with are those of the "Sovereign" user interface.
+desktop5() {
+	USERIF=Sovereign newer -o "$B/$1.o" s/Desktop && link "$1"
 }
 
 # romaddr <name>: the address module <name> gets in the ROM, from the kernel and the modules ahead of it

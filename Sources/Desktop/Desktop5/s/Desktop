@@ -29,7 +29,7 @@ Module_BaseAddr
         GET     Hdr:Proc
         GET     Hdr:FSNumbers
         GET     Hdr:HighFSI
-        GET     Hdr:LowFSi
+        GET     Hdr:LowFSI
         GET     Hdr:NewErrors
         GET     Hdr:Variables
         GET     Hdr:Wimp
@@ -41,7 +41,7 @@ Module_BaseAddr
         GET     Hdr:Draw
         GET     Hdr:ColourTran
         GET     VersionASM
-        GET     Hdr:NDRDebug
+        GET     Hdr:NdrDebug
         GET     Hdr:Sprite
         GET     Hdr:Squash
         GET     Hdr:ADFS
@@ -55,7 +55,10 @@ KeepItUp SETL   {TRUE} :LAND: NewBanner
         GBLL    SquashedSprites
 SquashedSprites SETL {TRUE} :LAND: NewBanner
         GBLL    DateFromKernel
-DateFromKernel  SETL {TRUE} :LAND: NewBanner
+; ROO26: was {TRUE} :LAND: NewBanner, which puts the year of the kernel's date into the banner's copyright
+; line. This kernel's date is 1995, and the line names RISC OS Developments Ltd, so it stays as the
+; template has it.
+DateFromKernel  SETL {FALSE}
 
         GBLL    debug
         GBLL    debugxx

@@ -2,3 +2,4 @@
 # under Sources/ a line. Their headers go into the newer header set (build/Hdr5) and they are assembled
 # against it. Sources/UPSTREAM records the commit of each.
 HWSupport/FPASC
+Desktop/Desktop5
