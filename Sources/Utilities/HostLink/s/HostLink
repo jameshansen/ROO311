@@ -1,0 +1,476 @@
+; Copyright 2026 James Hansen
+;
+; Licensed under the Apache License, Version 2.0 (the "License");
+; you may not use this file except in compliance with the License.
+; You may obtain a copy of the License at
+;
+;     http://www.apache.org/licenses/LICENSE-2.0
+;
+; Unless required by applicable law or agreed to in writing, software
+; distributed under the License is distributed on an "AS IS" BASIS,
+; WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+; See the License for the specific language governing permissions and
+; limitations under the License.
+;
+; > HostLink
+;
+; HostLink lets an emulator that runs ROO311 work the desktop for the person playing: start an
+; application, click an icon on the icon bar, put the pointer where the host's pointer is, and
+; hear when the screen mode changes, which is when a game has taken the screen from the desktop.
+;
+; The host is reached through four SWIs in the chunk the ArcEm emulator answers itself
+; (&56AC0 to &56AFF), always called with the X bit set. On a machine where nothing answers them
+; the first comes back with an error, and the module stays quiet from then on.
+;
+;   Host_Hello    (&56AE0)  out: R0 the host's version
+;   Host_Poll     (&56AE1)  in: R0 a buffer, R1 its size
+;                           out: R0 0 nothing to do, 1 start the *command in the buffer as a
+;                           task, 2 click the icon bar icon whose sprite is named in the buffer
+;   Host_Event    (&56AE2)  in: R0 1 the screen mode changed (R1 the new mode), 2 an icon bar
+;                           icon was clicked (R1 its handle), 3 no icon had that sprite
+;   Host_Pointer  (&56AE3)  out: R0 1 with R1, R2 where the pointer is to go in OS units, or 0
+;
+; The commands come to a task of the module's own, which the desktop starts as Desktop_HostLink
+; and which looks for them five times a second. The pointer is asked for at each VSync, and moved
+; in a callback with OS_Word 21,3.
+
+XHost_Hello             * &76AE0
+XHost_Poll              * &76AE1
+XHost_Event             * &76AE2
+XHost_Pointer           * &76AE3
+
+XOS_Byte                * &20006
+XOS_Word                * &20007
+OS_Exit                 * &11
+XOS_Module              * &2001E
+XOS_Claim               * &2001F
+XOS_Release             * &20020
+XOS_ReadMonotonicTime   * &20042
+XOS_AddCallBack         * &20054
+XOS_RemoveCallBack      * &2005F
+XWimp_Initialise        * &600C0
+XWimp_GetIconState      * &600CE
+XWimp_CloseDown         * &600DD
+XWimp_StartTask         * &600DE
+XWimp_PollIdle          * &600E1
+XWimp_SendMessage       * &600E7
+
+EventV                  * &10
+Event_VSync             * 4
+Service_Reset           * &27
+Service_ModeChange      * &46
+Service_StartWimp       * &49
+Service_StartedWimp     * &4A
+Module_Enter            * 2
+Module_Claim            * 6
+Module_Free             * 7
+TASK                    * &4B534154
+SVC_mode                * 3
+
+; Workspace
+
+                ^       0, R12
+TaskHandle      #       4       ; 0 none, -1 being started, or the task's handle
+Present         #       4       ; the host answered
+CallBackDue     #       4
+PointerBlock    #       8       ; OS_Word 21,3: reason, then x and y, two bytes each
+Known           #       32      ; a bit for each icon bar icon there when an application was last started
+Block           #       256     ; for Wimp_Poll and the icon calls
+Command         #       256     ; what the host asked for
+Stack           #       460     ; to &400, where an ADD can reach
+StackTop        #       0
+WorkspaceSize   *       :INDEX: @
+
+
+Module_Base
+        DCD     Start - Module_Base
+        DCD     Init - Module_Base
+        DCD     Die - Module_Base
+        DCD     Service - Module_Base
+        DCD     Title - Module_Base
+        DCD     Help - Module_Base
+        DCD     Commands - Module_Base
+        DCD     0
+        DCD     0
+        DCD     0
+        DCD     0
+
+Title   =       "HostLink", 0
+Help    =       "HostLink", 9, 9, "1.00 (13 Nov 2026)", 0
+        ALIGN
+
+Commands
+        =       "Desktop_HostLink", 0
+        ALIGN
+        DCD     DesktopCommand - Module_Base
+        DCD     0
+        DCD     0
+        DCD     0
+        DCD     0
+
+DesktopName
+        =       "Desktop_HostLink", 0
+        ALIGN
+
+; ------------------------------------------------------------------------- initialisation
+
+Init
+        STMFD   sp!, {lr}
+        LDR     r2, [r12]
+        TEQ     r2, #0
+        BNE     %FT10
+        MOV     r0, #Module_Claim
+        LDR     r3, =WorkspaceSize
+        SWI     XOS_Module
+        LDMVSFD sp!, {pc}
+        STR     r2, [r12]
+10      MOV     r12, r2
+        MOV     r0, #0
+        STR     r0, TaskHandle
+        STR     r0, CallBackDue
+        STR     r0, Present
+        CMP     r0, r0                  ; V clear: it is set after the call only if nothing answered
+        SWI     XHost_Hello
+        BVS     %FT90
+        MOV     r0, #1
+        STR     r0, Present
+        MOV     r0, #EventV
+        ADRL    r1, Event
+        MOV     r2, r12
+        SWI     XOS_Claim
+        MOV     r0, #14                 ; enable the VSync event
+        MOV     r1, #Event_VSync
+        SWI     XOS_Byte
+90      CMP     r0, r0
+        LDMFD   sp!, {pc}
+
+Die
+        STMFD   sp!, {r0-r3, lr}
+        LDR     r12, [r12]
+        LDR     r0, Present
+        TEQ     r0, #0
+        BEQ     %FT90
+        MOV     r0, #13                 ; disable the VSync event
+        MOV     r1, #Event_VSync
+        SWI     XOS_Byte
+        MOV     r0, #EventV
+        ADRL    r1, Event
+        MOV     r2, r12
+        SWI     XOS_Release
+        LDR     r0, CallBackDue
+        TEQ     r0, #0
+        BEQ     %FT50
+        ADRL    r0, CallBack
+        MOV     r1, r12
+        SWI     XOS_RemoveCallBack
+50
+        LDR     r0, TaskHandle
+        CMP     r0, #0
+        LDRGT   r1, =TASK
+        SWIGT   XWimp_CloseDown
+90      CMP     r0, r0
+        LDMFD   sp!, {r0-r3, pc}
+
+; ------------------------------------------------------------------------- service calls
+
+Service
+        TEQ     r1, #Service_StartWimp
+        TEQNE   r1, #Service_StartedWimp
+        TEQNE   r1, #Service_Reset
+        TEQNE   r1, #Service_ModeChange
+        MOVNE   pc, lr
+        STMFD   sp!, {r0-r2, lr}
+        LDR     r12, [r12]
+        LDR     lr, Present
+        TEQ     lr, #0
+        BEQ     %FT90
+        TEQ     r1, #Service_StartWimp
+        BEQ     %FT20
+        TEQ     r1, #Service_StartedWimp
+        BEQ     %FT30
+        TEQ     r1, #Service_Reset
+        MOVEQ   lr, #0
+        STREQ   lr, TaskHandle
+        BEQ     %FT90
+        MOV     r1, r2                  ; Service_ModeChange: R2 is the new mode
+        MOV     r0, #1
+        SWI     XHost_Event
+        LDMFD   sp!, {r0-r2, pc}
+
+20      LDR     lr, TaskHandle          ; the desktop is starting: have it start the task
+        TEQ     lr, #0
+        BNE     %FT90
+        MVN     lr, #0
+        STR     lr, TaskHandle
+        LDMFD   sp!, {r0-r2, lr}
+        ADR     r0, DesktopName
+        MOV     r1, #0
+        MOV     pc, lr
+
+30      LDR     lr, TaskHandle
+        CMN     lr, #1
+        MOVEQ   lr, #0
+        STREQ   lr, TaskHandle
+90      LDMFD   sp!, {r0-r2, pc}
+
+; ------------------------------------------------------------------------- the task
+
+DesktopCommand
+        STMFD   sp!, {lr}
+        MOV     r2, r0
+        ADR     r1, Title
+        MOV     r0, #Module_Enter
+        SWI     XOS_Module
+        LDMFD   sp!, {pc}
+
+Start
+        LDR     r12, [r12]
+        ADD     sp, r12, #:INDEX: StackTop
+        LDR     r0, TaskHandle
+        CMP     r0, #0
+        BGT     Quit                    ; already running
+        MOV     r0, #200
+        LDR     r1, =TASK
+        ADR     r2, Title
+        SWI     XWimp_Initialise
+        BVS     Quit
+        STR     r1, TaskHandle
+Loop
+        SWI     XOS_ReadMonotonicTime
+        ADD     r2, r0, #20
+        LDR     r0, =&3FFE              ; null events and messages only
+        ADD     r1, r12, #:INDEX: Block
+        SWI     XWimp_PollIdle
+        BVS     Loop
+        TEQ     r0, #0
+        BLEQ    Commands_Due
+        TEQ     r0, #17
+        TEQNE   r0, #18
+        BNE     Loop
+        LDR     r0, [r1, #16]           ; Message_Quit
+        TEQ     r0, #0
+        BNE     Loop
+        LDR     r0, TaskHandle
+        LDR     r1, =TASK
+        SWI     XWimp_CloseDown
+        MOV     r0, #0
+        STR     r0, TaskHandle
+Quit
+        SWI     OS_Exit
+
+; Everything the host has asked for since the last time
+Commands_Due
+        STMFD   sp!, {r0-r1, lr}
+10      ADD     r0, r12, #:INDEX: Command
+        MOV     r1, #256
+        SWI     XHost_Poll
+        TEQ     r0, #0
+        LDMEQFD sp!, {r0-r1, pc}
+        TEQ     r0, #1
+        BLEQ    MarkIcons
+        ADDEQ   r0, r12, #:INDEX: Command
+        SWIEQ   XWimp_StartTask
+        BEQ     %BT10
+        TEQ     r0, #2
+        BLEQ    Click
+        B       %BT10
+
+; Notes in Known which icons are on the icon bar now, before an application is started
+MarkIcons
+        STMFD   sp!, {r0-r5, lr}
+        ADD     r2, r12, #:INDEX: Known
+        MOV     r0, #0
+        MOV     r3, #0
+5       STR     r0, [r2, r3]
+        ADD     r3, r3, #4
+        CMP     r3, #32
+        BLT     %BT5
+        MOV     r4, #0
+10      ADD     r1, r12, #:INDEX: Block
+        MVN     r0, #1
+        STR     r0, [r1, #0]
+        STR     r4, [r1, #4]
+        SWI     XWimp_GetIconState
+        BVS     %FT90
+        LDR     r5, [r1, #24]
+        TST     r5, #1:SHL:23           ; deleted
+        BNE     %FT20
+        LDRB    r0, [r2, r4, LSR #3]
+        AND     r3, r4, #7
+        MOV     r5, #1
+        ORR     r0, r0, r5, LSL r3
+        STRB    r0, [r2, r4, LSR #3]
+20      ADD     r4, r4, #1
+        CMP     r4, #256
+        BLT     %BT10
+90      CMP     r0, r0                  ; Z set, as the caller had it
+        LDMFD   sp!, {r0-r5, pc}
+
+; A click with Select on the icon bar icon whose sprite has the name in Command, as the Wimp
+; would send it to the icon's task. A name kept in a task's own memory can't be read from here,
+; so when no icon has the name, the newest icon that has come since an application was last
+; started is the one.
+Click
+        STMFD   sp!, {r0-r8, lr}
+        MOV     r4, #0
+        MVN     r8, #0
+10      ADD     r1, r12, #:INDEX: Block
+        MVN     r0, #1
+        STR     r0, [r1, #0]
+        STR     r4, [r1, #4]
+        SWI     XWimp_GetIconState
+        BVS     %FT80
+        LDR     r5, [r1, #24]
+        TST     r5, #1:SHL:23           ; deleted
+        BNE     %FT70
+        TST     r5, #2                  ; no sprite
+        BEQ     %FT70
+        ADD     r0, r12, #:INDEX: Known ; new since the last start?
+        LDRB    r0, [r0, r4, LSR #3]
+        AND     r7, r4, #7
+        MOV     r0, r0, LSR r7
+        TST     r0, #1
+        MOVEQ   r8, r4
+        TST     r5, #&100               ; not indirected: the name is in the icon
+        ADDEQ   r6, r1, #28
+        BEQ     %FT40
+        TST     r5, #1                  ; text and sprite: the name is in the validation string
+        BNE     %FT30
+        LDR     r7, [r1, #36]           ; a sprite alone: a name, unless the length is 0
+        TEQ     r7, #0
+        BEQ     %FT70
+        LDR     r6, [r1, #28]
+        CMP     r6, #&1800000           ; in application space: another task's memory
+        BLO     %FT70
+        B       %FT40
+30      LDR     r6, [r1, #32]
+        CMN     r6, #1
+        BEQ     %FT70
+        CMP     r6, #&1800000
+        BLO     %FT70
+35      LDRB    r0, [r6], #1            ; the S command, at the start or after a semicolon
+        CMP     r0, #32
+        BLO     %FT70
+        TEQ     r0, #"S"
+        TEQNE   r0, #"s"
+        BEQ     %FT40
+36      CMP     r0, #32
+        BLO     %FT70
+        TEQ     r0, #";"
+        LDRNEB  r0, [r6], #1
+        BNE     %BT36
+        B       %BT35
+40      BL      SameName
+        BNE     %FT70
+50      LDR     r0, [r1, #8]            ; the middle of the icon
+        LDR     r2, [r1, #16]
+        ADD     r0, r0, r2
+        MOV     r0, r0, ASR #1
+        LDR     r2, [r1, #12]
+        LDR     r3, [r1, #20]
+        ADD     r2, r2, r3
+        MOV     r2, r2, ASR #1
+        STR     r0, [r1, #0]
+        STR     r2, [r1, #4]
+        MOV     r0, #4                  ; Select
+        STR     r0, [r1, #8]
+        MVN     r0, #1
+        STR     r0, [r1, #12]
+        STR     r4, [r1, #16]
+        MOV     r0, #6                  ; Mouse_Click
+        MVN     r2, #1                  ; to the icon bar icon's task
+        MOV     r3, r4
+        SWI     XWimp_SendMessage
+        MOV     r0, #2
+        MOV     r1, r4
+        SWI     XHost_Event
+        LDMFD   sp!, {r0-r8, pc}
+70      ADD     r4, r4, #1
+        CMP     r4, #256
+        BLT     %BT10
+80      CMN     r8, #1                  ; no icon by that name: the newest, if one has come
+        BEQ     %FT90
+        MOV     r4, r8
+        ADD     r1, r12, #:INDEX: Block
+        MVN     r0, #1
+        STR     r0, [r1, #0]
+        STR     r4, [r1, #4]
+        SWI     XWimp_GetIconState
+        BVC     %BT50
+90      MOV     r0, #3
+        SWI     XHost_Event
+        LDMFD   sp!, {r0-r8, pc}
+
+; Z set if the sprite name at R6 (ended by a control character, a space, a semicolon or a comma)
+; is the name in Command, ignoring case
+SameName
+        STMFD   sp!, {r0-r3, r6, lr}
+        ADD     r3, r12, #:INDEX: Command
+10      LDRB    r0, [r6], #1
+        LDRB    r1, [r3], #1
+        CMP     r0, #32
+        MOVLS   r0, #0
+        TEQ     r0, #";"
+        TEQNE   r0, #","
+        MOVEQ   r0, #0
+        CMP     r0, #"A"
+        RSBHSS  r2, r0, #"Z"
+        ORRHS   r0, r0, #32
+        CMP     r1, #"A"
+        RSBHSS  r2, r1, #"Z"
+        ORRHS   r1, r1, #32
+        TEQ     r0, r1
+        LDMNEFD sp!, {r0-r3, r6, pc}
+        TEQ     r0, #0
+        BNE     %BT10
+        LDMFD   sp!, {r0-r3, r6, pc}
+
+; ------------------------------------------------------------------------- the pointer
+
+; EventV, in IRQ mode: at each VSync, ask the host whether the pointer is to move
+Event
+        TEQ     r0, #Event_VSync
+        MOVNE   pc, lr
+        STMFD   sp!, {r0-r3, lr}
+        LDR     r0, CallBackDue
+        TEQ     r0, #0
+        BNE     %FT90
+        MOV     r3, pc
+        ORR     r2, r3, #SVC_mode
+        TEQP    r2, #0
+        NOP
+        STMFD   sp!, {lr}
+        SWI     XHost_Pointer
+        TEQ     r0, #0
+        BEQ     %FT80
+        ADD     r0, r12, #:INDEX: PointerBlock
+        MOV     lr, #3
+        STRB    lr, [r0, #0]
+        STRB    r1, [r0, #1]
+        MOV     r1, r1, LSR #8
+        STRB    r1, [r0, #2]
+        STRB    r2, [r0, #3]
+        MOV     r2, r2, LSR #8
+        STRB    r2, [r0, #4]
+        MOV     r0, #1
+        STR     r0, CallBackDue
+        ADR     r0, CallBack
+        MOV     r1, r12
+        SWI     XOS_AddCallBack
+80      LDMFD   sp!, {lr}
+        TEQP    r3, #0
+        NOP
+90      LDMFD   sp!, {r0-r3, pc}
+
+CallBack
+        STMFD   sp!, {r0-r1, lr}
+        MOV     r0, #0
+        STR     r0, CallBackDue
+        MOV     r0, #21
+        ADD     r1, r12, #:INDEX: PointerBlock
+        SWI     XOS_Word
+        LDMFD   sp!, {r0-r1, pc}
+
+        LTORG
+
+        END

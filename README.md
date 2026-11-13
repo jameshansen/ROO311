@@ -90,7 +90,7 @@ The ROM is tested in Arculator on an A5000-style machine (ARM3, MEMC1a, 82C711, 
 ### Works
 
 - Kernel on MEMC1/IOC/VIDC1, 26-bit throughout
-- 70 ROM modules initialize
+- 71 ROM modules initialize, HostLink the one RISC OS 3.11 didn't have
 - Configure runs from the Apps folder. Its Screen window sets the monitor type and the desktop's mode, and the screen changes at once and comes back the same after a reset
 - Supervisor prompt, keyboard, mouse, `*` commands
 - The mouse pointer in every desktop mode tried (0, 12, 13, 15, 20, 21, 27, 28 and 31), with its double-click shape, the hourglass and `*Pointer`
@@ -368,11 +368,25 @@ These are in code paths nothing had built since RISC OS 3.5, and they had broken
 - **The Podule manager's loop.** The count of extension ROMs was kept in a register the routines it calls overwrite, so with an extension ROM fitted the machine hung at start-up.
 - **`*ScreenLoad`.** The palette code took the sprite pointer from a register only the mode selector code sets, so a 256 colour picture came up with a black palette.
 - **ADFS_DiscOp writes.** FileCore's test for a floppy drive never passed, and with no FSLock module, which RISC OS 3.11 didn't have either, every floppy write a game made failed with "SWI &44781 not known".
+- **SoundDMA's sample period.** On a VIDC1 machine `WorkOutVIDCParams` stored the divisor it had just used, 6, as the sound frequency register's value, where it should have stored the period it worked out. Every sound played at 6 microseconds a byte whatever was asked for: the desktop's default 48 microsecond channel came out 8 times too fast, and Lemmings' music, at 64 microseconds a byte, 2.67 times. The period is stored now, and the desktop gets its 100 buffer interrupts a second.
 
 ### Emulators
 
 - **I2C timing.** After checking an I2C acknowledge the kernel takes the clock line low before the data line. Dropping both in one write made MAME's clock chip see a new start, so the CMOS RAM read back as `&FF` and the machine stopped at the supervisor prompt.
 - **Floppy FIFO.** ADFS leaves the floppy controller's FIFO off. The command that turns it on was added for the Risc PC's controller, and when MAME's 82C711 refused it the boot stopped.
+
+### HostLink
+
+HostLink (`Sources/Utilities/HostLink`) is a module of ROO311's own, for an emulator to work the desktop for the person at it. It reaches the emulator through four SWIs in the chunk ArcEm answers itself, `&56AE0` to `&56AE3`, always called with the X bit set. On a machine or an emulator where nothing answers them, the first returns an error and the module does nothing more.
+
+| SWI | Called | Does |
+| --- | --- | --- |
+| `&56AE0` Hello | At start-up | The emulator says it is there, R0 its version |
+| `&56AE1` Poll | 5 times a second by HostLink's desktop task, with R0 a buffer and R1 its size | The emulator returns R0 0 for nothing, 1 to start the *command in the buffer as a task (`Wimp_StartTask`), or 2 to click the icon bar icon whose sprite is named in the buffer |
+| `&56AE2` Event | When something happens | R0 1 the screen mode changed (R1 the mode), 2 an icon was clicked (R1 its handle), 3 no icon had that name |
+| `&56AE3` Pointer | At each VSync | The emulator returns R0 1 with R1 and R2 the pointer's place in OS units, which HostLink sets with `OS_Word 21,3` in a callback |
+
+An icon bar icon's sprite name can be held in its task's own memory, which HostLink's task can't read. When no icon it can read has the name, it clicks the newest icon to appear since it last started an application. PiArcBoot uses it to start a game from its disc with no keys typed, to click the game's icon, and to know when the game has taken the screen.
 
 ### Building with AsAsm and GCC
 

@@ -77,4 +77,5 @@ Apps/Draw                             @romapp             !Draw
 Apps/Paint                            @romapp             !Paint
 Apps/EditApp                          @romapp             !Edit
 FileSys/ImageFS/DOSFS                 @dosfs              DOSFS
+Utilities/HostLink                    s/HostLink          HostLink
 Apps/SciCalc                          resources
