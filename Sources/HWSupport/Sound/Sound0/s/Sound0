@@ -1516,7 +1516,7 @@ process_oversample ENTRY "r1,r2"
 
 ; now update the required VIDCSFR to be this value
 
-        STRB    r2, [r10, #VIDCSFR_N]   ; record the value for prog'ing
+        STRB    r2, [r10, #VIDCSFR_N]   ; ROO311: was r1, the divisor; record the value for prog'ing
         MOV     r2, r2, LSL r0          ; compute inter-sample period for one channel
 
  [ VarSndClock

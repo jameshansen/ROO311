@@ -369,6 +369,7 @@ These are in code paths nothing had built since RISC OS 3.5, and they had broken
 - **`*ScreenLoad`.** The palette code took the sprite pointer from a register only the mode selector code sets, so a 256 colour picture came up with a black palette.
 - **ADFS_DiscOp writes.** FileCore's test for a floppy drive never passed, and with no FSLock module, which RISC OS 3.11 didn't have either, every floppy write a game made failed with "SWI &44781 not known".
 - **SoundDMA's sample period.** On a VIDC1 machine `WorkOutVIDCParams` stored the divisor it had just used, 6, as the sound frequency register's value, where it should have stored the period it worked out. Every sound played at 6 microseconds a byte whatever was asked for: the desktop's default 48 microsecond channel came out 8 times too fast, and Lemmings' music, at 64 microseconds a byte, 2.67 times. The period is stored now, and the desktop gets its 100 buffer interrupts a second.
+- **The 82C711 test.** `Configure82C710` tells an 82C711 from an 82C710 by storing &AA in its serial port's scratch register, moving the port and reading the register back. What it stored was the last byte of the 82C710 table, 0, still in the register, so an 82C711 that moves its port as the code expects failed the test and ADFS found no floppy controller. It stores &AA now.
 
 ### Emulators
 

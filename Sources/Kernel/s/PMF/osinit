@@ -931,6 +931,7 @@ Configure82C710 ENTRY "r0,r1"
 ; now if we're on 82C710 then 1st serial port is at &3F8
 ; and if we're on 82C711 then 1st serial port is at &2F8
 
+        MOV     lr, #&AA                ; ROO311: lr held the 82C710 table's last byte, 0, so an 82C711 was never found
         STRB    lr, [r0, #&2FF * 4]     ; store &AA in serial scratchpad register for 82C711 port 1
         MOV     lr, #&55
         STRB    lr, [r0, #&3FF * 4]     ; store &55 in serial scratchpad register for 82C710
