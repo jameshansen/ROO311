@@ -835,10 +835,11 @@ _kernel_oserror *wimp_block_copy        (int handle,
                                         int dxmin,
                                         int dymin);
 
+/* ROO311: the second pair of names were current and next too, which Norcroft let pass and GCC does not */
 _kernel_oserror *wimp_slot_size         (int current,
                                         int next,
-                                        int *current,
-                                        int *next,
+                                        int *current_out,
+                                        int *next_out,
                                         int *free);
 
 /* readpixtrans and claimfreememory not supported */

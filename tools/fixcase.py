@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """Make the assembler sources safe to build on Linux with AsAsm. Three fixes, all idempotent:
 
-    python tools/fixcase.py [--check]
+    python tools/fixcase.py [--check] [Support]
+
+The sources under Sources/, or with Support those of the support pack, whose Hdr: names are looked for
+in the headers of both.
 
 1. GET/LNK/BIN file names match the case of the files on disc. RISC OS filing systems ignore case,
    so the sources name files however the author typed them (GET s.vdu.VduDriver for
@@ -70,8 +73,12 @@ def backslash_constant(line):
 
 
 def main():
+    global ROOT
     check = "--check" in sys.argv
-    hdrs = [d for d in ROOT.rglob("*") if d.is_dir() and d.name.lower() == "hdr"]
+    sources = ROOT
+    if "Support" in sys.argv:
+        ROOT = ROOT.parent / "Support"
+    hdrs = [d for r in {sources, ROOT} for d in r.rglob("*") if d.is_dir() and d.name.lower() == "hdr"]
     changed = unresolved = slashes = 0
     for f in sorted(p for p in ROOT.rglob("*") if p.is_file() and ".git" not in p.parts):
         try:

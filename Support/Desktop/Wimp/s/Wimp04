@@ -1887,7 +1887,7 @@ writedirreverse_len * .-writedirreverse
         MOVGE   R2,#WimpValidation_Display
         BLGE    findcommand
         LDREQB  R4,[R3],#1
-        TEQEQ   R4,#"\"
+        TEQEQ   R4,#&5C
         LDREQB  R4,[R3]
         Pull    "R2"
 
@@ -6662,7 +6662,7 @@ pushfontstring TraceL font
 
         BLGE    findcommand
         LDREQB  R10, [R3], #1
-        TEQEQ   R10, #"\"
+        TEQEQ   R10, #&5C
         LDREQB  R10, [R3]
 ; R10 = replacement character
 

@@ -292,6 +292,12 @@ modules() {
 	done
 }
 
+# the support pack, modules for programs that need more than RISC OS 3.11 had (tools/support.py has the
+# rest). It uses the C library's headers and stubs, so it follows a ROM build.
+support() {
+	cd "$ROOT" && python3 tools/support.py
+}
+
 # the ROM image: the kernel, then every module that built, in MODULES order
 rom() {
 	kernel

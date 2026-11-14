@@ -266,7 +266,9 @@ Our_SubstituteArgs32
 
 XOS_SubstituteArgs32_code ROUT
 
-      WritePSRc SVC_mode, R12   ; enable IRQs
+; ROO311: WritePSRc written out. The newer headers macro warns with a third operand AsAsm does not take.
+        TEQP    PC, #SVC_mode           ; enable IRQs
+        NOP                             ; an ARM2 can corrupt the next instruction after TEQP
 
       Push   "R0-R8, lr"
       ADD     R8, R4, R3

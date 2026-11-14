@@ -80,6 +80,7 @@ These are the cases where the ROM's code was read. In each case the fix was writ
 - **Old programs run.** The SharedCLibrary is in the ROM with RISC_OSLib inside it, the way RISC OS 3 had it, and Battle Chess (1992), a C game built with the Norcroft compiler, runs on it.
 - **RISC OS 3.11's settings.** A CMOS reset gives RISC OS 3.11's defaults, Configure keeps the monitor type and the desktop's mode in the CMOS RAM, and its Screen window changes the screen straight away.
 - **Fits in 2MB.** The message files are tokenized and the BASIC applications crunched and squished, the same way the original build did it, which leaves 3K spare.
+- **A support pack.** The nested Window Manager and the Toolbox, built from the same sources, for programs that need more than RISC OS 3.11 had. Release 3.21 of Star Fighter 3000 runs with it.
 
 ![Configure's Screen window on the ROO311 desktop](docs/configure-screen.png)
 
@@ -414,6 +415,23 @@ The sources were written for Acorn's AAsm and ObjAsm assemblers and the Norcroft
 
 FPEmulator 4.39 comes from the current RISC OS Open sources, since the RISC OS 3.60 import has no source for its floating point core, which RISC OS Open published in 2010. The Desktop module comes from them too, for its start-up banner, and so does the icon bar's cog. `Sources/NEWER` lists the components built this way, against a second, newer set of headers.
 
+## Support pack
+
+Some programs need more than RISC OS 3.11 had. Release 3.21 of Star Fighter 3000 wants the nested Window Manager, version 3.80 or later, and the Toolbox. `sh build.sh support` builds them from RISC OS Open's sources into `build/support/toolbox.zip`, and a release publishes it beside the ROM. `Support/UPSTREAM` records the repository and commit of each, and the sources are kept out of `Sources/` so the ROM's build never gathers their headers.
+
+| In the pack | What it is |
+| --- | --- |
+| `extrom.WindowManager` | Window Manager 4.01 (1998), built with its RISC OS 3.1 options. The Window Manager can't be replaced once the desktop has started, so this one goes in an extension ROM. RISC OS initializes the newest version of each module it finds, so it takes the ROM's place at power on. It uses the ROM's own sprites and templates, so the desktop looks the same |
+| `!System.Modules.Toolbox` | Toolbox 1.47, Window 1.61, Menu 0.34, Iconbar 1.18, ProgInfo 0.15, SaveAs 0.16, Scale 0.14 and DCS 1.08, which a program's `!Run` loads |
+| `!System.Modules.CallASWI` | CallASWI 0.03, which adds the four SWIs RISC OS 3.7 brought in that the Toolbox calls |
+| `!System`, `!Scrap` | Set `System$Path` and `Wimp$ScrapDir` when booted |
+
+The files carry their types after a comma (`Window,ffa`), as HostFS, SparkFS and Info-ZIP name them. PiArcBoot puts the Window Manager in an extension ROM and the rest in a HostFS folder beside the game.
+
+The Toolbox modules are C. Acorn's linker made a C module that loads anywhere (`link -module`) by adding a table of the addresses in it and the code that adjusts them when the module starts, which the C library's stubs call as `__RelocCode`. Here each module is linked twice, at two addresses, and `tools/rmreloc.py` takes the words that differ by the distance between them as that table, which `tools/reloc.s` works through. Each module is built from the object list of its own Makefile's RAM build, and `tools/resgen.py` makes the blocks of messages and resources for ResourceFS that Acorn's resgen did.
+
+Three of the support sources needed changes, each with a `ROO311:` comment. The Window Manager's RISC OS 3.1 options asserted that `*Help` text isn't internationalized, which ROO311's is. A Toolbox header declared a function with two parameters of each name. CallASWI's one `WritePSRc` is written out, since the newer headers' macro warns in a form AsAsm doesn't accept. `tools/fixcase.py Support` makes the same file name and backslash fixes it makes for the ROM's sources.
+
 ## Building the ROM
 
 The build runs on Linux and needs AsAsm from GCCSDK (`svn://svn.riscos.info/gccsdk/trunk/tools/asasm`), `binutils-arm-none-eabi` and Python 3, and the C parts need GCC 4.7.4 for RISC OS. [toolchain/README.md](toolchain/README.md) says how to build both and what each one needs.
@@ -424,7 +442,13 @@ ASASM=/path/to/asasm GCC=/path/to/arm-unknown-riscos-gcc sh build.sh
 
 The ROM is written to `build/A5000/rom`, and each module's ELF file beside it holds source line numbers. The same sources always give the same image, so it doesn't matter where or when it's built.
 
-GitHub Actions runs this build from source on every push, compiler included (`.github/workflows/build.yml`), and a version tag publishes the image as `ROM311` in a release.
+After a ROM build, whose C library headers and stubs it uses, this builds the support pack into `build/support/toolbox.zip`:
+
+```bash
+ASASM=/path/to/asasm GCC=/path/to/arm-unknown-riscos-gcc sh build.sh support
+```
+
+GitHub Actions runs both builds from source on every push, compiler included (`.github/workflows/build.yml`), and a version tag publishes the image as `ROM311` and the support pack as `toolbox.zip` in a release.
 
 | File | What it does |
 | --- | --- |
@@ -441,6 +465,10 @@ GitHub Actions runs this build from source on every push, compiler included (`.g
 | `tools/msgtok.py` | Tokenizes the ROM's message files, as the original build's MsgTok tools did |
 | `tools/basic.py` | Lists a tokenized BBC BASIC file, crunches one as BASIC's `CRUNCH` does and squishes one as the build's Squish tool does |
 | `tools/sprites.py` | Makes the ROM's sprite file from the sources' sprite files |
+| `tools/support.py` | Builds the support pack from `Support/` (`sh build.sh support`) |
+| `tools/rmreloc.py`, `tools/reloc.s` | Make a C module that loads anywhere in the RMA from two links of it |
+| `tools/resgen.py` | Puts files in a module as a block for ResourceFS, as Acorn's resgen did |
+| `tools/incs.py` | Makes the headers a component's C includes findable by the RISC OS names it uses |
 
 ## AI use disclosure
 

@@ -2363,7 +2363,7 @@ trymenucursorkeys
         BL      checkhandle
         BVS     nothing
         LDR     r2, reversedmenu
-        CMP     r2, #"\"
+        CMP     r2, #&5C
         LDREQ   r2, [handle, #w_wax0]   ; get menu x
         LDRNE   r2, [handle, #w_wax1]
         LDR     r14, [handle, #w_icons]

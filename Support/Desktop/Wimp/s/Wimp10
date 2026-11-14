@@ -2918,7 +2918,7 @@ trace_char ROUT
         ;write character
         SWI     HostFS_WriteC
         ;if it's a backslash, write it again
-        CMP     R0, #"\"
+        CMP     R0, #&5C
         SWIEQ   HostFS_WriteC
         B       |trace_char: exit|
 
@@ -2943,7 +2943,7 @@ trace_char ROUT
 ; R1 = character to trace
 ; R2 -> representation table
 
-        MOV     R0, #"\"
+        MOV     R0, #&5C
         SWI     HostFS_WriteC
 
         MOV     R0, #"x"

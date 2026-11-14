@@ -37,7 +37,7 @@ Module_BaseAddr
         GET     Hdr:FSNumbers
         GET     Hdr:HighFSI
         GET     Hdr:HostFS
-        GET     Hdr:NDRDebug
+        GET     Hdr:NdrDebug
         GET     Hdr:Font
         GET     Hdr:Wimp
         GET     Hdr:Messages
