@@ -17,4 +17,7 @@ extrom.WindowManager
 !System, !Scrap
   Set System$Path and Wimp$ScrapDir when booted, as RISC OS 3's did.
 
+!Boot
+  Sets Choices$Path and Choices$Write to its Choices folder when booted, as Acorn's Universal !Boot did for RISC OS 3.1, so programs can read and save their choices.
+
 The sources and the commit each came from are in ROO311's repository, under Support/. They are Acorn's, published by RISC OS Open under the Apache License, version 2.0, as is ROO311.

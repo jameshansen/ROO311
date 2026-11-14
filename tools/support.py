@@ -225,9 +225,13 @@ def main():
     for folder, name in TOOLBOX:
         toolbox_module(folder, name)
 
-    # !System and !Scrap: an Obey file each that sets the variable, as RISC OS 3's did
+    # !System and !Scrap: an Obey file each that sets the variable, as RISC OS 3's did. !Boot holds the
+    # Choices folder that Acorn's Universal !Boot gave RISC OS 3.1 and later versions have, where programs
+    # read their choices (Choices:) and save them (Choices$Write).
     for app, lines in (("!System", ["Set System$Dir <Obey$Dir>", "Set System$Path <System$Dir>."]),
-                       ("!Scrap", ["Set Wimp$ScrapDir <Obey$Dir>.ScrapDir", "CDir <Wimp$ScrapDir>"])):
+                       ("!Scrap", ["Set Wimp$ScrapDir <Obey$Dir>.ScrapDir", "CDir <Wimp$ScrapDir>"]),
+                       ("!Boot", ["Set Boot$Dir <Obey$Dir>", "Set Choices$Write <Boot$Dir>.Choices",
+                                  "Set Choices$Path <Choices$Write>.", "CDir <Choices$Write>"])):
         d = S / "pack" / app
         d.mkdir(parents=True, exist_ok=True)
         for f in ("!Boot", "!Run"):

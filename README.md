@@ -425,6 +425,7 @@ Some programs need more than RISC OS 3.11 had. Release 3.21 of Star Fighter 3000
 | `!System.Modules.Toolbox` | Toolbox 1.47, Window 1.61, Menu 0.34, Iconbar 1.18, ProgInfo 0.15, SaveAs 0.16, Scale 0.14 and DCS 1.08, which a program's `!Run` loads |
 | `!System.Modules.CallASWI` | CallASWI 0.03, which adds the four SWIs RISC OS 3.7 brought in that the Toolbox calls |
 | `!System`, `!Scrap` | Set `System$Path` and `Wimp$ScrapDir` when booted |
+| `!Boot` | Sets `Choices$Path` and `Choices$Write` to its `Choices` folder when booted, as Acorn's Universal !Boot did for RISC OS 3.1, so programs can read and save their choices |
 
 The files carry their types after a comma (`Window,ffa`), as HostFS, SparkFS and Info-ZIP name them. PiArcBoot puts the Window Manager in an extension ROM and the rest in a HostFS folder beside the game.
 
