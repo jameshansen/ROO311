@@ -18,7 +18,8 @@
 ; application, click an icon on the icon bar and put the pointer where the host's pointer is. It
 ; tells the host what the game does once it is started: when the screen mode changes, which is
 ; when a game takes the screen from the desktop, when an error box opens to ask the person
-; something, and when a task starts in the desktop.
+; something, when a task starts in the desktop, and where the windows on the screen are, so that
+; the host can show just those for a game that plays in a window.
 ;
 ; The host is reached through four SWIs in the chunk the ArcEm emulator answers itself
 ; (&56AC0 to &56AFF), always called with the X bit set. On a machine where nothing answers them
@@ -31,13 +32,18 @@
 ;   Host_Event    (&56AE2)  in: R0 1 the screen mode changed (R1 the new mode), 2 an icon bar
 ;                           icon was clicked (R1 its handle), 3 no icon had that sprite,
 ;                           4 an error box opened (R1 1) or closed (R1 0), 5 a task started
-;                           in the desktop (R1 its handle)
+;                           in the desktop (R1 its handle), 6 the windows on the screen have
+;                           changed (R1 a block: how many, up to 31, then each one's outline,
+;                           its borders and all, as x0, y0, x1, y1 in OS units). A backdrop
+;                           window, such as the desktop's own, isn't one of them.
 ;   Host_Pointer  (&56AE3)  out: R0 1 with R1, R2 where the pointer is to go in OS units, or 0
 ;
 ; The commands come to a task of the module's own, which the desktop starts as Desktop_HostLink
 ; and which looks for them five times a second. The Wimp's Message_TaskInitialise, sent to every
 ; task when one starts, tells it of a new task. The pointer is asked for at each VSync, and moved
-; in a callback with OS_Word 21,3.
+; in a callback with OS_Word 21,3. The windows are looked at five times a second too: those in
+; front of the icon bar, found by going up the window stack from it, as a window's state says
+; which window is above it.
 
 XHost_Hello             * &76AE0
 XHost_Poll              * &76AE1
@@ -54,7 +60,9 @@ XOS_ReadMonotonicTime   * &20042
 XOS_AddCallBack         * &20054
 XOS_RemoveCallBack      * &2005F
 XWimp_Initialise        * &600C0
+XWimp_GetWindowState    * &600CB
 XWimp_GetIconState      * &600CE
+XWimp_GetWindowOutline  * &600E0
 XWimp_CloseDown         * &600DD
 XWimp_StartTask         * &600DE
 XWimp_PollIdle          * &600E1
@@ -85,6 +93,8 @@ Block           #       256     ; for Wimp_Poll and the icon calls
 Command         #       256     ; what the host asked for
 Stack           #       460     ; to &400, where an ADD can reach
 StackTop        #       0
+Windows         #       512     ; the windows the host was last told of: how many, then their outlines
+Found           #       512     ; the same, as found just now
 WorkspaceSize   *       :INDEX: @
 
 
@@ -102,7 +112,7 @@ Module_Base
         DCD     0
 
 Title   =       "HostLink", 0
-Help    =       "HostLink", 9, 9, "1.01 (13 Nov 2026)", 0
+Help    =       "HostLink", 9, 9, "1.02 (14 Nov 2026)", 0
         ALIGN
 
 Commands
@@ -249,6 +259,8 @@ Start
         SWI     XWimp_Initialise
         BVS     Quit
         STR     r1, TaskHandle
+        MVN     r0, #0                  ; no count yet, so the windows are told of at once
+        STR     r0, Windows
 Loop
         SWI     XOS_ReadMonotonicTime
         ADD     r2, r0, #20
@@ -258,6 +270,8 @@ Loop
         BVS     Loop
         TEQ     r0, #0
         BLEQ    Commands_Due
+        TEQ     r0, #0
+        BLEQ    Windows_Due
         TEQ     r0, #17
         TEQNE   r0, #18
         BNE     Loop
@@ -295,6 +309,63 @@ Commands_Due
         TEQ     r0, #2
         BLEQ    Click
         B       %BT10
+
+; Tells the host where the windows on the screen are, when that has changed since it was last
+; told: the outline of each window in front of the icon bar, from the back, leaving out backdrops
+Windows_Due
+        STMFD   sp!, {r0-r7, lr}
+        ADD     r5, r12, #:INDEX: Found
+        MOV     r6, #0                  ; how many found
+        ADD     r1, r12, #:INDEX: Block
+        MVN     r0, #1                  ; the icon bar
+        STR     r0, [r1, #0]
+        SWI     XWimp_GetWindowState
+        BVS     %FT50
+10      LDR     r0, [r1, #28]           ; the window above
+        CMN     r0, #1                  ; none: the top of the stack
+        BEQ     %FT50
+        CMP     r6, #31
+        BHS     %FT50
+        STR     r0, [r1, #0]
+        SWI     XWimp_GetWindowState    ; for the window above that
+        BVS     %FT50
+        LDR     r2, [r1, #32]
+        TST     r2, #1:SHL:11           ; a backdrop, as the desktop's own is: not one to show
+        BNE     %BT10
+        SWI     XWimp_GetWindowOutline  ; its outline over its visible area, the rest kept
+        BVS     %FT50
+        ADD     r7, r5, #4
+        ADD     r7, r7, r6, LSL #4
+        ADD     r0, r1, #4
+        LDMIA   r0, {r2-r4, lr}
+        STMIA   r7, {r2-r4, lr}
+        ADD     r6, r6, #1
+        B       %BT10
+50      STR     r6, [r5, #0]
+        ADD     r4, r12, #:INDEX: Windows
+        MOV     r2, r6, LSL #2
+        ADD     r2, r2, #1              ; words: the count, and four for each window
+        MOV     r3, #0
+60      LDR     r0, [r5, r3, LSL #2]
+        LDR     lr, [r4, r3, LSL #2]
+        TEQ     r0, lr
+        BNE     %FT70
+        ADD     r3, r3, #1
+        CMP     r3, r2
+        BLT     %BT60
+        CMP     r0, r0                  ; Z set, as the caller had it
+        LDMFD   sp!, {r0-r7, pc}        ; the same as the host was last told
+70      MOV     r3, #0
+75      LDR     r0, [r5, r3, LSL #2]
+        STR     r0, [r4, r3, LSL #2]
+        ADD     r3, r3, #1
+        CMP     r3, r2
+        BLT     %BT75
+        MOV     r0, #6
+        MOV     r1, r4
+        SWI     XHost_Event
+        CMP     r0, r0
+        LDMFD   sp!, {r0-r7, pc}
 
 ; Notes in Known which icons are on the icon bar now, before an application is started
 MarkIcons
