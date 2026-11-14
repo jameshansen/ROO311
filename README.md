@@ -384,10 +384,10 @@ HostLink (`Sources/Utilities/HostLink`) is a module of ROO311's own, for an emul
 | --- | --- | --- |
 | `&56AE0` Hello | At start-up | The emulator says it is there, R0 its version |
 | `&56AE1` Poll | 5 times a second by HostLink's desktop task, with R0 a buffer and R1 its size | The emulator returns R0 0 for nothing, 1 to start the *command in the buffer as a task (`Wimp_StartTask`), or 2 to click the icon bar icon whose sprite is named in the buffer |
-| `&56AE2` Event | When something happens | R0 1 the screen mode changed (R1 the mode), 2 an icon was clicked (R1 its handle), 3 no icon had that name |
+| `&56AE2` Event | When something happens | R0 1 the screen mode changed (R1 the mode), 2 an icon was clicked (R1 its handle), 3 no icon had that name, 4 an error box opened (R1 1) or closed (R1 0), 5 a task started in the desktop (R1 its handle) |
 | `&56AE3` Pointer | At each VSync | The emulator returns R0 1 with R1 and R2 the pointer's place in OS units, which HostLink sets with `OS_Word 21,3` in a callback |
 
-An icon bar icon's sprite name can be held in its task's own memory, which HostLink's task can't read. When no icon it can read has the name, it clicks the newest icon to appear since it last started an application. PiArcBoot uses it to start a game from its disc with no keys typed, to click the game's icon, and to know when the game has taken the screen.
+An icon bar icon's sprite name can be held in its task's own memory, which HostLink's task can't read. When no icon it can read has the name, it clicks the newest icon to appear since it last started an application. Mode changes come from `Service_ModeChange`, error boxes from `Service_WimpReportError`, and new tasks from the `Message_TaskInitialise` the Wimp sends every task when one starts. PiArcBoot uses it to start a game from its disc with no keys typed, to click the game's icon, and to know when the game has taken the screen, asked for a disc or gone on to the desktop, so its splash screen comes down then and no sooner.
 
 ### Building with AsAsm and GCC
 

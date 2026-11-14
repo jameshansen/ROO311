@@ -15,8 +15,10 @@
 ; > HostLink
 ;
 ; HostLink lets an emulator that runs ROO311 work the desktop for the person playing: start an
-; application, click an icon on the icon bar, put the pointer where the host's pointer is, and
-; hear when the screen mode changes, which is when a game has taken the screen from the desktop.
+; application, click an icon on the icon bar and put the pointer where the host's pointer is. It
+; tells the host what the game does once it is started: when the screen mode changes, which is
+; when a game takes the screen from the desktop, when an error box opens to ask the person
+; something, and when a task starts in the desktop.
 ;
 ; The host is reached through four SWIs in the chunk the ArcEm emulator answers itself
 ; (&56AC0 to &56AFF), always called with the X bit set. On a machine where nothing answers them
@@ -27,11 +29,14 @@
 ;                           out: R0 0 nothing to do, 1 start the *command in the buffer as a
 ;                           task, 2 click the icon bar icon whose sprite is named in the buffer
 ;   Host_Event    (&56AE2)  in: R0 1 the screen mode changed (R1 the new mode), 2 an icon bar
-;                           icon was clicked (R1 its handle), 3 no icon had that sprite
+;                           icon was clicked (R1 its handle), 3 no icon had that sprite,
+;                           4 an error box opened (R1 1) or closed (R1 0), 5 a task started
+;                           in the desktop (R1 its handle)
 ;   Host_Pointer  (&56AE3)  out: R0 1 with R1, R2 where the pointer is to go in OS units, or 0
 ;
 ; The commands come to a task of the module's own, which the desktop starts as Desktop_HostLink
-; and which looks for them five times a second. The pointer is asked for at each VSync, and moved
+; and which looks for them five times a second. The Wimp's Message_TaskInitialise, sent to every
+; task when one starts, tells it of a new task. The pointer is asked for at each VSync, and moved
 ; in a callback with OS_Word 21,3.
 
 XHost_Hello             * &76AE0
@@ -61,6 +66,7 @@ Service_Reset           * &27
 Service_ModeChange      * &46
 Service_StartWimp       * &49
 Service_StartedWimp     * &4A
+Service_WimpReportError * &57
 Module_Enter            * 2
 Module_Claim            * 6
 Module_Free             * 7
@@ -96,7 +102,7 @@ Module_Base
         DCD     0
 
 Title   =       "HostLink", 0
-Help    =       "HostLink", 9, 9, "1.00 (13 Nov 2026)", 0
+Help    =       "HostLink", 9, 9, "1.01 (13 Nov 2026)", 0
         ALIGN
 
 Commands
@@ -178,6 +184,7 @@ Service
         TEQNE   r1, #Service_StartedWimp
         TEQNE   r1, #Service_Reset
         TEQNE   r1, #Service_ModeChange
+        TEQNE   r1, #Service_WimpReportError
         MOVNE   pc, lr
         STMFD   sp!, {r0-r2, lr}
         LDR     r12, [r12]
@@ -192,8 +199,15 @@ Service
         MOVEQ   lr, #0
         STREQ   lr, TaskHandle
         BEQ     %FT90
+        TEQ     r1, #Service_WimpReportError
+        BEQ     %FT40
         MOV     r1, r2                  ; Service_ModeChange: R2 is the new mode
         MOV     r0, #1
+        SWI     XHost_Event
+        LDMFD   sp!, {r0-r2, pc}
+
+40      MOV     r1, r0                  ; Service_WimpReportError: R0 1 opening, 0 closing
+        MOV     r0, #4
         SWI     XHost_Event
         LDMFD   sp!, {r0-r2, pc}
 
@@ -247,10 +261,17 @@ Loop
         TEQ     r0, #17
         TEQNE   r0, #18
         BNE     Loop
-        LDR     r0, [r1, #16]           ; Message_Quit
-        TEQ     r0, #0
+        LDR     r0, [r1, #16]           ; the message's action
+        TEQ     r0, #0                  ; Message_Quit
+        BEQ     %FT80
+        LDR     lr, =&400C2             ; Message_TaskInitialise: a task has started
+        TEQ     r0, lr
         BNE     Loop
-        LDR     r0, TaskHandle
+        LDR     r1, [r1, #4]            ; its handle
+        MOV     r0, #5
+        SWI     XHost_Event
+        B       Loop
+80      LDR     r0, TaskHandle
         LDR     r1, =TASK
         SWI     XWimp_CloseDown
         MOV     r0, #0
