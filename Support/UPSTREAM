@@ -1,0 +1,15 @@
+# The support pack's sources (tools/support.py builds them), and where each came from. One line per component:
+# <folder under Support/>  <repository under https://gitlab.riscosopen.org/RiscOS/Sources/>  <commit>  <what that commit is>
+# They are kept apart from Sources/ so that the ROM's build never gathers their headers.
+Desktop/Wimp          Desktop/Wimp                  8f75c7e  Window Manager 4.01 (1998-09-30), without its Test and TestO folders
+Toolbox/Toolbox       Toolbox/Toolbox               7d8661d  Toolbox 1.47 (1999-02-16)
+Toolbox/Window        Toolbox/Window                28e6895  Window 1.61 (1999-03-18)
+Toolbox/Menu          Toolbox/Menu                  6b54c34  Menu 0.34 (1998-08-12)
+Toolbox/IconBar       Toolbox/IconBar               7ebaa0d  IconBar 1.18 (1998-02-18)
+Toolbox/ProgInfo      Toolbox/ProgInfo              b4fb272  ProgInfo 0.15 (1998-07-14)
+Toolbox/SaveAs        Toolbox/SaveAs                de21712  SaveAs 0.16 (1998-07-30)
+Toolbox/Scale         Toolbox/Scale                 826e86b  Scale 0.14 (1998-07-30)
+Toolbox/DCS           Toolbox/DCS                   aecb312  DCS 1.08 (1998-02-18)
+Toolbox/tboxlib       Toolbox/tboxlib               42a575f  tboxlibint, the Toolbox modules' own library (1999-03-17)
+Toolbox/ToolboxLib    Toolbox/ToolboxLib            e6fd0bc  the Toolbox libraries (1999-03-26), wimplib and its headers only
+Utilities/CallASWI    Utilities/Patches/CallASWI    3eeea09  CallASWI 0.03 (2002-12-20)
