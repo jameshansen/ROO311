@@ -29,7 +29,8 @@
 ;   Host_Poll     (&56AE1)  in: R0 a buffer, R1 its size
 ;                           out: R0 0 nothing to do, 1 start the *command in the buffer as a
 ;                           task, 2 click the icon bar icon whose sprite is named in the buffer
-;   Host_Event    (&56AE2)  in: R0 1 the screen mode changed (R1 the new mode), 2 an icon bar
+;   Host_Event    (&56AE2)  in: R0 1 the screen mode changed (R1 the new mode, R2 and R3 its
+;                           XEigFactor and YEigFactor, for turning pixels into OS units), 2 an icon bar
 ;                           icon was clicked (R1 its handle), 3 no icon had that sprite,
 ;                           4 an error box opened (R1 1) or closed (R1 0), 5 a task started
 ;                           in the desktop (R1 its handle), 6 the windows on the screen have
@@ -57,6 +58,7 @@ XOS_Module              * &2001E
 XOS_Claim               * &2001F
 XOS_Release             * &20020
 XOS_ReadMonotonicTime   * &20042
+XOS_ReadModeVariable    * &20035
 XOS_AddCallBack         * &20054
 XOS_RemoveCallBack      * &2005F
 XWimp_Initialise        * &600C0
@@ -112,7 +114,7 @@ Module_Base
         DCD     0
 
 Title   =       "HostLink", 0
-Help    =       "HostLink", 9, 9, "1.02 (14 Nov 2026)", 0
+Help    =       "HostLink", 9, 9, "1.03 (14 Nov 2026)", 0
         ALIGN
 
 Commands
@@ -211,9 +213,17 @@ Service
         BEQ     %FT90
         TEQ     r1, #Service_WimpReportError
         BEQ     %FT40
-        MOV     r1, r2                  ; Service_ModeChange: R2 is the new mode
+        STMFD   sp!, {r3}               ; Service_ModeChange: R2 is the new mode
+        MOV     r0, #-1                 ; its eigen factors, read now that it is the current mode
+        MOV     r1, #5
+        SWI     XOS_ReadModeVariable
+        MOV     r3, r2                  ; YEigFactor
+        MOV     r1, #4
+        SWI     XOS_ReadModeVariable    ; R2 XEigFactor
+        LDR     r1, [sp, #12]           ; the new mode, from R2 as it came in
         MOV     r0, #1
         SWI     XHost_Event
+        LDMFD   sp!, {r3}
         LDMFD   sp!, {r0-r2, pc}
 
 40      MOV     r1, r0                  ; Service_WimpReportError: R0 1 opening, 0 closing
