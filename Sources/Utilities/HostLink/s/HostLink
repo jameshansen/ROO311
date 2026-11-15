@@ -41,8 +41,8 @@
 ;
 ; The commands come to a task of the module's own, which the desktop starts as Desktop_HostLink
 ; and which looks for them five times a second. The Wimp's Message_TaskInitialise, sent to every
-; task when one starts, tells it of a new task. The pointer is asked for at each VSync, and moved
-; in a callback with OS_Word 21,3. The windows are looked at five times a second too: those in
+; task when one starts, tells it of a new task. The pointer is asked for every centisecond, from
+; TickerV, and moved in a callback with OS_Word 21,3. The windows are looked at five times a second too: those in
 ; front of the icon bar, found by going up the window stack from it, as a window's state says
 ; which window is above it.
 
@@ -70,8 +70,7 @@ XWimp_StartTask         * &600DE
 XWimp_PollIdle          * &600E1
 XWimp_SendMessage       * &600E7
 
-EventV                  * &10
-Event_VSync             * 4
+TickerV                 * &1C
 Service_Reset           * &27
 Service_ModeChange      * &46
 Service_StartWimp       * &49
@@ -114,7 +113,7 @@ Module_Base
         DCD     0
 
 Title   =       "HostLink", 0
-Help    =       "HostLink", 9, 9, "1.03 (14 Nov 2026)", 0
+Help    =       "HostLink", 9, 9, "1.04 (15 Nov 2026)", 0
         ALIGN
 
 Commands
@@ -152,13 +151,10 @@ Init
         BVS     %FT90
         MOV     r0, #1
         STR     r0, Present
-        MOV     r0, #EventV
-        ADRL    r1, Event
+        MOV     r0, #TickerV
+        ADRL    r1, Ticker
         MOV     r2, r12
         SWI     XOS_Claim
-        MOV     r0, #14                 ; enable the VSync event
-        MOV     r1, #Event_VSync
-        SWI     XOS_Byte
 90      CMP     r0, r0
         LDMFD   sp!, {pc}
 
@@ -168,11 +164,8 @@ Die
         LDR     r0, Present
         TEQ     r0, #0
         BEQ     %FT90
-        MOV     r0, #13                 ; disable the VSync event
-        MOV     r1, #Event_VSync
-        SWI     XOS_Byte
-        MOV     r0, #EventV
-        ADRL    r1, Event
+        MOV     r0, #TickerV
+        ADRL    r1, Ticker
         MOV     r2, r12
         SWI     XOS_Release
         LDR     r0, CallBackDue
@@ -529,22 +522,21 @@ SameName
 
 ; ------------------------------------------------------------------------- the pointer
 
-; EventV, in IRQ mode: at each VSync, ask the host whether the pointer is to move
-Event
-        TEQ     r0, #Event_VSync
-        MOVNE   pc, lr
+; TickerV, in IRQ mode, every centisecond: ask the host whether the pointer is to move. It is
+; TickerV rather than the VSync event, as turning an event on reaches every program's own event
+; handler, and some games' handlers stop with an address exception on an event they didn't ask
+; for. The emulator answers Host_Pointer itself, with no change of mode, so this uses nothing of
+; the program it interrupted but the IRQ stack. Many games run in SVC mode with their own idea of
+; R13, so only a move, which the host asks for just while a game plays in a desktop window, goes
+; into SVC mode to add the callback that makes it.
+Ticker
         STMFD   sp!, {r0-r3, lr}
         LDR     r0, CallBackDue
         TEQ     r0, #0
         BNE     %FT90
-        MOV     r3, pc
-        ORR     r2, r3, #SVC_mode
-        TEQP    r2, #0
-        NOP
-        STMFD   sp!, {lr}
         SWI     XHost_Pointer
         TEQ     r0, #0
-        BEQ     %FT80
+        BEQ     %FT90
         ADD     r0, r12, #:INDEX: PointerBlock
         MOV     lr, #3
         STRB    lr, [r0, #0]
@@ -556,10 +548,15 @@ Event
         STRB    r2, [r0, #4]
         MOV     r0, #1
         STR     r0, CallBackDue
+        MOV     r3, pc
+        ORR     r2, r3, #SVC_mode
+        TEQP    r2, #0
+        NOP
+        STMFD   sp!, {lr}
         ADR     r0, CallBack
         MOV     r1, r12
         SWI     XOS_AddCallBack
-80      LDMFD   sp!, {lr}
+        LDMFD   sp!, {lr}
         TEQP    r3, #0
         NOP
 90      LDMFD   sp!, {r0-r3, pc}
