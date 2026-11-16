@@ -453,7 +453,20 @@ Desktop_Start ROUT
         MOV     R2, #&FF
         SWI     OS_Byte
         TEQ     R1, #0                  ; was an EXEC file open?
-        SWINE   OS_Exit                 ; exit if so
+        BEQ     %FT03                   ; exit if so, else on to the desktop
+
+; ROO311: what Exit2 gives back goes back here too, before the boot file runs: the banner's sprite
+; space, the messages file and the workspace. The sprite area stayed grown, with its end where the
+; banner's sprites began, and the workspace stayed in the RMA. NewWelcomeWorkspace isn't set up
+; yet, so FreeFontsEtc can't be called.
+        BL      FreeBannerSprites
+        ADR     r0, MessageBlock
+        SWI     XMessageTrans_CloseFile
+        MOV     r0, #ModHandReason_Free
+        MOV     r2, wp
+        SWI     XOS_Module
+        SWI     OS_Exit
+03
 
 ; Store number of active tasks - inhibits startup screen
 ; Store ROM apps start inhibit - set if there's a command tail or active tasks
@@ -1817,6 +1830,12 @@ FreeBannerSprites Entry "r0-r2"
         SUBVC   r1, r2, r1              ; shrink back to the size before the banner
         MOVVC   r0, #3
         SWIVC   XOS_ChangeDynamicArea
+        MOV     r0, #3                  ; ROO311: and whatever size the area is left, its header says
+        SWI     XOS_ReadDynamicArea     ; so, as the banner no longer has the end of it
+        BVS     %FT10
+        TEQ     r1, #0
+        STRNE   r1, [r0, #saEnd]
+10
         CLRV
         EXIT
 
