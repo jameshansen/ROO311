@@ -158,7 +158,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | | Game | Year | Starts | Notes |
 | --- | --- | --- | --- | --- |
 | 🟢 | Acheton and Kingdom of Hamil | 1987 | Full screen |  |
-| ⚪ | Alone In the Dark | 1995 | Not seen | Has to be installed to a hard disc first |
+| ⚪ | Alone In the Dark | 1995 | Not seen | Has to be installed to a hard disc first. Installed to a folder HostFS shows the machine, as its installer would install it, it reaches its menu and starts a new game on ROO311 |
 | 🟢 | Apocalypse | 1990 | Full screen |  |
 | 🟢 | Avon and Murdac | 1989 | Full screen |  |
 | ⚪ | Ballarena | 1990 | Not seen | Doesn't start on RISC OS 3.11 in this test either |
@@ -193,7 +193,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | ⚪ | Dune II - Battle for Arrakis [CD version] | 1997 | Not seen | No floppy image to boot |
 | 🟢 | E-Type | 1989 | Full screen |  |
 | 🟢 | E-Type Compendium | 1991 | Full screen |  |
-| ⚪ | E-Type II | 1994 | Not seen | Doesn't get past loading on RISC OS 3.11 in this test |
+| ⚪ | E-Type II | 1994 | Not seen | Doesn't get past loading on RISC OS 3.11 in this test. Run from its disc as PiArcBoot runs it, it reaches its two-player race on ROO311 |
 | 🟢 | Empire Soccer 94 | 1995 | Full screen |  |
 | 🟢 | Enter The Realm | 1991 | Full screen |  |
 | ⚪ | Exodus [32bit version] | 2018 | Not seen | No floppy image to boot |
@@ -230,7 +230,7 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | 🟢 | Magic Pockets | 1993 | Full screen |  |
 | 🟢 | Mah-Jong Patience | 1990 | Icon bar, then desktop |  |
 | 🟢 | Man at Arms | 1990 | Full screen |  |
-| ⚪ | Manchester United | 1990 | Not seen | Its disc isn't an ADFS disc, so it can't be started without ADFFS |
+| ⚪ | Manchester United | 1990 | Not seen | Its package holds only its second disc. Its first disc, from JASPP's release folder, has a boot file for Arthur that says to run `!!MUFC!!`, which reaches its menu on ROO311 |
 | 🟢 | Manchester United Europe | 1991 | Full screen |  |
 | 🟢 | Memory Magic | 1990 | Full screen |  |
 | 🟢 | MicroDrive | 1990 | Full screen |  |
@@ -286,6 +286,8 @@ The Starts column says how each game started on RISC OS 3.11. A full screen game
 | 🔴 | Zool - Ninja of the 'Nth' Dimension [32bit version] | 2002 | Full screen | Shows nothing when started from the desktop. Started from the command line it reaches its title after 2 minutes, where RISC OS 3.11 takes 30 seconds |
 
 7 more packages also reach the same screen on both ROMs, though JASPP's forum either doesn't list them or lists them as needing ADFFS on RISC OS 3.11. They are Adventures (the classic compilation), Champions, COPS, Killerbugs, Plague Planet, SpySnatcher and World Class Leaderboard.
+
+4 packages outside the 127 start on ROO311 too, as PiArcBoot starts them, though they haven't been compared with RISC OS 3.11. They are Confusion, Cyborg, Word Up Word Down and Xenon 2: Megablast. Xenon 2's package holds its first disc only as its application, and it runs from a folder HostFS shows the machine with its second disc in the drive, as its help says to run it from a hard disc.
 
 ## Install
 
