@@ -16,17 +16,19 @@ ROO311 is a port of RISC OS Open to the 26-bit Acorn Archimedes. It looks and wo
 
 An Archimedes emulator needs a RISC OS ROM image before it can start, and the RISC OS 3.11 one is commercial. ROO311 is a free and open ROM image that an emulator can load where it would load that one, so an emulated A5000 starts in the desktop with no commercial ROM and no hard disc. It boots a game from its floppy image, and it has Chars, Help, Edit, Draw, Paint, SciCalc and Configure in the ROM.
 
+ROO311 was made for [PiArcBoot](https://github.com/jameshansen/PiArcBoot), which starts Archimedes games straight from their disc images on a Raspberry Pi, a Linux PC or Windows, and comes with this ROM.
+
 The whole ROM is one 2MB file. It's unfinished, see [What works](#what-works).
 
 ## Why
 
-I have been creating a number of tools to allow the easy launching of some of my, and my kids' favourite games on the Raspberry Pi, such as [Knytt](https://github.com/jameshansen/PiKnytt) and [Klass of 99](https://github.com/jameshansen/PiKlassOf99), and I have been sharing these projects here for other fans of these lesser known titles. I wanted to add the Risc OS version of Lemmings, along with other games freely released on [JASPP](https://forums.jaspp.org.uk/forum/index.php) to that list. The problem is that these old games require a commercial Risc OS 3.11 ROM, so the ultimate purpose of this project to eliminate that block to releasing a future tool to do this onto GitHub.
+I have been creating a number of tools to allow the easy launching of some of my, and my kids' favourite games on the Raspberry Pi, such as [Knytt](https://github.com/jameshansen/PiKnytt) and [Klass of 99](https://github.com/jameshansen/PiKlassOf99), and I have been sharing these projects here for other fans of these lesser known titles. I wanted to add the Risc OS version of Lemmings, along with other games freely released on [JASPP](https://forums.jaspp.org.uk/forum/index.php) to that list. The problem is that these old games require a commercial Risc OS 3.11 ROM, so the ultimate purpose of this project was to eliminate that block to releasing a tool to do this onto GitHub. That tool is [PiArcBoot](https://github.com/jameshansen/PiArcBoot), and it comes with this ROM.
 
 As such, the goal of this project is four-fold:
 * Support all of the JASPP game releases that supported Risc OS 3.11 out of the box. See [JASPP games](#jaspp-games) for where this stands.
 * Retain the look and feel of RISC OS Open, rather than 3.11.
 * Consider quality of life improvements and other modernizations to be added to the ROM.
-* Tweak ROM to improve integration with any future tools I release if needed.
+* Tweak ROM to improve integration with PiArcBoot, and any future tools I release, if needed.
 
 I also want to give a quick shout out to a similar project called [arclibre](https://github.com/acorn-playground/arclibre/) by James Randall.
 
