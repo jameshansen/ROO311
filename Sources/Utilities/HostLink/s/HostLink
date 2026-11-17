@@ -18,7 +18,7 @@
 ; application, click an icon on the icon bar and put the pointer where the host's pointer is. It
 ; tells the host what the game does once it is started: when the screen mode changes, which is
 ; when a game takes the screen from the desktop, when an error box opens to ask the person
-; something, when a task starts in the desktop, and where the windows on the screen are, so that
+; something, when a task starts or stops in the desktop, and where the windows on the screen are, so that
 ; the host can show just those for a game that plays in a window.
 ;
 ; The host is reached through four SWIs in the chunk the ArcEm emulator answers itself
@@ -36,12 +36,13 @@
 ;                           in the desktop (R1 its handle), 6 the windows on the screen have
 ;                           changed (R1 a block: how many, up to 31, then each one's outline,
 ;                           its borders and all, as x0, y0, x1, y1 in OS units). A backdrop
-;                           window, such as the desktop's own, isn't one of them.
+;                           window, such as the desktop's own, isn't one of them. 7 a task
+;                           stopped (R1 its handle).
 ;   Host_Pointer  (&56AE3)  out: R0 1 with R1, R2 where the pointer is to go in OS units, or 0
 ;
 ; The commands come to a task of the module's own, which the desktop starts as Desktop_HostLink
 ; and which looks for them five times a second. The Wimp's Message_TaskInitialise, sent to every
-; task when one starts, tells it of a new task. The pointer is asked for every centisecond, from
+; task when one starts, tells it of a new task, and Message_TaskCloseDown of one that has stopped. The pointer is asked for every centisecond, from
 ; TickerV, and moved in a callback with OS_Word 21,3. The windows are looked at five times a second too: those in
 ; front of the icon bar, found by going up the window stack from it, as a window's state says
 ; which window is above it.
@@ -113,7 +114,7 @@ Module_Base
         DCD     0
 
 Title   =       "HostLink", 0
-Help    =       "HostLink", 9, 9, "1.04 (15 Nov 2026)", 0
+Help    =       "HostLink", 9, 9, "1.05 (16 Nov 2026)", 0
         ALIGN
 
 Commands
@@ -283,9 +284,13 @@ Loop
         BEQ     %FT80
         LDR     lr, =&400C2             ; Message_TaskInitialise: a task has started
         TEQ     r0, lr
+        MOVEQ   r0, #5
+        BEQ     %FT70
+        ADD     lr, lr, #1              ; Message_TaskCloseDown: a task has stopped
+        TEQ     r0, lr
         BNE     Loop
-        LDR     r1, [r1, #4]            ; its handle
-        MOV     r0, #5
+        MOV     r0, #7
+70      LDR     r1, [r1, #4]            ; its handle, as the message's sender
         SWI     XHost_Event
         B       Loop
 80      LDR     r0, TaskHandle
